@@ -68,7 +68,7 @@
 </rules>
 
 ## 因果推論モデル(MetaLearner以外)の調査
-<title>因果推論モデルの調査</title>
+<title>因果推論モデル(MetaLearner以外)の調査</title>
 <objective>
 因果推論分野でCATE(Conditional Average Treatment Effect)の推定を機械学習モデルを選ばずに行う因果推論モデル(アップリフトモデル)に関する手法を調査する。
 </objective>
@@ -104,7 +104,7 @@
 </rules>
 
 ## Modified Outcome / Class Variable Transformationの調査
-<title>因果推論モデルの調査</title>
+<title>Modified Outcome / Class Variable Transformationの調査</title>
 <objective>
 因果推論分野でCATE(Conditional Average Treatment Effect)の推定を機械学習モデルを選ばずに行う因果推論モデル(アップリフトモデル)に関する手法を調査する。
 目的変数を加工することで、標準的な回帰・分類モデルで直接CATEを学習可能にする手法(Modified Outcome / Class Variable Transformation)を調査する。
@@ -139,3 +139,42 @@
 - 論文のリンクは必ず含める
 - 思考は英語で行うが、出力は日本語で行う
 </rules>
+
+## Custom Lossの調査
+<title>因果推論モデルのCustom Lossの調査</title>
+
+<objective>
+因果推論分野でCATE(Conditional Average Treatment Effect)の推定を機械学習モデルを選ばずに行う因果推論モデル(アップリフトモデル)に関する手法を調査する。
+損失関数をカスタマイズすることで、CATEを直接学習可能にする手法(Custom Loss)を調査する。
+</objective>
+
+<exclusion>
+- CATEの推定精度の向上を目指し、因果構造の解明は対象外
+- ATT(Average Treatment effect on the Treated)の推定は対象外
+- Neural Networkを用いた手法は対象外
+- Causal Forestは対象外
+- 差分プライバシー等の精度以外の目的を持つ手法は対象外
+- MetaLearnerは対象外
+</exclusion>
+
+<goals>
+- Custom Lossのような因果推論分野のアップリフトモデルを調査する。
+- 近年の英語論文のリストを作成する。この際に、できるだけ多くの手法をリスト化することを目指す。
+</goals>
+
+<steps>
+1. 検索を行うためのキーワードを収集する
+2. Google ScholarやarXivでキーワードを用いて論文を検索する
+3. 論文のアブストラクトを確認し、目的に合致するものを選定する
+4. 選定した論文の概要とリンクを日本語でリスト化する
+5. 手法の方向性で分類する
+</steps>
+
+<rules>
+- 論文は英語で書かれたものに限定する
+- 論文の公開日はできるだけ新しいものを優先する（例：過去3年以内）
+- 論文の概要は簡潔にまとめる（3-5文程度）
+- 論文のリンクは必ず含める
+- 思考は英語で行うが、出力は日本語で行う
+</rules>
+

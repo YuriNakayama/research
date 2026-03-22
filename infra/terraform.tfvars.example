@@ -1,0 +1,5 @@
+region           = "ap-northeast-1"
+environment      = "dev"
+project          = "auto_research"
+vpc_id           = "vpc-xxxxxxxxx"
+schedule_enabled = false

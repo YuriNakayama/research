@@ -45,32 +45,30 @@ ENV PATH="/root/.local/bin:${PATH}"
 RUN uv python install 3.13
 
 # =============================================================================
-# Application user (UID=1000 to match EFS access point)
+# Reuse existing node user (UID=1000 to match EFS access point)
 # =============================================================================
-RUN groupadd -g 1000 claude \
-    && useradd -u 1000 -g 1000 -m -s /bin/bash claude \
-    && mkdir -p /home/claude/.local/bin /home/claude/.local/share \
-    && cp /root/.local/bin/uv /home/claude/.local/bin/uv \
-    && cp /root/.local/bin/uvx /home/claude/.local/bin/uvx \
-    && cp -r /root/.local/share/uv /home/claude/.local/share/uv \
-    && chown -R claude:claude /home/claude/.local
+RUN mkdir -p /home/node/.local/bin /home/node/.local/share \
+    && cp /root/.local/bin/uv /home/node/.local/bin/uv \
+    && cp /root/.local/bin/uvx /home/node/.local/bin/uvx \
+    && cp -r /root/.local/share/uv /home/node/.local/share/uv \
+    && chown -R node:node /home/node/.local
 
 # =============================================================================
 # Application code
 # =============================================================================
 WORKDIR /app
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock* ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev 2>/dev/null || uv sync --no-dev
 
 COPY . .
-RUN chown -R claude:claude /app
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown -R node:node /app
 
 # =============================================================================
 # Runtime
 # =============================================================================
-USER claude
-ENV PATH="/home/claude/.local/bin:${PATH}"
+USER node
+ENV PATH="/home/node/.local/bin:${PATH}"
 
-COPY scripts/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

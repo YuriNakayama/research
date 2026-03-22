@@ -208,6 +208,10 @@ resource "aws_ecs_task_definition" "claude_task" {
       image     = "${var.ecr_repository_url}:latest"
       essential = true
 
+      linuxParameters = {
+        initProcessEnabled = true
+      }
+
       mountPoints = [
         {
           sourceVolume  = "claude-config"

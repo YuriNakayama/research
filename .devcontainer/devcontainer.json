@@ -1,0 +1,62 @@
+{
+  "name": "AI Reception (Mobile)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "saoudrizwan.claude-dev"
+      ],
+      "settings": {
+        "editor.fontSize": 6,
+        "editor.lineHeight": 12,
+        "terminal.integrated.fontSize": 6,
+        "workbench.tree.indent": 20,
+        "workbench.activityBar.location": "top",
+        "workbench.sideBar.location": "left",
+        "editor.minimap.enabled": false,
+        "breadcrumbs.enabled": false,
+        "editor.renderWhitespace": "none",
+        "editor.renderLineHighlight": "all",
+        "editor.cursorBlinking": "smooth",
+        "editor.smoothScrolling": true,
+        "workbench.list.smoothScrolling": true,
+        "terminal.integrated.smoothScrolling": true,
+        "editor.mouseWheelZoom": true,
+        "window.zoomLevel": 0,
+        "editor.wordWrap": "on",
+        "editor.wrappingIndent": "indent",
+        "editor.accessibilitySupport": "on",
+        "workbench.colorTheme": "Default Dark Modern",
+        "workbench.reduceMotion": "off",
+        "editor.padding.top": 10,
+        "editor.padding.bottom": 10,
+        "python.defaultInterpreterPath": "/home/node/.local/bin/python"
+      }
+    }
+  },
+  "forwardPorts": [3000, 8000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "Backend",
+      "onAutoForward": "notify"
+    }
+  },
+  "onCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+  "postStartCommand": "bash .devcontainer/scripts/post-start.sh",
+  "remoteUser": "node",
+  "mounts": [
+    "source=ai-reception-pnpm-store,target=/home/node/.local/share/pnpm/store,type=volume"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {}
+  }
+}

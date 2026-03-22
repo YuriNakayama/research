@@ -43,6 +43,8 @@ RUN npm config set prefix /usr/local \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 RUN uv python install 3.13 \
+    && chmod a+x /root /root/.local /root/.local/share /root/.local/share/uv \
+    && chmod -R a+rX /root/.local/share/uv/python \
     && PYTHON_PATH=$(uv python find 3.13) \
     && ln -sf "$PYTHON_PATH" /usr/local/bin/python3 \
     && ln -sf "$PYTHON_PATH" /usr/local/bin/python \

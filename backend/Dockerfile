@@ -43,8 +43,10 @@ RUN npm config set prefix /usr/local \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 RUN uv python install 3.13 \
-    && ln -sf $(uv python find 3.13) /usr/local/bin/python3 \
-    && ln -sf /usr/local/bin/python3 /usr/local/bin/python
+    && PYTHON_PATH=$(uv python find 3.13) \
+    && ln -sf "$PYTHON_PATH" /usr/local/bin/python3 \
+    && ln -sf "$PYTHON_PATH" /usr/local/bin/python \
+    && python3 --version
 
 # =============================================================================
 # Reuse existing node user (UID=1000 to match EFS access point)

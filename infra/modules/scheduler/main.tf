@@ -81,8 +81,8 @@ resource "aws_scheduler_schedule" "daily_research" {
       platform_version    = "LATEST"
 
       network_configuration {
-        assign_public_ip = false
-        subnets          = var.private_subnet_ids
+        assign_public_ip = true
+        subnets          = var.public_subnet_ids
         security_groups  = [var.fargate_sg_id]
       }
     }

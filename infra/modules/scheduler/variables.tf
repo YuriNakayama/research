@@ -18,8 +18,8 @@ variable "task_definition_arn" {
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "Private subnet IDs"
+variable "public_subnet_ids" {
+  description = "Public subnet IDs (Fargate with public IP, no NAT needed)"
   type        = list(string)
 }
 

@@ -31,5 +31,5 @@ variable "github_repo" {
 variable "schedule_enabled" {
   description = "Whether EventBridge schedule is enabled"
   type        = bool
-  default     = false
+  default     = true
 }

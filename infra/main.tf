@@ -101,7 +101,7 @@ module "scheduler" {
   project                 = var.project
   ecs_cluster_arn         = module.ecs.cluster_arn
   task_definition_arn     = module.ecs.task_definition_arn
-  private_subnet_ids      = module.networking.private_subnet_ids
+  public_subnet_ids       = module.networking.public_subnet_ids
   fargate_sg_id           = module.ecs.fargate_sg_id
   task_execution_role_arn = module.ecs.task_execution_role_arn
   task_role_arn           = module.ecs.task_role_arn

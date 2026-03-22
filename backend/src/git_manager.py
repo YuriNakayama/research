@@ -37,8 +37,8 @@ def configure_git(work_dir: str | Path, name: str = "Auto Research Bot", email: 
 
 
 def create_branch(work_dir: str | Path, prefix: str = "research/auto") -> str:
-    """Create and checkout a new feature branch with today's date."""
-    today = datetime.now(tz=timezone.utc).strftime("%Y%m%d")
+    """Create and checkout a new feature branch with today's date and time."""
+    today = datetime.now(tz=timezone.utc).strftime("%Y%m%d-%H%M%S")
     branch_name = f"{prefix}/{today}"
     _run_git(["checkout", "-b", branch_name], cwd=work_dir)
     logger.info("Created branch: %s", branch_name)

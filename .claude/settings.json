@@ -49,7 +49,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/\\.(md|txt)$/.test(p)&&!/(README|CLAUDE|AGENTS|CONTRIBUTING|SKILL)\\.md$/.test(p)&&!/\\.claude\\//.test(p)&&!/feature-plan-workspace\\//.test(p)&&!/docs\\/plans\\//.test(p)){console.error('[Hook] BLOCKED: Unnecessary documentation file creation');console.error('[Hook] File: '+p);process.exit(2)}})\""
+                        "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/\\.(md|txt)$/.test(p)&&!/(README|CLAUDE|AGENTS|CONTRIBUTING|SKILL)\\.md$/.test(p)&&!/\\.claude\\//.test(p)&&!/feature-plan-workspace\\//.test(p)&&!/docs\\/plans\\//.test(p)&&!/docs\\/research\\//.test(p)){console.error('[Hook] BLOCKED: Unnecessary documentation file creation');console.error('[Hook] File: '+p);process.exit(2)}})\""
                     }
                 ],
                 "description": "Block creation of random .md files - keeps docs consolidated"

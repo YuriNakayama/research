@@ -73,6 +73,6 @@ RUN chmod +x /entrypoint.sh && chown -R node:node /app
 # Runtime
 # =============================================================================
 USER node
-ENV PATH="/home/node/.local/bin:${PATH}"
+ENV PATH="/app/.venv/bin:/home/node/.local/bin:${PATH}"
 
 CMD ["/entrypoint.sh"]

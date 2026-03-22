@@ -1,0 +1,16 @@
+research:
+  prompt_path: "docs/research/cate/metalearner/prompt/search_paper.md"
+  output_dir: "docs/research/cate/metalearner"
+  branch_prefix: "research/auto"
+  claude_options: ""
+  skill: ""
+
+github:
+  repo: "YuriNakayama/research"
+  base_branch: "main"
+
+email:
+  sender: "yuri620620@gmail.com"
+  recipients:
+    - "yuri.nakayama@g.softbank.co.jp"
+    - "yuri620620@gmail.com"

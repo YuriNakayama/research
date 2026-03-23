@@ -12,6 +12,7 @@ from pathlib import Path
 import boto3
 import markdown
 from fpdf import FPDF
+from fpdf.fonts import FontFace
 
 logger = logging.getLogger(__name__)
 
@@ -92,8 +93,18 @@ def _markdown_to_pdf(md_path: Path) -> bytes:
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font(pdf.default_font_family, size=10)
-    pdf.write_html(html_body)
+    font = pdf.default_font_family
+    pdf.set_font(font, size=10)
+    tag_styles = {
+        "h1": FontFace(family=font, size_pt=20),
+        "h2": FontFace(family=font, size_pt=16),
+        "h3": FontFace(family=font, size_pt=14),
+        "h4": FontFace(family=font, size_pt=12),
+        "p": FontFace(family=font, size_pt=10),
+        "li": FontFace(family=font, size_pt=10),
+        "code": FontFace(family=font, size_pt=9),
+    }
+    pdf.write_html(html_body, tag_styles=tag_styles, font_family=font)
     return bytes(pdf.output())
 
 
@@ -120,21 +131,27 @@ def notify_success(
         f"Output files:\n{files_text}\n"
     )
 
-    pdf_attachments: list[tuple[str, bytes]] = []
+    attachments: list[tuple[str, bytes]] = []
     if work_dir:
         work_dir = Path(work_dir)
         for rel_path in output_files:
             md_file = work_dir / rel_path
             if md_file.exists() and md_file.suffix == ".md":
+                # Attach original Markdown
+                md_bytes = md_file.read_bytes()
+                attachments.append((md_file.name, md_bytes))
+                logger.info("Attached Markdown: %s (%d bytes)", md_file.name, len(md_bytes))
+
+                # Attach PDF conversion
                 try:
                     pdf_bytes = _markdown_to_pdf(md_file)
                     pdf_name = md_file.with_suffix(".pdf").name
-                    pdf_attachments.append((pdf_name, pdf_bytes))
+                    attachments.append((pdf_name, pdf_bytes))
                     logger.info("Generated PDF: %s (%d bytes)", pdf_name, len(pdf_bytes))
                 except Exception:
                     logger.exception("Failed to generate PDF for %s", rel_path)
 
-    _send(region, sender, recipients, subject, body, attachments=pdf_attachments)
+    _send(region, sender, recipients, subject, body, attachments=attachments)
     logger.info("Success notification sent to %d recipients", len(recipients))
 
 

@@ -48,7 +48,9 @@ class TestNotifySuccess:
         call_kwargs = mock_client.send_raw_email.call_args[1]
         assert call_kwargs["Source"] == "sender@example.com"
         assert call_kwargs["Destinations"] == ["user@example.com"]
-        assert "report.pdf" in call_kwargs["RawMessage"]["Data"]
+        raw_data = call_kwargs["RawMessage"]["Data"]
+        assert "report.md" in raw_data
+        assert "report.pdf" in raw_data
 
     @patch("src.email_notifier._get_ses_client")
     def test_falls_back_to_plain_when_pdf_fails(self, mock_client_factory: MagicMock, tmp_path: Path) -> None:

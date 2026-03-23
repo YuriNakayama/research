@@ -175,7 +175,7 @@ resource "aws_iam_role_policy" "task_ses" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = ["ses:SendEmail"]
+        Action   = ["ses:SendEmail", "ses:SendRawEmail"]
         Resource = "*"
       }
     ]

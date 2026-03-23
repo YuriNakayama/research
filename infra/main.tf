@@ -37,7 +37,6 @@ module "networking" {
 
   environment = var.environment
   project     = var.project
-  vpc_id      = var.vpc_id
 }
 
 # =============================================================================

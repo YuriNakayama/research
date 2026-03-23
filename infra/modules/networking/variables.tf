@@ -8,7 +8,8 @@ variable "project" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "Existing VPC ID to use"
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
   type        = string
+  default     = "10.1.0.0/16"
 }

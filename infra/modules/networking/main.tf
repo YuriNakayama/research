@@ -1,34 +1,88 @@
 # =============================================================================
-# Use existing VPC (shared with ai-reception)
-#
-# TODO: ai-reception VPCへの依存を解消し、専用VPCに移行する
-#   - VPC数の上限緩和申請（現在5/5で上限到達）
-#   - 専用VPC + サブネット + NAT Gatewayを作成（月額+$32程度）
-#   - EFS マウントターゲット、ECS タスクのサブネット/SGを新VPCに切り替え
-#   - 移行後、vpc_id変数のデフォルト値と本ファイルのdata sourceを更新
+# VPC
 # =============================================================================
-data "aws_vpc" "main" {
-  id = var.vpc_id
-}
-
-data "aws_subnets" "public" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
-    Name = "*public*"
+    Name = "${var.project}_${var.environment}_vpc"
   }
 }
 
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
+# =============================================================================
+# Internet Gateway
+# =============================================================================
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project}_${var.environment}_igw"
+  }
+}
+
+# =============================================================================
+# Availability Zones
+# =============================================================================
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+locals {
+  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+}
+
+# =============================================================================
+# Public Subnets
+# =============================================================================
+resource "aws_subnet" "public" {
+  count = length(local.azs)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone       = local.azs[count.index]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project}_${var.environment}_public_${local.azs[count.index]}"
+  }
+}
+
+# =============================================================================
+# Private Subnets (for EFS mount targets)
+# =============================================================================
+resource "aws_subnet" "private" {
+  count = length(local.azs)
+
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  availability_zone = local.azs[count.index]
+
+  tags = {
+    Name = "${var.project}_${var.environment}_private_${local.azs[count.index]}"
+  }
+}
+
+# =============================================================================
+# Route Table (public subnets → Internet Gateway)
+# =============================================================================
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
   }
 
   tags = {
-    Name = "*private*"
+    Name = "${var.project}_${var.environment}_public_rt"
   }
+}
+
+resource "aws_route_table_association" "public" {
+  count = length(aws_subnet.public)
+
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
 }

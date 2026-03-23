@@ -42,7 +42,7 @@ def run_research(
     prompt_content = prompt_file.read_text(encoding="utf-8")
     logger.info("Loaded prompt from %s (%d chars)", prompt_path, len(prompt_content))
 
-    cmd = ["claude", "-p", prompt_content]
+    cmd = ["claude", "-p", prompt_content, "--allowedTools", "WebSearch", "WebFetch"]
     if claude_options:
         cmd.extend(claude_options.split())
 

@@ -87,6 +87,7 @@ def main() -> int:
                 region=config.aws_region,
                 sender=config.email.sender,
                 recipients=config.email.recipients,
+                work_dir=work_dir,
             )
         except Exception:
             logger.exception("Failed to send email notification (non-fatal)")

@@ -7,6 +7,12 @@ data "aws_caller_identity" "current" {}
 resource "aws_ecs_cluster" "main" {
   name = "${var.project}_${var.environment}"
 
+  configuration {
+    execute_command_configuration {
+      logging = "DEFAULT"
+    }
+  }
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -169,7 +175,7 @@ resource "aws_iam_role_policy" "task_ses" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = ["ses:SendEmail"]
+        Action   = ["ses:SendEmail", "ses:SendRawEmail"]
         Resource = "*"
       }
     ]

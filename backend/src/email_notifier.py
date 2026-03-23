@@ -1,13 +1,65 @@
-"""Email notification via Amazon SES."""
+"""Email notification via Amazon SES with PDF attachment support."""
 
 from __future__ import annotations
 
 import logging
 import os
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
 
 import boto3
+import markdown
+from fpdf import FPDF
 
 logger = logging.getLogger(__name__)
+
+_JAPANESE_FONT_CANDIDATES = [
+    # macOS
+    "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+    "/System/Library/Fonts/Hiragino Sans GB.ttc",
+    # Linux (Debian/Ubuntu - noto-cjk package)
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/noto-cjk/NotoSansCJKjp-Regular.otf",
+    "/usr/share/fonts/truetype/noto/NotoSansCJKjp-Regular.ttf",
+]
+
+
+def _find_japanese_font() -> str | None:
+    """Find an available Japanese font on the system."""
+    for path in _JAPANESE_FONT_CANDIDATES:
+        if Path(path).exists():
+            return path
+    return None
+
+
+class _MarkdownPDF(FPDF):
+    """Simple PDF generator from Markdown via HTML with Japanese support."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._jp_font_name: str | None = None
+        font_path = _find_japanese_font()
+        if font_path:
+            self.add_font("JapaneseFont", "", font_path)
+            self.add_font("JapaneseFont", "B", font_path)
+            self.add_font("JapaneseFont", "I", font_path)
+            self.add_font("JapaneseFont", "BI", font_path)
+            self._jp_font_name = "JapaneseFont"
+            logger.info("Using Japanese font: %s", font_path)
+
+    @property
+    def default_font_family(self) -> str:
+        return self._jp_font_name or "Helvetica"
+
+    def header(self) -> None:
+        pass
+
+    def footer(self) -> None:
+        self.set_y(-15)
+        self.set_font(self.default_font_family, size=8)
+        self.cell(0, 10, f"Page {self.page_no()}/{{nb}}", align="C")
 
 
 def _get_ses_client(region: str) -> boto3.client:
@@ -28,14 +80,32 @@ def _get_sender(config_sender: str = "") -> str:
     return os.environ.get("EMAIL_SENDER", config_sender)
 
 
+def _markdown_to_pdf(md_path: Path) -> bytes:
+    """Convert a Markdown file to PDF bytes."""
+    md_text = md_path.read_text(encoding="utf-8")
+    html_body = markdown.markdown(
+        md_text,
+        extensions=["tables", "fenced_code"],
+    )
+
+    pdf = _MarkdownPDF()
+    pdf.alias_nb_pages()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font(pdf.default_font_family, size=10)
+    pdf.write_html(html_body)
+    return bytes(pdf.output())
+
+
 def notify_success(
     pr_url: str,
     output_files: list[str],
     region: str = "ap-northeast-1",
     sender: str = "",
     recipients: list[str] | None = None,
+    work_dir: str | Path | None = None,
 ) -> None:
-    """Send a success notification email."""
+    """Send a success notification email with PDF attachment."""
     sender = _get_sender(sender)
     recipients = _get_recipients(recipients)
     if not sender or not recipients:
@@ -50,7 +120,21 @@ def notify_success(
         f"Output files:\n{files_text}\n"
     )
 
-    _send(region, sender, recipients, subject, body)
+    pdf_attachments: list[tuple[str, bytes]] = []
+    if work_dir:
+        work_dir = Path(work_dir)
+        for rel_path in output_files:
+            md_file = work_dir / rel_path
+            if md_file.exists() and md_file.suffix == ".md":
+                try:
+                    pdf_bytes = _markdown_to_pdf(md_file)
+                    pdf_name = md_file.with_suffix(".pdf").name
+                    pdf_attachments.append((pdf_name, pdf_bytes))
+                    logger.info("Generated PDF: %s (%d bytes)", pdf_name, len(pdf_bytes))
+                except Exception:
+                    logger.exception("Failed to generate PDF for %s", rel_path)
+
+    _send(region, sender, recipients, subject, body, attachments=pdf_attachments)
     logger.info("Success notification sent to %d recipients", len(recipients))
 
 
@@ -78,14 +162,41 @@ def notify_failure(
     logger.info("Failure notification sent to %d recipients", len(recipients))
 
 
-def _send(region: str, sender: str, recipients: list[str], subject: str, body: str) -> None:
-    """Send an email via SES."""
+def _send(
+    region: str,
+    sender: str,
+    recipients: list[str],
+    subject: str,
+    body: str,
+    attachments: list[tuple[str, bytes]] | None = None,
+) -> None:
+    """Send an email via SES, using raw email when attachments are present."""
     client = _get_ses_client(region)
-    client.send_email(
+
+    if not attachments:
+        client.send_email(
+            Source=sender,
+            Destination={"ToAddresses": recipients},
+            Message={
+                "Subject": {"Data": subject, "Charset": "UTF-8"},
+                "Body": {"Text": {"Data": body, "Charset": "UTF-8"}},
+            },
+        )
+        return
+
+    msg = MIMEMultipart("mixed")
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = ", ".join(recipients)
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    for filename, data in attachments:
+        part = MIMEApplication(data, Name=filename)
+        part["Content-Disposition"] = f'attachment; filename="{filename}"'
+        msg.attach(part)
+
+    client.send_raw_email(
         Source=sender,
-        Destination={"ToAddresses": recipients},
-        Message={
-            "Subject": {"Data": subject, "Charset": "UTF-8"},
-            "Body": {"Text": {"Data": body, "Charset": "UTF-8"}},
-        },
+        Destinations=recipients,
+        RawMessage={"Data": msg.as_string()},
     )

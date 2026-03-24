@@ -1,63 +1,90 @@
-# AI Reception
+# Auto Research Pipeline
 
-Real-time voice interaction reception system using OpenAI Realtime API.
-AI provides general legal information (not legal advice). Refers users to professionals when needed.
+Automated research pipeline that runs daily via ECS Fargate, executes research prompts using Claude CLI, and delivers results as GitHub Pull Requests with Slack/email notifications.
 
 ## Architecture
 
 ```
-Browser (User)
-  ↕ WebSocket / HTTPS
-Frontend (Next.js on AWS Amplify)
-  ↕ WebSocket / REST API
-Backend (FastAPI on ECS Fargate)
-  ↕ WebSocket
-OpenAI Realtime API
+EventBridge Scheduler (cron: JST 09:00)
+  ↓ RunTask
+ECS Fargate Task (Private Subnet)
+  ├── Claude CLI (claude -p) — research execution
+  ├── git clone/push — branch & commit
+  ├── gh pr create — Pull Request creation
+  └── Slack/Email notification
+  ↕ mount
+EFS (/claude-config) — Claude CLI auth persistence
+
+External:
+  Secrets Manager — GitHub App key, Slack Webhook
+  ECR — Docker image (auto-research-task)
+  CloudWatch Logs — /ecs/auto-research
 ```
 
 ## Technology Stack
 
-- **Frontend**: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS 3.4, Zod
-- **Backend**: Python 3.13, FastAPI, Uvicorn, OpenAI Agents SDK, SQLAlchemy, Boto3
-- **Auth**: AWS Cognito (JWT tokens)
-- **Database**: DynamoDB (production), SQLite (local development)
-- **Infrastructure**: AWS (ECS Fargate, ALB, ECR, Amplify, Cognito, DynamoDB), Terraform
-- **Testing**: Jest + Testing Library (unit), Playwright (E2E), Pytest + moto (backend)
-- **Package Management**: UV (Python), pnpm (Node.js)
+- **Backend**: Python 3.12+, PyYAML, PyJWT, Requests, Boto3, fpdf2, Markdown
+- **Container**: Docker (node:22-bookworm-slim base), Claude CLI, gh CLI, UV
+- **Infrastructure**: AWS (ECS Fargate, EFS, ECR, EventBridge Scheduler, Secrets Manager, CloudWatch), Terraform
+- **CI/CD**: GitHub Actions (ci-backend.yml)
+- **Auth**: GitHub App (JWT → installation token)
+- **Testing**: Pytest + pytest-cov, Ruff, Mypy
+- **Package Management**: UV (Python)
 
 ## Folder Structure
 
 ```
-dev/                 Development scripts (setup, start, lint, format, test)
-frontend/src/
-  app/             Pages and layouts (App Router)
-  components/      React components (feature-based subdirectories)
-  hooks/           Custom hooks (useVoiceChat, useSummaryList, useVoiceTrial)
-  contexts/        React Context (auth, chatSession)
-  services/        API clients and external integrations (auth, session, audio/, websocket/)
-  types/           TypeScript type definitions with Zod schemas
-  config/          Environment and agent configuration
-backend/src/
-  presentation/    FastAPI endpoints and Pydantic request/response models
-  application/     Business logic and use cases (realtime, session, summary)
-  domain/          Core domain models and prompt templates
-  infrastructure/  External integrations (cognito, bedrock, dynamodb, openai, websocket)
-  core/            Cross-cutting concerns (logging, security, config)
+backend/
+  Dockerfile               Fargate task Docker image
+  pyproject.toml            Python dependencies (UV managed)
+  uv.lock                   Lock file
+  src/
+    main.py                 Entrypoint: orchestrates full pipeline
+    config.py               YAML config + env var loading
+    research_runner.py       Claude CLI execution logic
+    git_manager.py           git clone/branch/commit/push operations
+    github_auth.py           GitHub App auth (JWT → token)
+    pr_creator.py            gh CLI PR creation
+    email_notifier.py        Email notification (SES/SMTP)
+  config/
+    research-config.yaml     Research settings (prompt path, output dir, branch prefix)
+  scripts/
+    entrypoint.sh            Container entrypoint (EFS link, GitHub auth, main.py)
+  tests/                     Pytest unit tests
 infra/
-  environments/    Environment configs (dev, staging, prod, state)
-  modules/         Terraform modules (foundation, platform, applications)
+  main.tf                    Root module (provider, backend)
+  variables.tf               Input variables
+  outputs.tf                 Output values
+  terraform.tfvars.example   Sample tfvars
+  modules/
+    networking/              VPC, subnets, NAT gateway
+    efs/                     EFS file system, access point
+    ecr/                     ECR repository
+    ecs/                     ECS cluster, task definition, IAM roles
+    scheduler/               EventBridge Scheduler
+    secrets/                 Secrets Manager
+    monitoring/              CloudWatch Logs
+    cicd/                    CI/CD pipeline resources
+  scripts/
+    init-efs.sh              EFS initial setup (Claude CLI login)
+dev/                         Development scripts
+  setup                      Install dependencies (uv sync)
+  format                     Code formatting (ruff)
+  lint                       Static analysis (ruff + mypy)
+  test-backend               Backend CI (format check → lint → type check → pytest)
+  create-worktree            Create git worktree with .env copy
+docs/
+  plans/                     Feature plans
+  research/                  Research prompts and outputs
 ```
 
 ## Commands
 
 ```bash
-dev/setup            # Install dependencies (pnpm install + uv sync)
-dev/start-frontend   # Start frontend with Mockoon (port args: [web] [mockoon])
-dev/format           # Code formatting (backend: ruff, frontend: prettier)
-dev/lint             # Static analysis (backend: ruff + mypy, frontend: eslint)
+dev/setup            # Install dependencies (uv sync in backend/)
+dev/format           # Code formatting (backend: ruff)
+dev/lint             # Static analysis (backend: ruff + mypy)
 dev/test-backend     # Backend CI (format check → lint → type check → pytest)
-dev/test-frontend    # Frontend CI (type-check → format:check → lint → Mockoon + Playwright)
-dev/test-e2e         # E2E tests (Playwright browser install → test execution)
 dev/create-worktree  # Create git worktree with .env copy
 ```
 
@@ -65,11 +92,20 @@ dev/create-worktree  # Create git worktree with .env copy
 
 | Term | Description |
 |------|-------------|
-| Reception | Intake function that receives user consultations |
-| Session | Conversation session between user and AI |
-| Agent | Backend AI agent that handles consultations by topic |
-| Handoff | Transfer between agents based on conversation content |
-| Tool | External tool or function call used by agents |
+| Research Prompt | Markdown file defining research topic, executed by Claude CLI |
+| Research Runner | Module that executes `claude -p` with prompt file |
+| GitHub App | Authentication mechanism for git push and PR creation |
+| EFS | Elastic File System, persists Claude CLI auth across Fargate tasks |
+| EventBridge Scheduler | AWS service for cron-based Fargate task scheduling |
+
+## Rules
+
+| Rule file | Auto-loaded for | When to read manually |
+|-----------|----------------|----------------------|
+| `.claude/rules/backend.md` | `backend/**` | Python code changes, Dockerfile edits, pytest, ruff/mypy configuration |
+| `.claude/rules/infra.md` | `infra/**` | Terraform changes, AWS resource design, module structure decisions |
+| `.claude/rules/frontend.md` | `frontend/**` | Not applicable to this project (legacy, from previous AI Reception project) |
+| `.claude/rules/security.md` | Always loaded | Commits, secret handling, IAM design, network security, CI/CD pipeline changes |
 
 ## Response Language
 

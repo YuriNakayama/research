@@ -65,6 +65,25 @@ class TestRunResearch:
             )
 
     @patch("src.research_runner.subprocess.run")
+    def test_strips_preamble_before_heading(self, mock_run: MagicMock, work_dir: Path) -> None:
+        mock_run.return_value = CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout="ファイル書き込みの許可が必要です。レポートの内容を以下に表示します。\n\n---\n\n# Research Report\n\nFindings here.",
+            stderr="",
+        )
+
+        output = run_research(
+            prompt_path="docs/research/prompt.md",
+            output_dir="docs/research/output",
+            work_dir=work_dir,
+        )
+
+        content = output.read_text()
+        assert content.startswith("# Research Report")
+        assert "ファイル書き込みの許可" not in content
+
+    @patch("src.research_runner.subprocess.run")
     def test_empty_output(self, mock_run: MagicMock, work_dir: Path) -> None:
         mock_run.return_value = CompletedProcess(
             args=[],

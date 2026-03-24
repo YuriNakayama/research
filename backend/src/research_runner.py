@@ -60,6 +60,14 @@ def run_research(
         raise RuntimeError(f"Claude CLI failed with exit code {result.returncode}: {result.stderr}")
 
     output = result.stdout
+    # Claude CLI may prepend permission-related messages when it cannot
+    # write files in non-interactive mode. Strip everything before the
+    # first Markdown heading so only the report remains.
+    heading_pos = output.find("\n# ")
+    if heading_pos != -1 and not output.lstrip().startswith("#"):
+        logger.warning("Stripped %d chars of preamble from Claude CLI output", heading_pos)
+        output = output[heading_pos + 1 :]
+
     if not output or len(output.strip()) < 10:
         raise RuntimeError("Claude CLI produced empty or too short output")
 

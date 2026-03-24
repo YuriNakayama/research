@@ -13,8 +13,8 @@ from src.github_auth import _generate_jwt, _get_installation_token, get_github_t
 class TestGenerateJWT:
     def test_generates_valid_jwt(self) -> None:
         # RSA key pair for testing
-        from cryptography.hazmat.primitives.asymmetric import rsa
         from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
 
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         pem = private_key.private_bytes(

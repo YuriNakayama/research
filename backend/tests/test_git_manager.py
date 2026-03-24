@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from subprocess import CompletedProcess
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
-from src.git_manager import clone_repo, commit_and_push, configure_git, create_branch, has_changes
+from src.git_manager import clone_repo, commit_and_push, create_branch, has_changes
 
 
 class TestCloneRepo:

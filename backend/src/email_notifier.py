@@ -125,11 +125,7 @@ def notify_success(
 
     files_text = "\n".join(f"  - {f}" for f in output_files)
     subject = "[Auto Research] Report generated successfully"
-    body = (
-        "Auto Research Pipeline completed successfully.\n\n"
-        f"PR: {pr_url}\n\n"
-        f"Output files:\n{files_text}\n"
-    )
+    body = f"Auto Research Pipeline completed successfully.\n\nPR: {pr_url}\n\nOutput files:\n{files_text}\n"
 
     attachments: list[tuple[str, bytes]] = []
     if work_dir:
@@ -169,11 +165,7 @@ def notify_failure(
         return
 
     subject = "[Auto Research] Pipeline failed"
-    body = (
-        "Auto Research Pipeline failed.\n\n"
-        f"Error: {error}\n\n"
-        "Check CloudWatch Logs for details.\n"
-    )
+    body = f"Auto Research Pipeline failed.\n\nError: {error}\n\nCheck CloudWatch Logs for details.\n"
 
     _send(region, sender, recipients, subject, body)
     logger.info("Failure notification sent to %d recipients", len(recipients))

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def create_pr(
         The PR URL.
     """
     work_dir = Path(work_dir)
-    today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
 
     title = f"[Auto Research] {today}"
 
@@ -43,20 +43,28 @@ def create_pr(
         for f in output_files:
             body_parts.append(f"- `{f}`")
 
-    body_parts.extend([
-        "",
-        "---",
-        "Generated automatically by Auto Research Pipeline",
-    ])
+    body_parts.extend(
+        [
+            "",
+            "---",
+            "Generated automatically by Auto Research Pipeline",
+        ]
+    )
 
     body = "\n".join(body_parts)
 
     cmd = [
-        "gh", "pr", "create",
-        "--title", title,
-        "--body", body,
-        "--base", base_branch,
-        "--head", branch_name,
+        "gh",
+        "pr",
+        "create",
+        "--title",
+        title,
+        "--body",
+        body,
+        "--base",
+        base_branch,
+        "--head",
+        branch_name,
     ]
 
     logger.info("Creating PR: %s", title)

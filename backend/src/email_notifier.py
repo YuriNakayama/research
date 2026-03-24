@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -16,39 +17,44 @@ from fpdf.fonts import FontFace
 
 logger = logging.getLogger(__name__)
 
-_JAPANESE_FONT_CANDIDATES = [
+_JAPANESE_FONT_CANDIDATES: list[tuple[str, int]] = [
+    # (path, collection_font_number) — index 0 = Japanese variant
     # macOS
-    "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
-    "/System/Library/Fonts/Hiragino Sans GB.ttc",
-    # Linux (Debian/Ubuntu - noto-cjk package)
-    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-    "/usr/share/fonts/noto-cjk/NotoSansCJKjp-Regular.otf",
-    "/usr/share/fonts/truetype/noto/NotoSansCJKjp-Regular.ttf",
+    ("/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc", 0),
+    ("/System/Library/Fonts/Hiragino Sans GB.ttc", 0),
+    # Linux (Debian/Ubuntu - fonts-noto-cjk package)
+    ("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 0),
+    # Single-font files
+    ("/usr/share/fonts/noto-cjk/NotoSansCJKjp-Regular.otf", 0),
+    ("/usr/share/fonts/truetype/noto/NotoSansCJKjp-Regular.ttf", 0),
 ]
 
 
-def _find_japanese_font() -> str | None:
-    """Find an available Japanese font on the system."""
-    for path in _JAPANESE_FONT_CANDIDATES:
+def _find_japanese_font() -> tuple[str, int] | None:
+    """Find an available Japanese font. Returns (path, collection_font_number)."""
+    for path, index in _JAPANESE_FONT_CANDIDATES:
         if Path(path).exists():
-            return path
+            return path, index
     return None
 
 
 class _MarkdownPDF(FPDF):
-    """Simple PDF generator from Markdown via HTML with Japanese support."""
+    """Simple PDF generator from Markdown via HTML with Japanese support.
+
+    Only registers the Regular style to avoid fpdf2's CID collision issue
+    when the same .ttc file is registered for multiple styles (B/I/BI).
+    Bold and italic are rendered with the same Regular font glyphs.
+    """
 
     def __init__(self) -> None:
         super().__init__()
         self._jp_font_name: str | None = None
-        font_path = _find_japanese_font()
-        if font_path:
-            self.add_font("JapaneseFont", "", font_path)
-            self.add_font("JapaneseFont", "B", font_path)
-            self.add_font("JapaneseFont", "I", font_path)
-            self.add_font("JapaneseFont", "BI", font_path)
+        result = _find_japanese_font()
+        if result:
+            font_path, font_index = result
+            self.add_font("JapaneseFont", "", font_path, collection_font_number=font_index)
             self._jp_font_name = "JapaneseFont"
-            logger.info("Using Japanese font: %s", font_path)
+            logger.info("Using Japanese font: %s (index=%d)", font_path, font_index)
 
     @property
     def default_font_family(self) -> str:
@@ -81,6 +87,10 @@ def _get_sender(config_sender: str = "") -> str:
     return os.environ.get("EMAIL_SENDER", config_sender)
 
 
+_STRIP_STYLE_TAGS_RE = re.compile(r"</?(?:strong|em|b|i)(?:\s[^>]*)?>")
+_TH_TO_TD_RE = re.compile(r"<(/?)th(\s[^>]*)?>", re.IGNORECASE)
+
+
 def _markdown_to_pdf(md_path: Path) -> bytes:
     """Convert a Markdown file to PDF bytes."""
     md_text = md_path.read_text(encoding="utf-8")
@@ -88,6 +98,11 @@ def _markdown_to_pdf(md_path: Path) -> bytes:
         md_text,
         extensions=["tables", "fenced_code"],
     )
+    # Strip bold/italic tags and convert <th> to <td> to avoid fpdf2
+    # requesting B/I font styles, which causes CID collisions when
+    # the same .ttc font file is registered only as Regular.
+    html_body = _STRIP_STYLE_TAGS_RE.sub("", html_body)
+    html_body = _TH_TO_TD_RE.sub(r"<\1td>", html_body)
 
     pdf = _MarkdownPDF()
     pdf.alias_nb_pages()

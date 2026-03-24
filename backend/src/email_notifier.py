@@ -87,7 +87,7 @@ def _get_sender(config_sender: str = "") -> str:
     return os.environ.get("EMAIL_SENDER", config_sender)
 
 
-_STRIP_STYLE_TAGS_RE = re.compile(r"</?(?:strong|em|b|i)(?:\s[^>]*)?>")
+_STRIP_STYLE_TAGS_RE = re.compile(r"</?(?:strong|em|b|i|code)(?:\s[^>]*)?>")
 _TH_TO_TD_RE = re.compile(r"<(/?)th(\s[^>]*)?>", re.IGNORECASE)
 
 

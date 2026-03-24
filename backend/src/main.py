@@ -9,11 +9,11 @@ import tempfile
 from pathlib import Path
 
 from src.config import load_config
+from src.email_notifier import notify_failure, notify_success
 from src.git_manager import clone_repo, commit_and_push, configure_git, create_branch
 from src.github_auth import get_github_token
 from src.pr_creator import create_pr
 from src.research_runner import run_research
-from src.email_notifier import notify_failure, notify_success
 
 logger = logging.getLogger(__name__)
 

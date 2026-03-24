@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import subprocess
+from datetime import UTC
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -63,9 +64,9 @@ def run_research(
     if not output or len(output.strip()) < 10:
         raise RuntimeError("Claude CLI produced empty or too short output")
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    today = datetime.now(tz=timezone.utc).strftime("%Y%m%d")
+    today = datetime.now(tz=UTC).strftime("%Y%m%d")
     output_file = output_directory / f"report-{today}.md"
     output_file.write_text(output, encoding="utf-8")
     logger.info("Saved output to %s (%d chars)", output_file, len(output))

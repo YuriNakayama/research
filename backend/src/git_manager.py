@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,9 @@ def clone_repo(repo_url: str, dest: str | Path, token: str | None = None) -> Pat
     return dest
 
 
-def configure_git(work_dir: str | Path, name: str = "Auto Research Bot", email: str = "auto-research@noreply.github.com") -> None:
+def configure_git(
+    work_dir: str | Path, name: str = "Auto Research Bot", email: str = "auto-research@noreply.github.com"
+) -> None:
     """Configure git user name and email."""
     _run_git(["config", "user.name", name], cwd=work_dir)
     _run_git(["config", "user.email", email], cwd=work_dir)
@@ -38,7 +40,7 @@ def configure_git(work_dir: str | Path, name: str = "Auto Research Bot", email: 
 
 def create_branch(work_dir: str | Path, prefix: str = "research/auto") -> str:
     """Create and checkout a new feature branch with today's date and time."""
-    today = datetime.now(tz=timezone.utc).strftime("%Y%m%d-%H%M%S")
+    today = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S")
     branch_name = f"{prefix}/{today}"
     _run_git(["checkout", "-b", branch_name], cwd=work_dir)
     logger.info("Created branch: %s", branch_name)
@@ -62,7 +64,7 @@ def commit_and_push(work_dir: str | Path, branch_name: str, message: str | None 
         logger.warning("No changes to commit")
         return
 
-    today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
     if message is None:
         message = f"[Auto Research] {today}"
 

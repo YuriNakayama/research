@@ -1,88 +1,91 @@
 ---
-description: E2E テスト（Playwright）の状況を確認し、失敗時は原因を特定して修正する
+description: Check E2E test (Playwright) status and identify/fix failures when detected
 ---
 
 # E2E Fix
 
-GitHub Actions 上の E2E テスト（Playwright）の状況を確認し、失敗している場合は原因を特定して修正する。
+Check the status of E2E tests (Playwright) on GitHub Actions, identify failure causes, and apply fixes.
 
-## 手順
+## Steps
 
-### 1. E2E ワークフローの実行状況を確認
+### 1. Check E2E workflow run status
 
 ```bash
 gh run list --workflow=e2e.yml --limit=5
 ```
 
-### 2. 失敗している場合はログを確認
+### 2. If failing, check logs
 
 ```bash
-# 失敗した run の詳細ログを取得
+# Get detailed logs for the failed run
 gh run view <run-id> --log-failed
 
-# テストレポート（アーティファクト）をダウンロード
+# Download test report (artifact)
 gh run download <run-id> -n playwright-report -D /tmp/playwright-report
 ```
 
-### 3. 失敗原因の分析
+### 3. Analyze failure cause
 
-#### よくある失敗パターン
+#### Common failure patterns
 
-| パターン | 原因 | 対処法 |
-|---------|------|--------|
-| Timeout | ページロード遅延、要素未表示 | waitFor のタイムアウトを調整、セレクタを確認 |
-| Element not found | セレクタ変更、DOM 構造変更 | `data-testid` の確認、セレクタ修正 |
-| Navigation error | URL 変更、リダイレクト変更 | ルーティング確認 |
-| Auth failure | 認証情報の期限切れ | SSM パラメータの確認（要 AWS アクセス） |
-| Flaky test | 非同期処理の競合 | `waitForSelector`、`waitForResponse` の追加 |
-| Environment issue | デプロイ未完了、サービス停止 | 対象環境の状態を確認 |
+| Pattern | Cause | Remedy |
+|---------|-------|--------|
+| Timeout | Page load delay, element not visible | Adjust waitFor timeout, verify selector |
+| Element not found | Selector changed, DOM structure changed | Check `data-testid`, fix selector |
+| Navigation error | URL changed, redirect changed | Verify routing |
+| Auth failure | Credentials expired | Check SSM parameters (requires AWS access) |
+| Flaky test | Async race condition | Add `waitForSelector`, `waitForResponse` |
+| Environment issue | Deployment not complete, service down | Check target environment status |
 
-### 4. テストコードの確認と修正
+### 4. Check and fix test code
 
 ```bash
-# E2E テストファイルの確認
+# Check E2E test files
 ls frontend/tests/
 
-# ローカルでの実行（Mockoon モック使用、dev スクリプト経由）
+# Local execution (using Mockoon mock, via dev script)
 dev/test-frontend
 
-# 特定テストのデバッグ実行
+# Debug execution for a specific test
 cd frontend && npx playwright test --debug <test-file>
 
-# headed モードで視覚確認
+# Visual verification in headed mode
 cd frontend && npx playwright test --headed <test-file>
 ```
 
-### 5. Playwright レポートの確認
+### 5. Check Playwright report
 
 ```bash
-# ダウンロードしたレポートを開く
+# Open the downloaded report
 cd frontend && npx playwright show-report /tmp/playwright-report
 ```
 
-### 6. 修正後の検証
+### 6. Verify after fix
 
 ```bash
-# ローカルで全テストを実行（Mockoon 起動 + Playwright）
+# Run all tests locally (Mockoon startup + Playwright)
 dev/test-frontend
 ```
 
-### 7. 修正をコミット・プッシュして再実行
+### 7. Commit and push fix to re-run
 
-ユーザーに確認の上、修正をコミットしてプッシュする。
+After user confirmation, commit and push the fix.
 
-## E2E テスト環境
+## E2E Test Environments
 
-| 環境 | フロントエンド URL | バックエンド URL | 認証情報 |
-|------|-------------------|-----------------|---------|
-| dev | SSM: `/ai-reception-dev/frontend-url` | SSM: `/ai-reception-dev/backend-url` | SSM (暗号化) |
-| stg | SSM: `/ai-reception-stg/frontend-url` | SSM: `/ai-reception-stg/backend-url` | SSM (暗号化) |
-| prod | SSM: `/ai-reception-prod/frontend-url` | SSM: `/ai-reception-prod/backend-url` | SSM (暗号化) |
+| Environment | Frontend URL | Backend URL | Credentials |
+|-------------|-------------|-------------|-------------|
+| dev | SSM: `/ai-reception-dev/frontend-url` | SSM: `/ai-reception-dev/backend-url` | SSM (encrypted) |
+| stg | SSM: `/ai-reception-stg/frontend-url` | SSM: `/ai-reception-stg/backend-url` | SSM (encrypted) |
+| prod | SSM: `/ai-reception-prod/frontend-url` | SSM: `/ai-reception-prod/backend-url` | SSM (encrypted) |
 
-## 注意事項
+## Notes
 
-- Playwright レポート（アーティファクト）は 7 日間保持される
-- CI では chromium と webkit のみ実行（firefox は除外）
-- ローカルテストは Mockoon モックサーバー使用、CI E2E は実環境に接続
-- フレーキーテストは根本原因を修正し、リトライに頼らない
-- **全出力は日本語で記載する**
+- Playwright reports (artifacts) are retained for 7 days
+- CI runs Chromium and WebKit only (Firefox excluded)
+- Local tests use Mockoon mock server; CI E2E connects to real environments
+- Fix root causes of flaky tests rather than relying on retries
+
+## Language
+
+- **All user-facing output, reports, and summaries must be written in Japanese(すべてのユーザーへの出力は日本語にしてください)**

@@ -74,14 +74,14 @@ test.beforeEach(async ({ page }) => {
 import { expect, test } from '@playwright/test'
 import { login, logoutIfNeeded, mockMediaDevices } from './utils'
 
-test.describe('機能名', () => {
+test.describe('Feature name', () => {
   test.beforeEach(async ({ page }) => {
     await mockMediaDevices(page)
     await logoutIfNeeded(page)
     await login(page)
   })
 
-  test('ユーザーが〇〇できる', async ({ page }) => {
+  test('User can do X', async ({ page }) => {
     // Arrange: navigate and set up
     // Act: perform user action
     // Assert: verify expected outcome
@@ -91,7 +91,7 @@ test.describe('機能名', () => {
 
 ### Key Points
 
-- Test descriptions are in Japanese
+- Test descriptions should follow the project's existing conventions
 - Use `mockMediaDevices()` for tests involving voice/audio
 - Use `logoutIfNeeded()` before login to ensure clean state
 - Use `waitForTextModeConnection()` or `waitForConnection()` to wait for WebSocket
@@ -167,5 +167,4 @@ This command invokes the `e2e-runner` agent located at:
 
 ## Language
 
-- Internal reasoning and thinking should be in English
-- **All user-facing output, reports, and summaries must be written in Japanese**
+- **All user-facing output, reports, and summaries must be written in Japanese(すべてのユーザーへの出力は日本語にしてください)**

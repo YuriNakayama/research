@@ -9,6 +9,9 @@
             "Bash(terraform import:*)",
             "Bash(gh:*)",
             "Bash(aws iam get-role:*)"
+        ],
+        "deny": [
+            "Bash(gh pr merge:*)"
         ]
     },
     "hooks": {

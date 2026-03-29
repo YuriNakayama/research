@@ -142,6 +142,11 @@ Papers are searched with arXiv as the primary source because it provides open-ac
 - URL (prefer `arxiv.org/abs/` format)
 - 1-2 sentence summary
 
+**CRITICAL — Anti-hallucination rule for URLs:**
+- Only record URLs that appear verbatim in WebSearch results. NEVER construct or guess arXiv IDs.
+- If a search result shows a title but no direct URL, run a follow-up `WebSearch` for `site:arxiv.org "{exact paper title}"` to obtain the real URL.
+- Do NOT fabricate arXiv IDs by combining partial numbers. Every URL must come from a search result or a WebFetch response.
+
 **Quality signals to prioritize:**
 - High citation count (if visible in search results)
 - Survey/review papers (valuable for overview)
@@ -167,6 +172,10 @@ Search across multiple patent databases to get broad coverage.
 - Patent office (USPTO/JPO/EPO/WIPO)
 - URL
 - 1 sentence summary of the invention
+
+**CRITICAL — Anti-hallucination rule for URLs:**
+- Only record patent numbers and URLs that appear verbatim in search results or WebFetch responses.
+- NEVER fabricate patent numbers. If a search result mentions a patent without a clear number, run a follow-up search to obtain the exact number and URL.
 
 **Prioritize:**
 - Patents from major companies in the domain
@@ -209,13 +218,54 @@ Search for enterprise adoption and market information.
 - URL
 - 1 sentence summary
 
-### Step 4: Organize and Deduplicate
+### Step 4: Organize, Deduplicate, and Verify
 
 After collection:
 1. Remove duplicate entries (same paper appearing from different searches)
 2. Sort within each category by year (newest first), then by relevance
 3. Verify URLs are properly formatted (especially arXiv links — ensure `arxiv.org/abs/` format)
-4. Flag any entries where information seems uncertain
+4. **URL Verification (MANDATORY)** — verify every collected resource against its URL:
+
+#### 4a: Academic Paper URL Verification
+
+For each paper with an arXiv URL:
+1. **WebFetch** the arXiv abstract page (`arxiv.org/abs/XXXX.XXXXX`)
+2. Compare the fetched title with the collected title
+3. Apply one of the following actions:
+   - **Match**: Title matches (allowing minor formatting differences) → mark as `verified`
+   - **Mismatch**: Title does not match → **discard the entry** and log a warning. Do NOT keep entries with mismatched title/URL pairs.
+   - **Fetch failed**: URL is unreachable or returns an error → **discard the entry**
+
+For papers with non-arXiv URLs (IEEE, ACM, etc.):
+1. **WebFetch** the URL
+2. Verify the page contains the expected paper title
+3. Apply the same match/mismatch/failed logic above
+
+#### 4b: Patent URL Verification
+
+For each patent:
+1. **WebFetch** the patent URL (Google Patents, USPTO, etc.)
+2. Verify the patent number and title match
+3. Discard entries where the patent number or title does not match
+
+#### 4c: Technical Resource / Business Case URL Verification
+
+For each resource:
+1. **WebFetch** the URL
+2. Verify the page is accessible and contains content related to the collected title
+3. Discard entries where the URL is unreachable or content is unrelated
+
+#### 4d: Verification Summary
+
+After verification, log the results:
+- Total collected: N entries
+- Verified: M entries
+- Discarded (mismatch): X entries
+- Discarded (unreachable): Y entries
+
+**Important**: It is better to have fewer verified entries than many unverified ones. Never include an entry in the output unless its URL has been verified. This prevents hallucinated or mismatched URL/title pairs from propagating to downstream tools (CSV lists, daily research pipeline).
+
+If verification reduces the result set below the requested collection depth, run additional searches to find replacement resources, then verify those as well.
 
 ### Step 5: Output File Generation
 
@@ -242,6 +292,17 @@ Generate a **single Markdown file** containing all collected resources in table 
 | {domain 1} | {n} | {n} | {n} | {n} | {n} |
 | {domain 2} | {n} | {n} | {n} | {n} | {n} |
 | **合計** | **{n}** | **{n}** | **{n}** | **{n}** | **{n}** |
+
+## URL検証結果
+
+| 項目 | 件数 |
+|------|------|
+| 収集 | {total_collected} |
+| 検証済み | {verified} |
+| 不一致で除外 | {mismatched} |
+| アクセス不可で除外 | {unreachable} |
+
+{Below table includes only verified entries. All URLs have been confirmed via WebFetch.}
 
 ## 全体の傾向
 

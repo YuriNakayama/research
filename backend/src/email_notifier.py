@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+from dataclasses import dataclass
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -18,16 +19,23 @@ from fpdf.fonts import FontFace
 logger = logging.getLogger(__name__)
 
 _JAPANESE_FONT_CANDIDATES: list[tuple[str, int]] = [
-    # (path, collection_font_number) — index 0 = Japanese variant
-    # macOS
     ("/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc", 0),
     ("/System/Library/Fonts/Hiragino Sans GB.ttc", 0),
-    # Linux (Debian/Ubuntu - fonts-noto-cjk package)
     ("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 0),
-    # Single-font files
     ("/usr/share/fonts/noto-cjk/NotoSansCJKjp-Regular.otf", 0),
     ("/usr/share/fonts/truetype/noto/NotoSansCJKjp-Regular.ttf", 0),
 ]
+
+
+@dataclass(frozen=True)
+class DomainResult:
+    """Result of a single domain's daily research execution."""
+
+    domain_name: str
+    success: bool
+    output_file: Path | None = None
+    item_title: str = ""
+    error: str = ""
 
 
 def _find_japanese_font() -> tuple[str, int] | None:
@@ -39,12 +47,7 @@ def _find_japanese_font() -> tuple[str, int] | None:
 
 
 class _MarkdownPDF(FPDF):
-    """Simple PDF generator from Markdown via HTML with Japanese support.
-
-    Only registers the Regular style to avoid fpdf2's CID collision issue
-    when the same .ttc file is registered for multiple styles (B/I/BI).
-    Bold and italic are rendered with the same Regular font glyphs.
-    """
+    """Simple PDF generator from Markdown via HTML with Japanese support."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -98,9 +101,6 @@ def _markdown_to_pdf(md_path: Path) -> bytes:
         md_text,
         extensions=["tables", "fenced_code"],
     )
-    # Strip bold/italic tags and convert <th> to <td> to avoid fpdf2
-    # requesting B/I font styles, which causes CID collisions when
-    # the same .ttc font file is registered only as Regular.
     html_body = _STRIP_STYLE_TAGS_RE.sub("", html_body)
     html_body = _TH_TO_TD_RE.sub(r"<\1td>", html_body)
 
@@ -118,72 +118,89 @@ def _markdown_to_pdf(md_path: Path) -> bytes:
         "p": FontFace(family=font, size_pt=10),
         "li": FontFace(family=font, size_pt=10),
         "code": FontFace(family=font, size_pt=9),
+        "pre": FontFace(family=font, size_pt=9),
     }
     pdf.write_html(html_body, tag_styles=tag_styles, font_family=font)
     return bytes(pdf.output())
 
 
-def notify_success(
-    pr_url: str,
-    output_files: list[str],
+def _build_results_body(results: list[DomainResult], pr_url: str) -> str:
+    """Build email body text from domain results."""
+    success_count = sum(1 for r in results if r.success)
+    total = len(results)
+
+    lines = [
+        "Daily Research Report",
+        "",
+        "■ 実行サマリ",
+        f"  成功: {success_count} / {total} ドメイン",
+        "",
+        "■ レポート",
+    ]
+
+    for r in results:
+        if r.success:
+            lines.append(f'  ✓ {r.domain_name}: "{r.item_title}"')
+        else:
+            lines.append(f"  ✗ {r.domain_name}: {r.error}")
+
+    if pr_url:
+        lines.extend(["", "■ PR", f"  {pr_url}"])
+
+    lines.append("")
+    return "\n".join(lines)
+
+
+def notify_research_results(
+    results: list[DomainResult],
+    pr_url: str = "",
     region: str = "ap-northeast-1",
     sender: str = "",
     recipients: list[str] | None = None,
     work_dir: str | Path | None = None,
 ) -> None:
-    """Send a success notification email with PDF attachment."""
+    """Send a single email summarizing all domain results."""
     sender = _get_sender(sender)
     recipients = _get_recipients(recipients)
     if not sender or not recipients:
         logger.warning("Email sender or recipients not configured, skipping notification")
         return
 
-    files_text = "\n".join(f"  - {f}" for f in output_files)
-    subject = "[Auto Research] Report generated successfully"
-    body = f"Auto Research Pipeline completed successfully.\n\nPR: {pr_url}\n\nOutput files:\n{files_text}\n"
+    success_count = sum(1 for r in results if r.success)
+    total = len(results)
+
+    from datetime import UTC, datetime
+
+    today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
+    subject = f"[Daily Research] {today} ({success_count}/{total} domains)"
+
+    body = _build_results_body(results, pr_url)
 
     attachments: list[tuple[str, bytes]] = []
     if work_dir:
         work_dir = Path(work_dir)
-        for rel_path in output_files:
-            md_file = work_dir / rel_path
-            if md_file.exists() and md_file.suffix == ".md":
-                # Attach original Markdown
-                md_bytes = md_file.read_bytes()
-                attachments.append((md_file.name, md_bytes))
-                logger.info("Attached Markdown: %s (%d bytes)", md_file.name, len(md_bytes))
+        for r in results:
+            if not r.success or not r.output_file:
+                continue
+            md_file = r.output_file if r.output_file.is_absolute() else work_dir / r.output_file
+            if not md_file.exists():
+                continue
 
-                # Attach PDF conversion
-                try:
-                    pdf_bytes = _markdown_to_pdf(md_file)
-                    pdf_name = md_file.with_suffix(".pdf").name
-                    attachments.append((pdf_name, pdf_bytes))
-                    logger.info("Generated PDF: %s (%d bytes)", pdf_name, len(pdf_bytes))
-                except Exception:
-                    logger.exception("Failed to generate PDF for %s", rel_path)
+            attachment_name = f"{r.domain_name}_{md_file.name}"
+            md_bytes = md_file.read_bytes()
+            attachments.append((attachment_name, md_bytes))
+            logger.info("Attached Markdown: %s (%d bytes)", attachment_name, len(md_bytes))
+
+            try:
+                pdf_bytes = _markdown_to_pdf(md_file)
+                pdf_name = f"{r.domain_name}_{md_file.stem}.pdf"
+                attachments.append((pdf_name, pdf_bytes))
+                logger.info("Generated PDF: %s (%d bytes)", pdf_name, len(pdf_bytes))
+            except Exception:
+                logger.exception("Failed to generate PDF for %s", r.domain_name)
 
     _send(region, sender, recipients, subject, body, attachments=attachments)
-    logger.info("Success notification sent to %d recipients", len(recipients))
-
-
-def notify_failure(
-    error: str,
-    region: str = "ap-northeast-1",
-    sender: str = "",
-    recipients: list[str] | None = None,
-) -> None:
-    """Send a failure notification email."""
-    sender = _get_sender(sender)
-    recipients = _get_recipients(recipients)
-    if not sender or not recipients:
-        logger.warning("Email sender or recipients not configured, skipping notification")
-        return
-
-    subject = "[Auto Research] Pipeline failed"
-    body = f"Auto Research Pipeline failed.\n\nError: {error}\n\nCheck CloudWatch Logs for details.\n"
-
-    _send(region, sender, recipients, subject, body)
-    logger.info("Failure notification sent to %d recipients", len(recipients))
+    logger.info("Research results notification sent to %d recipients", len(recipients))
 
 
 def _send(

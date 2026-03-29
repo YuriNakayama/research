@@ -1,9 +1,8 @@
-research:
-  prompt_path: "docs/research/cate/metalearner/prompt/search_paper.md"
-  output_dir: "docs/research/cate/metalearner"
-  branch_prefix: "research/auto"
+daily:
+  branch_prefix: "daily/auto"
   claude_options: ""
-  skill: ""
+  domains:
+    - name: "legal_tech"
 
 github:
   repo: "YuriNakayama/research"

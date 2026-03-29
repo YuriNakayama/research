@@ -10,12 +10,15 @@ import yaml
 
 
 @dataclass(frozen=True)
-class ResearchConfig:
-    prompt_path: str
-    output_dir: str
-    branch_prefix: str = "research/auto"
+class DailyDomainConfig:
+    name: str
+
+
+@dataclass(frozen=True)
+class DailyConfig:
+    domains: list[DailyDomainConfig] = field(default_factory=list)
+    branch_prefix: str = "daily/auto"
     claude_options: str = ""
-    skill: str = ""
 
 
 @dataclass(frozen=True)
@@ -32,7 +35,7 @@ class EmailConfig:
 
 @dataclass(frozen=True)
 class AppConfig:
-    research: ResearchConfig
+    daily: DailyConfig
     github: GitHubConfig
     email: EmailConfig
     environment: str = "dev"
@@ -51,16 +54,17 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
     with open(config_path) as f:
         raw = yaml.safe_load(f)
 
-    research_raw = raw.get("research", {})
+    daily_raw = raw.get("daily", {})
     github_raw = raw.get("github", {})
     email_raw = raw.get("email", {})
 
-    research = ResearchConfig(
-        prompt_path=os.environ.get("RESEARCH_PROMPT_PATH", research_raw.get("prompt_path", "")),
-        output_dir=os.environ.get("RESEARCH_OUTPUT_DIR", research_raw.get("output_dir", "")),
-        branch_prefix=os.environ.get("RESEARCH_BRANCH_PREFIX", research_raw.get("branch_prefix", "research/auto")),
-        claude_options=os.environ.get("RESEARCH_CLAUDE_OPTIONS", research_raw.get("claude_options", "")),
-        skill=os.environ.get("RESEARCH_SKILL", research_raw.get("skill", "")),
+    domains_raw = daily_raw.get("domains", [])
+    domains = [DailyDomainConfig(name=d["name"]) for d in domains_raw]
+
+    daily = DailyConfig(
+        domains=domains,
+        branch_prefix=os.environ.get("DAILY_BRANCH_PREFIX", daily_raw.get("branch_prefix", "daily/auto")),
+        claude_options=os.environ.get("DAILY_CLAUDE_OPTIONS", daily_raw.get("claude_options", "")),
     )
 
     github = GitHubConfig(
@@ -80,7 +84,7 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
     )
 
     return AppConfig(
-        research=research,
+        daily=daily,
         github=github,
         email=email,
         environment=os.environ.get("ENVIRONMENT", "dev"),

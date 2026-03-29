@@ -7,6 +7,8 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
+from src.email_notifier import DomainResult
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,8 +16,7 @@ def create_pr(
     work_dir: str | Path,
     branch_name: str,
     base_branch: str = "main",
-    output_files: list[str] | None = None,
-    prompt_path: str = "",
+    results: list[DomainResult] | None = None,
 ) -> str:
     """Create a Pull Request using gh CLI.
 
@@ -25,23 +26,24 @@ def create_pr(
     work_dir = Path(work_dir)
     today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
 
-    title = f"[Auto Research] {today}"
+    title = f"[Daily Research] {today}"
 
     body_parts = [
-        "## Auto Research Report",
+        "## Daily Research Report",
         "",
         f"- **Date**: {today}",
         f"- **Branch**: `{branch_name}`",
     ]
 
-    if prompt_path:
-        body_parts.append(f"- **Prompt**: `{prompt_path}`")
-
-    if output_files:
-        body_parts.append("")
-        body_parts.append("### Output Files")
-        for f in output_files:
-            body_parts.append(f"- `{f}`")
+    if results:
+        domains = ", ".join(r.domain_name for r in results if r.success)
+        body_parts.append(f"- **Domains**: {domains}")
+        body_parts.extend(["", "### Reports"])
+        for r in results:
+            if r.success and r.output_file:
+                body_parts.append(f'- `{r.output_file}` — "{r.item_title}"')
+            elif not r.success:
+                body_parts.append(f"- ~~{r.domain_name}~~: {r.error}")
 
     body_parts.extend(
         [

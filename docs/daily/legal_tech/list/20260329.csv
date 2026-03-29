@@ -1,0 +1,6 @@
+title,url,authors,year,venue,summary,status
+Natural Language Processing for the Legal Domain: A Survey of Tasks Datasets Models and Challenges,https://arxiv.org/abs/2410.21306,Ferraro et al.,2024,arXiv,法律ドメインにおけるNLPタスク・データセット・モデルの包括的サーベイ。法律文書要約、論点マイニング、判決予測等を網羅,done
+Can Large Language Models Grasp Legal Theories? Enhance Legal Reasoning with Insights from Multi-Agent Collaboration,https://arxiv.org/abs/2410.02507,Zhou et al.,2024,arXiv,LLMの法的理論理解能力を評価。マルチエージェント協調による法的推論の改善を提案,done
+LawLLM: Law Large Language Model for the US Legal System,https://arxiv.org/abs/2407.21065,Nguyen et al.,2024,arXiv,米国法律システム向けの大規模言語モデル。法的推論・判例検索・法律相談への応用,done
+Evaluating AI for Law: Bridging the Gap with Open-Source Solutions,https://arxiv.org/abs/2404.12349,Savelka et al.,2024,arXiv,法律AIの評価フレームワーク。オープンソースソリューションによる法的推論支援の可能性を検証,done
+Legal Evaluations and Challenges of Large Language Models,https://arxiv.org/abs/2411.10137,Wang et al.,2024,arXiv,LLMの法律分野における評価と課題。法律テキスト分析・契約レビュー・判例検索における可能性と限界,pending

@@ -20,13 +20,17 @@ def _run_git(args: list[str], cwd: str | Path | None = None) -> subprocess.Compl
     return result
 
 
-def clone_repo(repo_url: str, dest: str | Path, token: str | None = None) -> Path:
+def clone_repo(repo_url: str, dest: str | Path, token: str | None = None, branch: str | None = None) -> Path:
     """Clone a repository. If token is provided, embed it in the URL."""
     dest = Path(dest)
     if token:
         repo_url = repo_url.replace("https://", f"https://x-access-token:{token}@")
-    _run_git(["clone", repo_url, str(dest)])
-    logger.info("Cloned repository to %s", dest)
+    cmd = ["clone"]
+    if branch:
+        cmd.extend(["--branch", branch])
+    cmd.extend([repo_url, str(dest)])
+    _run_git(cmd)
+    logger.info("Cloned repository to %s (branch: %s)", dest, branch or "default")
     return dest
 
 

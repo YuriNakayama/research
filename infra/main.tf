@@ -123,8 +123,13 @@ module "monitoring" {
 module "cicd" {
   source = "./modules/cicd"
 
-  environment        = var.environment
-  project            = var.project
-  github_repo        = var.github_repo
-  ecr_repository_arn = module.ecr.repository_arn
+  environment            = var.environment
+  project                = var.project
+  github_repo            = var.github_repo
+  ecr_repository_arn     = module.ecr.repository_arn
+  ecs_cluster_arn        = module.ecs.cluster_arn
+  task_definition_arn    = module.ecs.task_definition_arn
+  task_execution_role_arn = module.ecs.task_execution_role_arn
+  task_role_arn          = module.ecs.task_role_arn
+  log_group_name         = module.monitoring.log_group_name
 }

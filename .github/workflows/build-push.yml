@@ -85,11 +85,15 @@ jobs:
       - name: Run ECS Fargate task
         id: run-task
         run: |
+          BRANCH="${{ github.ref_name }}"
+          echo "Deploying branch: $BRANCH"
+          OVERRIDES='{"containerOverrides":[{"name":"claude-task","environment":[{"name":"GIT_BRANCH","value":"'"$BRANCH"'"}]}]}'
           TASK_ARN=$(aws ecs run-task \
             --cluster $ECS_CLUSTER \
             --task-definition ${{ steps.task-def.outputs.revision }} \
             --launch-type FARGATE \
             --network-configuration "awsvpcConfiguration={subnets=[$SUBNET],securityGroups=[$SECURITY_GROUP],assignPublicIp=ENABLED}" \
+            --overrides "$OVERRIDES" \
             --query 'tasks[0].taskArn' \
             --output text)
           echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT

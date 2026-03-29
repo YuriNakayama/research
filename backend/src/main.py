@@ -91,8 +91,9 @@ def main() -> int:
     repo_url = f"https://github.com/{config.github.repo}"
 
     try:
-        logger.info("Cloning %s", repo_url)
-        clone_repo(repo_url, work_dir, token=token)
+        git_branch = os.environ.get("GIT_BRANCH")
+        logger.info("Cloning %s (branch: %s)", repo_url, git_branch or "default")
+        clone_repo(repo_url, work_dir, token=token, branch=git_branch)
         configure_git(work_dir)
         branch_name = create_branch(work_dir, prefix=config.daily.branch_prefix)
 

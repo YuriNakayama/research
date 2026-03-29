@@ -28,6 +28,21 @@ class TestCloneRepo:
         args = mock_run.call_args[0][0]
         assert "x-access-token:ghp_token@" in args[2]
 
+    @patch("src.git_manager.subprocess.run")
+    def test_clone_with_branch(self, mock_run: MagicMock) -> None:
+        mock_run.return_value = CompletedProcess(args=[], returncode=0, stdout="", stderr="")
+        clone_repo("https://github.com/owner/repo", "/tmp/work", branch="feature/test")
+        args = mock_run.call_args[0][0]
+        assert "--branch" in args
+        assert "feature/test" in args
+
+    @patch("src.git_manager.subprocess.run")
+    def test_clone_without_branch(self, mock_run: MagicMock) -> None:
+        mock_run.return_value = CompletedProcess(args=[], returncode=0, stdout="", stderr="")
+        clone_repo("https://github.com/owner/repo", "/tmp/work")
+        args = mock_run.call_args[0][0]
+        assert "--branch" not in args
+
 
 class TestCreateBranch:
     @patch("src.git_manager.subprocess.run")

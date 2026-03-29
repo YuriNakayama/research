@@ -122,26 +122,26 @@ rm tmp-pull-request-template.tmp
 ## PR Template
 
 ```markdown
-#### 概要
+#### Summary
 
-<!-- このPRの目的を1-3行で説明 -->
+<!-- Explain the purpose of this PR in 1-3 lines -->
 
-#### 変更内容
+#### Changes
 
-<!-- 変更内容を箇条書きで記載 -->
+<!-- List changes as bullet points -->
 -
 -
 -
 
-#### テスト計画
+#### Test Plan
 
-<!-- テスト方法・確認項目 -->
+<!-- Test methods and verification items -->
 - [ ]
 - [ ]
 
-#### コメント
+#### Comments
 
-<!-- レビュアーへの補足事項 -->
+<!-- Supplementary notes for reviewers -->
 ```
 
 ## Commit Message Format
@@ -169,8 +169,11 @@ rm tmp-pull-request-template.tmp
 
 - Always use the Pull Request template
 - Add appropriate labels
-- Write all PR titles and descriptions in Japanese
 - Summary should be concise (1-3 lines)
 - List changes by logical unit, not by commit
 - Include specific verification steps in test plan
 - Confirm version with user when creating release branch from develop
+
+## Language
+
+- **All user-facing output, PR titles, and descriptions must be written in Japanese(すべてのユーザーへの出力は日本語にしてください)**

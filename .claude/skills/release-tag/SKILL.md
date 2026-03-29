@@ -104,13 +104,13 @@ Assuming the release preparation is complete and the `main` branch is up to date
 ### Release Flow
 
 ```
-develop → release/v*.*.* → main → タグ作成
+develop → release/v*.*.* → main → create tag
 ```
 
-1. `develop` から `release/v*.*.*` ブランチを作成
-2. `main` に向けて PR 作成・マージ
-3. `main` からタグを作成
-4. Hotfix の場合: `main` から `hotfix/*` → `main` にマージ後、`develop` にもバックマージ
+1. Create `release/v*.*.*` branch from `develop`
+2. Create PR targeting `main`, then merge
+3. Create tag from `main`
+4. For hotfixes: `main` → `hotfix/*` → merge to `main`, then back-merge to `develop`
 
 ### Versioning Rules
 
@@ -138,4 +138,7 @@ After pushing the tag, the following are triggered automatically:
 - **No user confirmation needed for title**
 - **Include release date in the body**
 - Use **`--latest` for regular releases and `--prerelease` for pre-releases**
-- **Write all release notes and descriptions in Japanese**
+
+## Language
+
+- **All user-facing output, release notes, and descriptions must be written in Japanese(すべてのユーザーへの出力は日本語にしてください)**

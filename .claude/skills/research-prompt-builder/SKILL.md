@@ -1,252 +1,288 @@
 ---
 name: research-prompt-builder
-description: 対話型ヒアリングで研究調査プロンプトを構築するスキル。AskUserQuestionツールを使った選択肢形式（複数選択・フリー記述可）のヒアリングを繰り返し、構造化された研究調査プロンプトを生成してファイル保存する。「調査プロンプトを作って」「研究テーマのプロンプトを作成」「サーベイ用のプロンプトを生成」「論文調査の指示書を作りたい」「research prompt」などのリクエストで使用する。研究分野を問わず汎用的に使える。
+description: Build structured research prompts through interactive multi-step hearings using AskUserQuestion with selection-based options (multi-select and free-text via "Other"). Use this skill when the user says things like "create a research prompt", "build a prompt for a research topic", "generate a survey prompt", "I want to create instructions for a paper survey", or "research prompt". Also triggers on Japanese equivalents like "調査プロンプトを作って", "研究テーマのプロンプトを作成", "サーベイ用のプロンプトを生成". Works across any research domain.
 ---
 
 # Research Prompt Builder
 
-AskUserQuestionツールを使った選択肢形式のヒアリングを段階的に行い、研究調査用の構造化プロンプトを生成するスキル。
+Conduct step-by-step hearings using AskUserQuestion in selection format to generate a structured research prompt.
 
-## 全体の流れ
+## Auto Mode (`--auto`)
 
-1. ユーザーの初期入力から研究テーマを把握する
-2. 不足情報をAskUserQuestionで段階的にヒアリングする
-3. 構造化プロンプトを生成し、会話内に表示＋ファイル保存する
+When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively** — skip ALL AskUserQuestion calls and use the following defaults:
 
-ヒアリングはすべてAskUserQuestionの選択肢形式で行う。フリー記述はAskUserQuestionの「Other」オプション（自動付与）で受け付ける。テキストで質問を投げかけるのではなく、必ずAskUserQuestionツールを使うこと。
+| Parameter | Default Value |
+|-----------|--------------|
+| Research Field | Input text から自動推定 |
+| Objective | Method survey（手法サーベイ） |
+| Exclusion Criteria | None（除外条件なし） |
+| Goals | Paper list creation + Method comparison table + Taxonomy organization |
+| Steps | Keyword search + Survey paper starting point |
+| Rules | English papers only + Within last 3 years + Links required |
+| Confirmation | Generate（確認なしで即生成） |
+| Save Location | Under docs/research/ |
 
-## Step 1: 研究テーマの把握
+In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the research theme. For example: `/research-prompt-builder --auto 因果推論 heterogeneous treatment effect` → theme is "因果推論 heterogeneous treatment effect".
 
-ユーザーの初期入力を分析し、以下の情報がどの程度含まれているか判断する：
+The research field is inferred from the theme keywords. If the theme is ambiguous, default to "Machine Learning / AI".
 
-- **テーマ/タイトル**: 何を調査するか
-- **目的(objective)**: なぜ調査するか
-- **除外条件(exclusion)**: 何を対象外とするか
-- **ゴール(goals)**: 具体的に何を達成したいか
-- **手順(steps)**: どのように進めるか
-- **ルール(rules)**: どのような制約があるか
+If `$ARGUMENTS` does NOT contain `--auto`, proceed with the normal interactive workflow below.
 
-初期入力に十分な情報がある項目はヒアリングをスキップし、不足している項目のみ聞く。初期入力がほぼない場合は、まず研究分野と調査テーマをヒアリングする。
+## Overall Flow
 
-### 初期入力が少ない場合の最初のヒアリング
+1. Understand the research theme from the user's initial input
+2. Gather missing information through step-by-step AskUserQuestion hearings
+3. Generate the structured prompt, display it in the conversation, and save to file
+
+All hearings use AskUserQuestion in selection format. Free-text input is accepted via the "Other" option (auto-appended). Always use the AskUserQuestion tool rather than asking questions as plain text.
+
+## Step 1: Understand the Research Theme
+
+> **`--auto` mode**: Skip the initial hearing. Use the theme from `$ARGUMENTS` directly and infer the research field automatically.
+
+Analyze the user's initial input and assess how much of the following information is present:
+
+- **Theme/title**: What to investigate
+- **Objective**: Why to investigate
+- **Exclusion criteria**: What to exclude
+- **Goals**: Specific deliverables
+- **Steps**: How to proceed
+- **Rules**: Constraints to apply
+
+Skip hearings for items with sufficient information in the initial input. Only ask about missing items. If the initial input is minimal, start by asking about the research field and topic.
+
+### Initial hearing when input is minimal
 
 ```
 AskUserQuestion:
-  question: "どの研究分野の調査プロンプトを作成しますか？"
-  header: "研究分野"
+  question: "Which research field should this prompt cover?"
+  header: "Research Field"
   multiSelect: false
   options:
-    - label: "機械学習・AI"
-      description: "深層学習、強化学習、NLP、CV等の機械学習関連"
-    - label: "統計・因果推論"
-      description: "統計手法、因果推論、実験計画法等"
-    - label: "ソフトウェア工学"
-      description: "開発手法、アーキテクチャ、テスト等"
-    - label: "自然科学・工学"
-      description: "物理、化学、生物、電気電子等"
+    - label: "Machine Learning / AI"
+      description: "Deep learning, reinforcement learning, NLP, CV, and related ML topics"
+    - label: "Statistics / Causal Inference"
+      description: "Statistical methods, causal inference, experimental design, etc."
+    - label: "Software Engineering"
+      description: "Development methodologies, architecture, testing, etc."
+    - label: "Natural Sciences / Engineering"
+      description: "Physics, chemistry, biology, electrical engineering, etc."
 ```
 
-この回答を踏まえて、テーマの詳細をさらにヒアリングする。分野に応じた選択肢を動的に構成すること。
+Based on the answer, ask further about theme details. Dynamically compose options based on the selected field.
 
-## Step 2: 目的(objective)のヒアリング
+## Step 2: Objective Hearing
 
-テーマが決まったら、調査の目的を明確にする。ユーザーの初期入力から目的が読み取れる場合はスキップ可能。
+> **`--auto` mode**: Skip. Use "Method survey".
+
+Once the theme is established, clarify the research objective. Skip if the objective is clear from the initial input.
 
 ```
 AskUserQuestion:
-  question: "この調査の主な目的は何ですか？"
-  header: "目的"
+  question: "What is the primary objective of this research?"
+  header: "Objective"
   multiSelect: false
   options:
-    - label: "手法のサーベイ"
-      description: "特定分野の手法を網羅的に調査し、比較・整理する"
-    - label: "最新動向の把握"
-      description: "直近の研究トレンドや新しいアプローチを把握する"
-    - label: "実装・適用検討"
-      description: "特定の手法を自分のタスクに適用するための知見を得る"
-    - label: "理論的理解"
-      description: "手法の理論的背景や数学的基盤を深く理解する"
+    - label: "Method survey"
+      description: "Comprehensively survey and compare methods in a specific field"
+    - label: "Track latest trends"
+      description: "Understand recent research trends and new approaches"
+    - label: "Implementation / application study"
+      description: "Gather knowledge to apply a specific method to your own task"
+    - label: "Theoretical understanding"
+      description: "Deeply understand the theoretical background and mathematical foundations"
 ```
 
-## Step 3: 除外条件(exclusion)のヒアリング
+## Step 3: Exclusion Criteria Hearing
 
-調査範囲を絞るための除外条件を確認する。テーマに応じて選択肢を動的に構成する。
+> **`--auto` mode**: Skip. Use "None" (除外条件なし).
+
+Confirm exclusion criteria to narrow the research scope. Dynamically compose options based on the theme.
 
 ```
 AskUserQuestion:
-  question: "調査から除外したい条件はありますか？（複数選択可）"
-  header: "除外条件"
+  question: "Are there any conditions you'd like to exclude from the research? (multiple selection)"
+  header: "Exclusion Criteria"
   multiSelect: true
   options:
-    - label: "{テーマに応じた除外候補1}"
-      description: "{説明}"
-    - label: "{テーマに応じた除外候補2}"
-      description: "{説明}"
-    - label: "{テーマに応じた除外候補3}"
-      description: "{説明}"
-    - label: "特になし"
-      description: "除外条件を設けない"
+    - label: "{Theme-appropriate exclusion candidate 1}"
+      description: "{Description}"
+    - label: "{Theme-appropriate exclusion candidate 2}"
+      description: "{Description}"
+    - label: "{Theme-appropriate exclusion candidate 3}"
+      description: "{Description}"
+    - label: "None"
+      description: "No exclusion criteria"
 ```
 
-選択肢はテーマに基づいて動的に生成する。例：
-- 機械学習の場合: 「特定のモデルアーキテクチャ」「特定のタスク」「理論のみの論文」
-- 因果推論の場合: 「特定の推定対象」「特定の手法カテゴリ」「シミュレーションのみの研究」
+Dynamically generate options based on the theme. Examples:
+- For ML: "Specific model architectures", "Specific tasks", "Theory-only papers"
+- For causal inference: "Specific estimands", "Specific method categories", "Simulation-only studies"
 
-## Step 4: ゴール(goals)のヒアリング
+## Step 4: Goals Hearing
 
-具体的な成果物・達成目標を確認する。
+> **`--auto` mode**: Skip. Use "Paper list creation" + "Method comparison table" + "Taxonomy organization".
+
+Confirm specific deliverables and targets.
 
 ```
 AskUserQuestion:
-  question: "調査のゴールとして何を重視しますか？（複数選択可）"
-  header: "ゴール"
+  question: "What goals do you prioritize for this research? (multiple selection)"
+  header: "Goals"
   multiSelect: true
   options:
-    - label: "論文リストの作成"
-      description: "関連論文を網羅的にリスト化する"
-    - label: "手法の比較表"
-      description: "手法の特徴・前提条件・性能を比較する表を作成"
-    - label: "分類体系の整理"
-      description: "手法を方向性・アプローチで分類する"
-    - label: "実装ガイド"
-      description: "実装に必要な情報やコード例をまとめる"
+    - label: "Paper list creation"
+      description: "Comprehensively list related papers"
+    - label: "Method comparison table"
+      description: "Create a table comparing method features, prerequisites, and performance"
+    - label: "Taxonomy organization"
+      description: "Classify methods by approach and direction"
+    - label: "Implementation guide"
+      description: "Compile implementation-relevant information and code examples"
 ```
 
-## Step 5: 調査手順(steps)のヒアリング
+## Step 5: Steps Hearing
 
-調査の進め方について確認する。
+> **`--auto` mode**: Skip. Use "Keyword search" + "Survey paper starting point".
+
+Confirm the research approach.
 
 ```
 AskUserQuestion:
-  question: "調査はどのような手順で進めますか？（複数選択可）"
-  header: "手順"
+  question: "How should the research proceed? (multiple selection)"
+  header: "Steps"
   multiSelect: true
   options:
-    - label: "キーワード検索 (Recommended)"
-      description: "検索キーワードを収集し、Google Scholar/arXivで論文を検索"
-    - label: "引用ネットワーク追跡"
-      description: "主要論文の引用・被引用をたどって関連論文を発見"
-    - label: "サーベイ論文起点"
-      description: "既存のサーベイ論文を起点に関連手法を網羅"
-    - label: "会議・ジャーナル指定"
-      description: "特定の学会やジャーナルの論文を優先的に調査"
+    - label: "Keyword search (Recommended)"
+      description: "Collect search keywords and search Google Scholar/arXiv for papers"
+    - label: "Citation network tracing"
+      description: "Follow citations and references from key papers to discover related work"
+    - label: "Survey paper starting point"
+      description: "Start from existing survey papers and comprehensively cover related methods"
+    - label: "Conference/journal specific"
+      description: "Prioritize papers from specific conferences or journals"
 ```
 
-## Step 6: ルール(rules)のヒアリング
+## Step 6: Rules Hearing
 
-調査の制約・ルールを確認する。
+> **`--auto` mode**: Skip. Use "English papers only" + "Within last 3 years" + "Links required".
+
+Confirm research constraints and rules.
 
 ```
 AskUserQuestion:
-  question: "調査に適用するルールを選んでください（複数選択可）"
-  header: "ルール"
+  question: "Select rules to apply to the research (multiple selection)"
+  header: "Rules"
   multiSelect: true
   options:
-    - label: "英語論文のみ (Recommended)"
-      description: "英語で書かれた論文に限定する"
-    - label: "直近N年以内"
-      description: "発表時期を直近の数年に限定する"
-    - label: "概要は簡潔に"
-      description: "各論文の概要は3-5文程度にまとめる"
-    - label: "リンク必須"
-      description: "論文へのリンクを必ず含める"
+    - label: "English papers only (Recommended)"
+      description: "Limit to papers written in English"
+    - label: "Within last N years"
+      description: "Limit by publication recency"
+    - label: "Keep summaries concise"
+      description: "Summarize each paper in 3-5 sentences"
+    - label: "Links required"
+      description: "Always include links to papers"
 ```
 
-「直近N年以内」が選ばれた場合、年数を追加でヒアリングする：
+If "Within last N years" is selected, ask for the specific number of years:
 
 ```
 AskUserQuestion:
-  question: "論文の公開時期をどの範囲に限定しますか？"
-  header: "期間"
+  question: "What time range should papers be limited to?"
+  header: "Time Range"
   multiSelect: false
   options:
-    - label: "過去3年以内 (Recommended)"
-      description: "比較的新しい研究に絞る"
-    - label: "過去5年以内"
-      description: "やや広めに最近の研究をカバー"
-    - label: "過去1年以内"
-      description: "最新の研究のみに絞る"
+    - label: "Last 3 years (Recommended)"
+      description: "Focus on relatively recent research"
+    - label: "Last 5 years"
+      description: "Broader recent coverage"
+    - label: "Last 1 year"
+      description: "Latest research only"
 ```
 
-## Step 7: 確認と生成
+## Step 7: Confirmation and Generation
 
-すべてのヒアリングが完了したら、収集した情報をまとめて確認する。
+> **`--auto` mode**: Skip confirmation. Generate the prompt immediately and save to `docs/research/`.
+
+Once all hearings are complete, summarize the collected information for confirmation.
 
 ```
 AskUserQuestion:
-  question: "以下の内容でプロンプトを生成します。よろしいですか？"
-  header: "確認"
+  question: "Ready to generate the prompt with the following settings. Proceed?"
+  header: "Confirmation"
   multiSelect: false
   options:
-    - label: "生成する"
-      description: "この内容でプロンプトを生成してファイルに保存する"
-    - label: "修正したい項目がある"
-      description: "特定の項目を修正してから生成する"
+    - label: "Generate"
+      description: "Generate the prompt and save to file"
+    - label: "I want to revise something"
+      description: "Modify specific items before generating"
 ```
 
-確認の質問を出す前に、収集した情報のサマリーを会話内にテキストで表示すること。
+Display a summary of collected information as text in the conversation before presenting the confirmation question.
 
-「修正したい項目がある」が選ばれた場合は、修正対象の項目を選択肢で聞き、該当項目のヒアリングをやり直す。
+If "I want to revise something" is selected, present the items as options and redo the hearing for the selected item.
 
-## 出力フォーマット
+## Output Format
 
-以下のXMLベースの構造で出力する：
+Output in the following XML-based structure:
 
 ```markdown
-## {タイトル}
-<title>{タイトル}</title>
+## {Title}
+<title>{Title}</title>
 <objective>
-{目的の記述}
+{Objective description}
 </objective>
 
 <exclusion>
-{除外条件のリスト（箇条書き）}
+{Exclusion criteria list (bullet points)}
 </exclusion>
 
 <goals>
-{ゴールのリスト（箇条書き）}
+{Goals list (bullet points)}
 </goals>
 
 <steps>
-{番号付きの手順リスト}
+{Numbered step list}
 </steps>
 
 <rules>
-{ルールのリスト（箇条書き）}
+{Rules list (bullet points)}
 </rules>
 ```
 
-## 出力先
+## Output Location
 
-1. **会話内に表示**: 生成したプロンプト全文を会話内に表示する
-2. **ファイル保存**: 保存先をユーザーに確認する
+> **`--auto` mode**: Skip the save location hearing. Always save to `docs/research/` without asking.
+
+1. **Display in conversation**: Show the full generated prompt in the conversation
+2. **Save to file**: Confirm save location with the user
 
 ```
 AskUserQuestion:
-  question: "プロンプトをどこに保存しますか？"
-  header: "保存先"
+  question: "Where should the prompt be saved?"
+  header: "Save Location"
   multiSelect: false
   options:
-    - label: "docs/research/ 配下"
-      description: "リポジトリのdocs/research/ディレクトリに保存"
-    - label: "カレントディレクトリ"
-      description: "現在の作業ディレクトリに保存"
-    - label: "保存しない"
-      description: "会話内の表示のみで保存しない"
+    - label: "Under docs/research/"
+      description: "Save to the docs/research/ directory in the repository"
+    - label: "Current directory"
+      description: "Save to the current working directory"
+    - label: "Don't save"
+      description: "Display in conversation only, don't save to file"
 ```
 
-ファイル名は `{テーマのkebab-case}-prompt.md` とする。
+Filename: `{theme-in-kebab-case}-prompt.md`
 
-## ヒアリングの原則
+## Hearing Principles
 
-- すべてのヒアリングはAskUserQuestionツールの選択肢形式で行う。テキストベースの質問は使わない
-- ユーザーの初期入力から読み取れる情報はスキップし、不足分のみ聞く
-- 選択肢はテーマに応じて動的に構成する（上記の例はテンプレートであり、そのまま使うのではなく内容を調整する）
-- 1回のAskUserQuestionで1-4個の質問を同時に聞ける。関連する質問はまとめて効率的にヒアリングする
-- ユーザーが「Other」で自由記述した内容は、プロンプトにそのまま反映する
+- All hearings use AskUserQuestion in selection format. Do not use text-based questions
+- Skip items that can be inferred from the user's initial input; only ask about gaps
+- Dynamically compose options based on the theme (the examples above are templates — adjust content accordingly)
+- A single AskUserQuestion can ask 1-4 questions simultaneously. Group related questions for efficient hearings
+- When the user enters free text via "Other", reflect it directly in the prompt
 
-## 言語
+## Language
 
-- ヒアリング（AskUserQuestionのlabel, description, question）はすべて日本語
-- 出力プロンプトも日本語
-- 手法名や専門用語は原語のまま保持する
+- Keep method names and technical terms in their original language
+- **All user-facing output, reports, and summaries must be written in Japanese(すべてのユーザーへの出力は日本語にしてください)**

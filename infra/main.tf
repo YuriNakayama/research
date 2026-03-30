@@ -118,6 +118,42 @@ module "monitoring" {
 }
 
 # =============================================================================
+# DynamoDB (Research reports metadata)
+# =============================================================================
+module "dynamodb" {
+  source = "./modules/dynamodb"
+
+  environment = var.environment
+  project     = var.project
+}
+
+# =============================================================================
+# Cognito (User authentication)
+# =============================================================================
+module "cognito" {
+  source = "./modules/cognito"
+
+  environment = var.environment
+  project     = var.project
+}
+
+# =============================================================================
+# Amplify (Next.js hosting)
+# =============================================================================
+module "amplify" {
+  source = "./modules/amplify"
+
+  environment           = var.environment
+  project               = var.project
+  github_repo           = var.github_repo
+  github_token          = var.github_token
+  cognito_user_pool_id  = module.cognito.user_pool_id
+  cognito_app_client_id = module.cognito.app_client_id
+  dynamodb_table_name   = module.dynamodb.table_name
+  dynamodb_table_arn    = module.dynamodb.table_arn
+}
+
+# =============================================================================
 # CI/CD (GitHub Actions OIDC role for ECR push)
 # =============================================================================
 module "cicd" {

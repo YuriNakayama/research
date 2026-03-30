@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Japanese Typography
+   ============================================================ */
+:root {
+  --font-sans: "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+}
+
+.dark {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  color: var(--color-foreground);
+  background: var(--color-background);
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+}
+
+/* ============================================================
+   Prose (Markdown content) overrides
+   ============================================================ */
+.prose {
+  max-width: 65ch;
+}
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose pre {
+  overflow-x: auto;
+}
+
+.prose code {
+  font-size: 0.875em;
+}
+
+@media (max-width: 767px) {
+  .prose code {
+    font-size: 0.8em;
+  }
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* KaTeX display math */
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}

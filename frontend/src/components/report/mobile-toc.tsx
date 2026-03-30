@@ -1,0 +1,66 @@
+"use client";
+
+import { useState } from "react";
+import { Toc, type TocItem } from "./toc";
+
+interface MobileTocProps {
+  items: TocItem[];
+}
+
+export function MobileToc({ items }: MobileTocProps) {
+  const [open, setOpen] = useState(false);
+
+  if (items.length === 0) return null;
+
+  return (
+    <>
+      {/* Floating button */}
+      <button
+        onClick={() => setOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gray-900 text-white shadow-lg lg:hidden dark:bg-gray-100 dark:text-gray-900"
+        aria-label="目次を開く"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 10h16M4 14h10M4 18h10"
+          />
+        </svg>
+      </button>
+
+      {/* Drawer overlay */}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 lg:hidden"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="absolute bottom-0 left-0 right-0 max-h-[70vh] overflow-y-auto rounded-t-xl bg-white p-6 dark:bg-gray-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <p className="font-semibold">目次</p>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="目次を閉じる"
+                className="rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <Toc items={items} />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

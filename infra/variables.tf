@@ -22,6 +22,13 @@ variable "github_repo" {
   default     = "YuriNakayama/research"
 }
 
+variable "github_token" {
+  description = "GitHub Personal Access Token for Amplify"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "schedule_enabled" {
   description = "Whether EventBridge schedule is enabled"
   type        = bool

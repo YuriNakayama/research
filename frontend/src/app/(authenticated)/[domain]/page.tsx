@@ -1,7 +1,11 @@
-import { getReportFiles, extractTitle, getReportContent, extractMetadata } from "@/lib/content";
+import { getDomains, getReportFiles, extractTitle, getReportContent, extractMetadata } from "@/lib/content";
 import { getAllReportMetadata } from "@/lib/metadata";
 import { ReportCard } from "@/components/report/report-card";
 import { notFound } from "next/navigation";
+
+export async function generateStaticParams() {
+  return getDomains().map((domain) => ({ domain }));
+}
 
 interface Props {
   params: Promise<{ domain: string }>;

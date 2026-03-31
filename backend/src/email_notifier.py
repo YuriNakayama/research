@@ -10,9 +10,13 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import boto3
 import markdown
+
+if TYPE_CHECKING:
+    from mypy_boto3_ses import SESClient
 from fpdf import FPDF
 from fpdf.fonts import FontFace
 
@@ -72,7 +76,7 @@ class _MarkdownPDF(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}/{{nb}}", align="C")
 
 
-def _get_ses_client(region: str) -> boto3.client:
+def _get_ses_client(region: str) -> SESClient:
     """Create SES client."""
     return boto3.client("ses", region_name=region)
 

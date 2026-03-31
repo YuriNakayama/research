@@ -83,6 +83,11 @@ resource "aws_iam_role" "amplify" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "amplify_managed" {
+  role       = aws_iam_role.amplify.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-Amplify"
+}
+
 resource "aws_iam_role_policy" "amplify_dynamodb" {
   name = "${var.project}_${var.environment}_amplify_dynamodb"
   role = aws_iam_role.amplify.id

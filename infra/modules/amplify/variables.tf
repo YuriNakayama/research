@@ -23,16 +23,6 @@ variable "cognito_app_client_id" {
   type        = string
 }
 
-variable "dynamodb_table_name" {
-  description = "DynamoDB reports table name"
-  type        = string
-}
-
-variable "dynamodb_table_arn" {
-  description = "DynamoDB reports table ARN"
-  type        = string
-}
-
 variable "github_token" {
   description = "GitHub Personal Access Token for Amplify"
   type        = string

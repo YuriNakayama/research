@@ -27,7 +27,7 @@ export function Toc({ items, className }: TocProps) {
       { rootMargin: "-80px 0px -80% 0px" },
     );
 
-    const headings = document.querySelectorAll("h2[id], h3[id]");
+    const headings = document.querySelectorAll("h2[id], h3[id], h4[id], h5[id], h6[id]");
     headings.forEach((h) => observer.observe(h));
 
     return () => observer.disconnect();
@@ -45,9 +45,12 @@ export function Toc({ items, className }: TocProps) {
               href={`#${item.id}`}
               className={cn(
                 "block truncate py-0.5 transition-colors hover:text-gray-900 dark:hover:text-gray-100",
+                item.level >= 4 && "text-xs",
                 activeId === item.id
                   ? "font-medium text-gray-900 dark:text-gray-100"
-                  : "text-gray-500 dark:text-gray-400",
+                  : item.level >= 4
+                    ? "text-gray-400 dark:text-gray-500"
+                    : "text-gray-500 dark:text-gray-400",
               )}
             >
               {item.text}

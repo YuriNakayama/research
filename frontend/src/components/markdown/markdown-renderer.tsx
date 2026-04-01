@@ -4,56 +4,37 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypePrettyCode from "rehype-pretty-code";
 import type { ComponentPropsWithoutRef } from "react";
+import { isValidElement } from "react";
+import { CodeBlock } from "./code-block";
+import { MermaidBlock } from "./mermaid-block";
+import { ImageWithCaption } from "./image-with-caption";
 
-// Allow KaTeX attributes through sanitize
-const sanitizeSchema = {
-  ...defaultSchema,
-  attributes: {
-    ...defaultSchema.attributes,
-    span: [
-      ...(defaultSchema.attributes?.span ?? []),
-      ["className", /^katex/],
-      "style",
-    ],
-    div: [
-      ...(defaultSchema.attributes?.div ?? []),
-      ["className", /^katex/],
-      "style",
-    ],
-    annotation: ["encoding"],
-    math: ["xmlns"],
-    semantics: [],
-  },
-  tagNames: [
-    ...(defaultSchema.tagNames ?? []),
-    "math",
-    "semantics",
-    "mrow",
-    "mi",
-    "mo",
-    "mn",
-    "msup",
-    "msub",
-    "mfrac",
-    "mover",
-    "munder",
-    "mtable",
-    "mtr",
-    "mtd",
-    "mtext",
-    "annotation",
-    "svg",
-    "path",
-    "line",
-    "rect",
-    "circle",
-  ],
+type MarkdownRendererProps = {
+  content: string;
 };
 
-interface MarkdownRendererProps {
-  content: string;
+function getElementProp(element: unknown, key: string): unknown {
+  if (!isValidElement(element)) return undefined;
+  return (element.props as Record<string, unknown>)[key];
+}
+
+function isMermaidCodeBlock(children: unknown): string | null {
+  const className = getElementProp(children, "className");
+  if (typeof className === "string" && className.includes("language-mermaid")) {
+    return extractTextFromChildren(getElementProp(children, "children"));
+  }
+  return null;
+}
+
+function extractTextFromChildren(node: unknown): string {
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(extractTextFromChildren).join("");
+  if (isValidElement(node)) {
+    return extractTextFromChildren((node.props as Record<string, unknown>).children);
+  }
+  return "";
 }
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
@@ -63,27 +44,40 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       remarkPlugins={[remarkMath, remarkGfm]}
       rehypePlugins={[
         rehypeKatex,
-        [rehypeSanitize, sanitizeSchema],
+        [rehypePrettyCode, {
+          theme: { dark: "github-dark", light: "github-light" },
+          keepBackground: true,
+        }],
       ]}
       components={{
+        pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => {
+          // Check if this is a mermaid code block
+          const mermaidCode = isMermaidCodeBlock(children);
+          if (mermaidCode) {
+            return <MermaidBlock code={mermaidCode} />;
+          }
+
+          // Get language from code child's className or data-language
+          const childClassName = getElementProp(children, "className");
+          const classStr = typeof childClassName === "string" ? childClassName : "";
+          const langMatch = classStr.match(/language-(\w+)/);
+          const language = (props as Record<string, unknown>)["data-language"] as string
+            ?? langMatch?.[1]
+            ?? undefined;
+
+          return (
+            <CodeBlock data-language={language} {...props}>
+              {children}
+            </CodeBlock>
+          );
+        },
         table: ({ children, ...props }: ComponentPropsWithoutRef<"table">) => (
           <div className="overflow-x-auto">
             <table {...props}>{children}</table>
           </div>
         ),
-        pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => (
-          <pre className="overflow-x-auto" {...props}>
-            {children}
-          </pre>
-        ),
-        img: ({ alt, ...props }: ComponentPropsWithoutRef<"img">) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt={alt ?? ""}
-            className="max-w-full rounded"
-            loading="lazy"
-            {...props}
-          />
+        img: (props: ComponentPropsWithoutRef<"img">) => (
+          <ImageWithCaption {...props} />
         ),
       }}
     >

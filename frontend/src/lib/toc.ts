@@ -9,7 +9,7 @@ export function extractTocItems(content: string): TocItem[] {
   const lines = content.split("\n");
 
   for (const line of lines) {
-    const match = line.match(/^(#{2,3})\s+(.+)$/);
+    const match = line.match(/^(#{2,6})\s+(.+)$/);
     if (match) {
       const level = match[1].length;
       const text = match[2].replace(/[*_`]/g, "");

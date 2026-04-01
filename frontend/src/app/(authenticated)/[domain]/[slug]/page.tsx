@@ -66,7 +66,7 @@ export default async function ReportPage({ params }: Props) {
         <span className="text-gray-700 dark:text-gray-200">{title}</span>
       </nav>
 
-      <div className="lg:grid lg:grid-cols-[1fr_220px] lg:gap-8">
+      <div className="lg:grid lg:grid-cols-[1fr_260px] lg:gap-8">
         {/* Main content */}
         <article>
           <ReportHeader title={title} metadata={metadata} />

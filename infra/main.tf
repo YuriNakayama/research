@@ -118,16 +118,6 @@ module "monitoring" {
 }
 
 # =============================================================================
-# DynamoDB (Research reports metadata)
-# =============================================================================
-module "dynamodb" {
-  source = "./modules/dynamodb"
-
-  environment = var.environment
-  project     = var.project
-}
-
-# =============================================================================
 # Cognito (User authentication)
 # =============================================================================
 module "cognito" {
@@ -149,8 +139,6 @@ module "amplify" {
   github_token          = var.github_token
   cognito_user_pool_id  = module.cognito.user_pool_id
   cognito_app_client_id = module.cognito.app_client_id
-  dynamodb_table_name   = module.dynamodb.table_name
-  dynamodb_table_arn    = module.dynamodb.table_arn
 }
 
 # =============================================================================

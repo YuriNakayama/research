@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "frontend/**"
+      - "docs/**"
       - ".github/workflows/ci-frontend.yml"
     types:
       - opened
@@ -23,6 +24,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Copy docs into frontend
+        run: cp -r docs frontend/docs
 
       - name: Install dependencies
         working-directory: frontend

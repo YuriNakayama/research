@@ -26,6 +26,9 @@ docs/works
 ## testing
 /frontend/coverage
 
+## docs (build-time copy from root docs/)
+/frontend/docs/
+
 ## next.js
 /frontend/.next/
 /frontend/out/

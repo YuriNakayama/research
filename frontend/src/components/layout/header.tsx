@@ -21,7 +21,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-4">
           {/* Mobile hamburger */}
           <button
@@ -53,18 +53,9 @@ export function Header() {
             </svg>
           </button>
 
-          <Link href="/" className="text-lg font-bold">
+          <Link href="/docs" className="text-lg font-bold">
             Research Viewer
           </Link>
-
-          <nav className="hidden gap-4 md:flex">
-            <Link
-              href="/legal_tech"
-              className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-            >
-              Legal Tech
-            </Link>
-          </nav>
         </div>
 
         <div className="flex items-center gap-2">
@@ -103,11 +94,11 @@ export function Header() {
       {menuOpen && (
         <nav className="border-t px-4 py-3 md:hidden dark:border-gray-800">
           <Link
-            href="/legal_tech"
+            href="/docs"
             className="block py-2 text-sm text-gray-600 dark:text-gray-400"
             onClick={() => setMenuOpen(false)}
           >
-            Legal Tech
+            ドキュメント
           </Link>
         </nav>
       )}

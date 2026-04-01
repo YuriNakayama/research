@@ -28,16 +28,6 @@ output "github_actions_role_arn" {
   value       = module.cicd.github_actions_role_arn
 }
 
-output "dynamodb_table_name" {
-  description = "DynamoDB reports table name"
-  value       = module.dynamodb.table_name
-}
-
-output "dynamodb_table_arn" {
-  description = "DynamoDB reports table ARN"
-  value       = module.dynamodb.table_arn
-}
-
 output "cognito_user_pool_id" {
   description = "Cognito User Pool ID"
   value       = module.cognito.user_pool_id

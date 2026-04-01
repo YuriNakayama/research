@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import type { ComponentPropsWithoutRef } from "react";
+import { MermaidDiagram } from "./mermaid-diagram";
 
 // Allow KaTeX attributes through sanitize
 const sanitizeSchema = {
@@ -85,6 +86,17 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             {...props}
           />
         ),
+        code: ({ className, children, ...props }: ComponentPropsWithoutRef<"code">) => {
+          const match = className?.match(/language-(\w+)/);
+          if (match?.[1] === "mermaid") {
+            return <MermaidDiagram chart={String(children).trim()} />;
+          }
+          return (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          );
+        },
       }}
     >
       {content}

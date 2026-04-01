@@ -21,10 +21,10 @@ resource "aws_amplify_app" "main" {
           phases:
             preBuild:
               commands:
+                - cp -r ../docs ./docs
                 - npm ci
             build:
               commands:
-                - npx tsx scripts/sync-dynamodb.ts
                 - npx next build
           artifacts:
             baseDirectory: .next
@@ -40,7 +40,6 @@ resource "aws_amplify_app" "main" {
     NEXT_PUBLIC_AWS_REGION              = data.aws_region.current.name
     NEXT_PUBLIC_COGNITO_USER_POOL_ID    = var.cognito_user_pool_id
     NEXT_PUBLIC_COGNITO_APP_CLIENT_ID   = var.cognito_app_client_id
-    DYNAMODB_TABLE_NAME                 = var.dynamodb_table_name
     AMPLIFY_MONOREPO_APP_ROOT           = "frontend"
   }
 
@@ -61,7 +60,7 @@ resource "aws_amplify_branch" "main" {
 }
 
 # =============================================================================
-# IAM Role for Amplify (DynamoDB access)
+# IAM Role for Amplify
 # =============================================================================
 
 resource "aws_iam_role" "amplify" {
@@ -86,27 +85,4 @@ resource "aws_iam_role" "amplify" {
 resource "aws_iam_role_policy_attachment" "amplify_managed" {
   role       = aws_iam_role.amplify.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-Amplify"
-}
-
-resource "aws_iam_role_policy" "amplify_dynamodb" {
-  name = "${var.project}_${var.environment}_amplify_dynamodb"
-  role = aws_iam_role.amplify.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:Query",
-        "dynamodb:Scan",
-        "dynamodb:UpdateItem"
-      ]
-      Resource = [
-        var.dynamodb_table_arn,
-        "${var.dynamodb_table_arn}/index/*"
-      ]
-    }]
-  })
 }

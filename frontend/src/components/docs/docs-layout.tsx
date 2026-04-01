@@ -43,7 +43,7 @@ export function DocsLayout({
 
       {/* Mobile navigation */}
       <MobileNav tree={tree} currentPath={currentPath} />
-      {mobileToc}
+      {mobileToc ? <div>{mobileToc}</div> : null}
     </div>
   );
 }

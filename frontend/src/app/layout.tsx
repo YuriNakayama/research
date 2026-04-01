@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "@fontsource-variable/noto-sans-jp";
 import "katex/dist/katex.min.css";
+import "highlight.js/styles/github.css";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
 

@@ -96,7 +96,7 @@ export default async function DocsPage({ params }: PageProps) {
     >
       <Breadcrumbs items={breadcrumbs} />
       {hasMetadata && <ReportHeader title={doc.title} metadata={doc.metadata} />}
-      <MarkdownRenderer content={doc.content} />
+      <MarkdownRenderer content={doc.content} basePath={currentSlug.slice(0, -1).join("/")} />
     </DocsLayout>
   );
 }

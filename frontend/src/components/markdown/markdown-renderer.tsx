@@ -13,7 +13,14 @@ import { ImageWithCaption } from "./image-with-caption";
 
 type MarkdownRendererProps = {
   content: string;
+  basePath?: string;
 };
+
+function preprocessMathBlocks(content: string): string {
+  return content.replace(/```math\n([\s\S]*?)```/g, (_match, math: string) => {
+    return `$$\n${math}$$`;
+  });
+}
 
 function getElementProp(element: unknown, key: string): unknown {
   if (!isValidElement(element)) return undefined;
@@ -37,7 +44,20 @@ function extractTextFromChildren(node: unknown): string {
   return "";
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+function resolveImageSrc(src: string | undefined, basePath: string | undefined): string | undefined {
+  if (!src) return src;
+  // Already absolute URL or absolute path
+  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) {
+    return src;
+  }
+  // Relative path — resolve against basePath via /api/docs-assets/
+  if (basePath) {
+    return `/api/docs-assets/${basePath}/${src}`;
+  }
+  return src;
+}
+
+export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
   return (
     <ReactMarkdown
       className="prose prose-sm md:prose-base lg:prose-lg dark:prose-invert max-w-none"
@@ -73,8 +93,8 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             <table {...props}>{children}</table>
           </div>
         ),
-        img: (props: ComponentPropsWithoutRef<"img">) => (
-          <ImageWithCaption {...props} />
+        img: ({ src, ...props }: ComponentPropsWithoutRef<"img">) => (
+          <ImageWithCaption src={resolveImageSrc(src, basePath)} {...props} />
         ),
         code: ({ className, children, ...props }: ComponentPropsWithoutRef<"code">) => {
           const match = className?.match(/language-(\w+)/);
@@ -89,7 +109,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
         },
       }}
     >
-      {content}
+      {preprocessMathBlocks(content)}
     </ReactMarkdown>
   );
 }

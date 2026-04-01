@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
-import rehypePrettyCode from "rehype-pretty-code";
+import rehypeHighlight from "rehype-highlight";
 import type { ComponentPropsWithoutRef } from "react";
 import { isValidElement } from "react";
 import { CodeBlock } from "./code-block";
@@ -44,10 +44,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       remarkPlugins={[remarkMath, remarkGfm]}
       rehypePlugins={[
         rehypeKatex,
-        [rehypePrettyCode, {
-          theme: { dark: "github-dark", light: "github-light" },
-          keepBackground: true,
-        }],
+        rehypeHighlight,
       ]}
       components={{
         pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => {

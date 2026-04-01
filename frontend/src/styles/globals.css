@@ -83,43 +83,22 @@ body {
 }
 
 /* ============================================================
-   rehype-pretty-code (Shiki) syntax highlighting
+   highlight.js syntax highlighting
    ============================================================ */
-[data-rehype-pretty-code-figure] {
-  margin: 1.5rem 0;
-  position: relative;
-}
-
-[data-rehype-pretty-code-figure] pre {
-  overflow-x: auto;
+.prose pre code.hljs {
+  padding: 1rem;
   border-radius: 0.5rem;
-  padding: 1rem 0;
   font-size: 0.875rem;
   line-height: 1.7;
 }
 
-[data-rehype-pretty-code-figure] code {
-  display: grid;
-  font-size: inherit;
+/* Dark mode: use github-dark, hide github-light */
+html.dark .hljs {
+  background: #0d1117 !important;
 }
 
-[data-rehype-pretty-code-figure] [data-line] {
-  padding: 0 1rem;
-}
-
-[data-rehype-pretty-code-figure] [data-highlighted-line] {
-  background: rgba(253, 224, 71, 0.1);
-}
-
-/* Dual theme: show correct theme based on html class */
-html:not(.dark) [data-rehype-pretty-code-figure] pre[data-theme="dark"],
-html:not(.dark) [data-rehype-pretty-code-figure] code[data-theme="dark"] {
-  display: none;
-}
-
-html.dark [data-rehype-pretty-code-figure] pre[data-theme="light"],
-html.dark [data-rehype-pretty-code-figure] code[data-theme="light"] {
-  display: none;
+html:not(.dark) .hljs {
+  background: #f6f8fa !important;
 }
 
 /* ============================================================

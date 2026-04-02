@@ -94,7 +94,7 @@ export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
           </div>
         ),
         img: ({ src, ...props }: ComponentPropsWithoutRef<"img">) => (
-          <ImageWithCaption src={resolveImageSrc(src, basePath)} {...props} />
+          <ImageWithCaption src={resolveImageSrc(typeof src === "string" ? src : undefined, basePath)} {...props} />
         ),
         code: ({ className, children, ...props }: ComponentPropsWithoutRef<"code">) => {
           const match = className?.match(/language-(\w+)/);

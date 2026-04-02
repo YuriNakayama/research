@@ -5,7 +5,7 @@ applications:
       phases:
         preBuild:
           commands:
-            - cp -r ../docs ./docs
+            - rm -rf ./docs && cp -r ../docs ./docs
             - npm ci
         build:
           commands:

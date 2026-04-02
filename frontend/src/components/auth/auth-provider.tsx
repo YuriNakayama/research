@@ -14,7 +14,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-500">読み込み中...</p>
+        <p className="text-[var(--text-tertiary)]">読み込み中...</p>
       </div>
     );
   }

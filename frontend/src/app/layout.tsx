@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 import "highlight.js/styles/github.css";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { PaletteProvider } from "@/components/layout/palette-provider";
 
 export const metadata: Metadata = {
   title: "Research Viewer",
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-screen bg-background antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>{children}</AuthProvider>
+          <PaletteProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </PaletteProvider>
         </ThemeProvider>
       </body>
     </html>

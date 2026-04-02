@@ -23,19 +23,19 @@ export function DocsLayout({
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)]">
       {/* Sidebar - desktop */}
-      <aside className="hidden w-60 shrink-0 overflow-y-auto border-r p-4 lg:block dark:border-gray-800">
+      <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-[var(--border-primary)] bg-[var(--sidebar-bg)] px-3 py-6 lg:block">
         <DirectoryTree nodes={tree} currentPath={currentPath} />
       </aside>
 
       {/* Main content */}
       <div className="flex min-w-0 flex-1">
-        <main className="min-w-0 flex-1 px-4 py-6 md:px-8">
+        <main className="min-w-0 flex-1 px-6 py-10 md:px-12 lg:px-16">
           {children}
         </main>
 
         {/* ToC - desktop */}
         {toc && (
-          <aside className="hidden w-52 shrink-0 overflow-y-auto p-4 xl:block">
+          <aside className="hidden w-52 shrink-0 overflow-y-auto py-10 pr-4 xl:block">
             {toc}
           </aside>
         )}

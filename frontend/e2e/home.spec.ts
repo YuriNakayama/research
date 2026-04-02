@@ -1,19 +1,28 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Home page", () => {
-  test("displays Research Viewer heading and domain cards", async ({ page }) => {
+test.describe("Home page (docs root)", () => {
+  test("redirects to /docs and displays document listing", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("main").getByRole("heading", { name: "Research Viewer" })).toBeVisible();
-    await expect(page.locator("main").getByText("Legal Tech")).toBeVisible();
-    await expect(page.getByText("法律・リーガルテック分野のリサーチ")).toBeVisible();
+    await expect(page).toHaveURL("/docs");
+    await expect(
+      page.getByRole("heading", { name: "ドキュメント" })
+    ).toBeVisible();
   });
 
-  test("navigates to domain page on card click", async ({ page }) => {
-    await page.goto("/");
-    await page
-      .getByRole("link", { name: "Legal Tech 法律・リーガルテック分野のリサーチ" })
-      .click();
-    await expect(page).toHaveURL("/legal_tech");
-    await expect(page.getByRole("heading", { name: "Legal Tech" })).toBeVisible();
+  test("displays root directory entries", async ({ page }) => {
+    await page.goto("/docs");
+    const main = page.locator("main");
+    await expect(
+      main.getByRole("link", { name: "research", exact: true })
+    ).toBeVisible();
+    await expect(
+      main.getByRole("link", { name: "daily", exact: true })
+    ).toBeVisible();
+  });
+
+  test("navigates to directory on folder card click", async ({ page }) => {
+    await page.goto("/docs");
+    await page.locator("main").getByRole("link", { name: "daily" }).click();
+    await expect(page).toHaveURL("/docs/daily");
   });
 });

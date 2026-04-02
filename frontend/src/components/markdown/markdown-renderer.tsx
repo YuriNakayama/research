@@ -44,8 +44,8 @@ function extractTextFromChildren(node: unknown): string {
   return "";
 }
 
-function resolveImageSrc(src: string | undefined, basePath: string | undefined): string | undefined {
-  if (!src) return src;
+function resolveImageSrc(src: string | Blob | undefined, basePath: string | undefined): string | undefined {
+  if (!src || typeof src !== "string") return typeof src === "string" ? src : undefined;
   // Already absolute URL or absolute path
   if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) {
     return src;

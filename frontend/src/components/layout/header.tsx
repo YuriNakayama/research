@@ -5,6 +5,8 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
+import { BookOpen, Sun, Moon, LogOut, Menu, X } from "lucide-react";
+import { PaletteSelector } from "./palette-selector";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -20,71 +22,51 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
+    <header className="sticky top-0 z-50 border-b border-[var(--border-primary)] bg-[var(--header-bg)]">
       <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-4">
           {/* Mobile hamburger */}
           <button
-            className="md:hidden"
+            className="md:hidden cursor-pointer"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="メニューを開く"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {menuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            {menuOpen ? (
+              <X className="h-5 w-5 text-[var(--header-text)]" strokeWidth={1.5} />
+            ) : (
+              <Menu className="h-5 w-5 text-[var(--header-text)]" strokeWidth={1.5} />
+            )}
           </button>
 
-          <Link href="/docs" className="text-lg font-bold">
-            Research Viewer
+          <Link href="/docs" className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-[var(--accent-bg)]" strokeWidth={1.5} />
+            <span className="text-base font-semibold tracking-tight text-[var(--header-text)]">
+              Research Viewer
+            </span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {mounted && <PaletteSelector />}
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="rounded-[var(--radius-md)] p-2 text-[var(--header-text-secondary)] transition-colors duration-200 hover:text-[var(--header-text)] hover:bg-white/10 cursor-pointer"
               aria-label="テーマ切替"
             >
               {theme === "dark" ? (
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <Sun className="h-[18px] w-[18px]" strokeWidth={1.5} />
               ) : (
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                </svg>
+                <Moon className="h-[18px] w-[18px]" strokeWidth={1.5} />
               )}
             </button>
           )}
 
           <button
             onClick={handleSignOut}
-            className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-1.5 text-sm text-[var(--header-text-secondary)] transition-colors duration-200 hover:text-[var(--header-text)] hover:bg-white/10 cursor-pointer"
           >
+            <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
             ログアウト
           </button>
         </div>
@@ -92,10 +74,10 @@ export function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="border-t px-4 py-3 md:hidden dark:border-gray-800">
+        <nav className="border-t border-white/10 px-4 py-3 md:hidden">
           <Link
             href="/docs"
-            className="block py-2 text-sm text-gray-600 dark:text-gray-400"
+            className="block py-2 text-sm text-[var(--header-text-secondary)] hover:text-[var(--header-text)]"
             onClick={() => setMenuOpen(false)}
           >
             ドキュメント

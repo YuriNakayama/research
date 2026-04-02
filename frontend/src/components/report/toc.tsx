@@ -7,10 +7,10 @@ export type { TocItem } from "@/lib/toc";
 export { extractTocItems } from "@/lib/toc";
 import type { TocItem } from "@/lib/toc";
 
-interface TocProps {
+type TocProps = {
   items: TocItem[];
   className?: string;
-}
+};
 
 export function Toc({ items, className }: TocProps) {
   const [activeId, setActiveId] = useState<string>("");
@@ -37,20 +37,20 @@ export function Toc({ items, className }: TocProps) {
 
   return (
     <nav className={cn("text-sm", className)} aria-label="目次">
-      <p className="mb-2 font-semibold">目次</p>
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+        目次
+      </p>
       <ul className="space-y-1">
         {items.map((item) => (
           <li key={item.id} style={{ paddingLeft: `${(item.level - 2) * 12}px` }}>
             <a
               href={`#${item.id}`}
               className={cn(
-                "block truncate py-0.5 transition-colors hover:text-gray-900 dark:hover:text-gray-100",
+                "block truncate border-l-2 py-0.5 pl-2 transition-colors duration-200",
                 item.level >= 4 && "text-xs",
                 activeId === item.id
-                  ? "font-medium text-gray-900 dark:text-gray-100"
-                  : item.level >= 4
-                    ? "text-gray-400 dark:text-gray-500"
-                    : "text-gray-500 dark:text-gray-400",
+                  ? "border-[var(--accent-bg)] font-medium text-[var(--text-accent)]"
+                  : "border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-link)]",
               )}
             >
               {item.text}

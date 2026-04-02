@@ -22,7 +22,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-500">認証確認中...</p>
+        <p className="text-[var(--text-tertiary)]">認証確認中...</p>
       </div>
     );
   }

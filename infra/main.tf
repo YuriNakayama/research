@@ -30,6 +30,16 @@ provider "aws" {
 }
 
 # =============================================================================
+# Load .env file
+# =============================================================================
+locals {
+  env_file = { for line in compact(split("\n", file("${path.module}/.env"))) :
+    split("=", line)[0] => join("=", slice(split("=", line), 1, length(split("=", line))))
+    if !startswith(trimspace(line), "#") && length(trimspace(line)) > 0
+  }
+}
+
+# =============================================================================
 # Networking
 # =============================================================================
 module "networking" {
@@ -136,9 +146,12 @@ module "amplify" {
   environment           = var.environment
   project               = var.project
   github_repo           = var.github_repo
-  github_token          = var.github_token
+  github_token          = local.env_file["GITHUB_ACCESS_TOKEN"]
   cognito_user_pool_id  = module.cognito.user_pool_id
   cognito_app_client_id = module.cognito.app_client_id
+  domain_name           = var.domain_name
+  subdomain_prefix      = var.subdomain_prefix
+  enable_custom_domain  = var.enable_custom_domain
 }
 
 # =============================================================================
@@ -147,13 +160,13 @@ module "amplify" {
 module "cicd" {
   source = "./modules/cicd"
 
-  environment            = var.environment
-  project                = var.project
-  github_repo            = var.github_repo
-  ecr_repository_arn     = module.ecr.repository_arn
-  ecs_cluster_arn        = module.ecs.cluster_arn
-  task_definition_arn    = module.ecs.task_definition_arn
+  environment             = var.environment
+  project                 = var.project
+  github_repo             = var.github_repo
+  ecr_repository_arn      = module.ecr.repository_arn
+  ecs_cluster_arn         = module.ecs.cluster_arn
+  task_definition_arn     = module.ecs.task_definition_arn
   task_execution_role_arn = module.ecs.task_execution_role_arn
-  task_role_arn          = module.ecs.task_role_arn
-  log_group_name         = module.monitoring.log_group_name
+  task_role_arn           = module.ecs.task_role_arn
+  log_group_name          = module.monitoring.log_group_name
 }

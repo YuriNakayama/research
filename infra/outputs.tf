@@ -47,3 +47,8 @@ output "amplify_default_domain" {
   description = "Amplify default domain"
   value       = module.amplify.default_domain
 }
+
+output "amplify_custom_domain_url" {
+  description = "Amplify custom domain URL"
+  value       = module.amplify.custom_domain_url
+}

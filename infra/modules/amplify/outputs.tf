@@ -12,3 +12,8 @@ output "amplify_role_arn" {
   description = "Amplify IAM role ARN"
   value       = aws_iam_role.amplify.arn
 }
+
+output "custom_domain_url" {
+  description = "Custom domain URL for Amplify app"
+  value       = var.enable_custom_domain ? "https://${var.subdomain_prefix}.${var.domain_name}" : null
+}

@@ -34,3 +34,21 @@ variable "schedule_enabled" {
   type        = bool
   default     = true
 }
+
+variable "domain_name" {
+  description = "Custom domain name for Amplify app (e.g. avifauna.click)"
+  type        = string
+  default     = "avifauna.click"
+}
+
+variable "subdomain_prefix" {
+  description = "Subdomain prefix for Amplify app (e.g. owl -> owl.avifauna.click)"
+  type        = string
+  default     = "owl"
+}
+
+variable "enable_custom_domain" {
+  description = "Whether to enable custom domain for Amplify app"
+  type        = bool
+  default     = true
+}

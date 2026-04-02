@@ -37,10 +37,10 @@ resource "aws_amplify_app" "main" {
   YAML
 
   environment_variables = {
-    NEXT_PUBLIC_AWS_REGION              = data.aws_region.current.name
-    NEXT_PUBLIC_COGNITO_USER_POOL_ID    = var.cognito_user_pool_id
-    NEXT_PUBLIC_COGNITO_APP_CLIENT_ID   = var.cognito_app_client_id
-    AMPLIFY_MONOREPO_APP_ROOT           = "frontend"
+    NEXT_PUBLIC_AWS_REGION            = data.aws_region.current.name
+    NEXT_PUBLIC_COGNITO_USER_POOL_ID  = var.cognito_user_pool_id
+    NEXT_PUBLIC_COGNITO_APP_CLIENT_ID = var.cognito_app_client_id
+    AMPLIFY_MONOREPO_APP_ROOT         = "frontend"
   }
 
   tags = {
@@ -85,4 +85,22 @@ resource "aws_iam_role" "amplify" {
 resource "aws_iam_role_policy_attachment" "amplify_managed" {
   role       = aws_iam_role.amplify.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-Amplify"
+}
+
+# =============================================================================
+# Custom Domain
+# =============================================================================
+
+resource "aws_amplify_domain_association" "main" {
+  count = var.enable_custom_domain ? 1 : 0
+
+  app_id      = aws_amplify_app.main.id
+  domain_name = var.domain_name
+
+  sub_domain {
+    branch_name = aws_amplify_branch.main.branch_name
+    prefix      = var.subdomain_prefix
+  }
+
+  wait_for_verification = true
 }

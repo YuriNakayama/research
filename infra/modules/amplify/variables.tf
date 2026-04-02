@@ -29,3 +29,21 @@ variable "github_token" {
   sensitive   = true
   default     = ""
 }
+
+variable "domain_name" {
+  description = "Custom domain name for Amplify app (e.g. avifauna.click)"
+  type        = string
+  default     = ""
+}
+
+variable "subdomain_prefix" {
+  description = "Subdomain prefix for Amplify app (e.g. owl -> owl.avifauna.click)"
+  type        = string
+  default     = ""
+}
+
+variable "enable_custom_domain" {
+  description = "Whether to enable custom domain for Amplify app"
+  type        = bool
+  default     = false
+}

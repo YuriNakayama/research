@@ -28,6 +28,7 @@ docs/works
 
 ## docs (build-time copy from root docs/)
 /frontend/docs/
+/frontend/docs
 
 ## next.js
 /frontend/.next/

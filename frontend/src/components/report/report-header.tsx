@@ -1,7 +1,9 @@
-interface ReportHeaderProps {
+import { ExternalLink } from "lucide-react";
+
+type ReportHeaderProps = {
   title: string;
   metadata: Record<string, string>;
-}
+};
 
 export function ReportHeader({ title, metadata }: ReportHeaderProps) {
   const items = [
@@ -12,16 +14,18 @@ export function ReportHeader({ title, metadata }: ReportHeaderProps) {
   ].filter((item) => item.value);
 
   return (
-    <div className="mb-8 border-b pb-6 dark:border-gray-700">
-      <h1 className="mb-4 text-2xl font-bold leading-tight md:text-3xl">
+    <div className="mb-10 border-b border-[var(--border-primary)] pb-8">
+      <h1 className="mb-4 text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-4xl">
         {title}
       </h1>
       {items.length > 0 && (
-        <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+        <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm">
           {items.map((item) => (
-            <div key={item.label} className="flex gap-1">
-              <dt className="font-medium">{item.label}:</dt>
-              <dd>{item.value}</dd>
+            <div key={item.label} className="flex items-center gap-2">
+              <dt className="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+                {item.label}
+              </dt>
+              <dd className="text-[var(--text-secondary)]">{item.value}</dd>
             </div>
           ))}
         </dl>
@@ -31,9 +35,10 @@ export function ReportHeader({ title, metadata }: ReportHeaderProps) {
           href={metadata["link"]}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-sm text-blue-600 hover:underline dark:text-blue-400"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--text-link)] transition-colors duration-200 hover:text-[var(--text-accent)]"
         >
           元論文を開く
+          <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
         </a>
       )}
     </div>

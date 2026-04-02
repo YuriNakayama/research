@@ -54,11 +54,11 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
   if (error) {
     return (
-      <div className="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+      <div className="rounded-[var(--radius-md)] border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
         <p className="text-sm text-red-600 dark:text-red-400">
           Mermaid diagram render error
         </p>
-        <pre className="mt-2 overflow-x-auto text-xs text-gray-600 dark:text-gray-400">
+        <pre className="mt-2 overflow-x-auto text-xs text-[var(--text-secondary)]">
           {chart}
         </pre>
       </div>
@@ -67,8 +67,8 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
   if (!svg) {
     return (
-      <div className="flex h-32 items-center justify-center rounded-md border bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-        <p className="text-sm text-gray-400">Loading diagram...</p>
+      <div className="flex h-32 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-primary)] bg-[var(--surface-secondary)]">
+        <p className="text-sm text-[var(--text-tertiary)]">Loading diagram...</p>
       </div>
     );
   }

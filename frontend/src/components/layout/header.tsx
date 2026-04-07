@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
-import { BookOpen, Sun, Moon, LogOut, Menu, X } from "lucide-react";
+import { Sun, Moon, LogOut, Menu, X } from "lucide-react";
 import { PaletteSelector } from "./palette-selector";
 
 export function Header() {
@@ -22,65 +22,73 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border-primary)] bg-[var(--header-bg)]">
-      <div className="flex h-14 items-center justify-between px-4">
-        <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-50 brutal-border-b border-[var(--border-primary)] bg-[var(--header-bg)]">
+      <div className="flex h-14 items-center justify-between">
+        <div className="flex items-center">
           {/* Mobile hamburger */}
           <button
-            className="md:hidden cursor-pointer"
+            type="button"
+            className="flex h-14 w-14 items-center justify-center brutal-border-r border-[var(--border-primary)] text-[var(--header-text)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] md:hidden cursor-pointer"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="メニューを開く"
           >
             {menuOpen ? (
-              <X className="h-5 w-5 text-[var(--header-text)]" strokeWidth={1.5} />
+              <X className="h-5 w-5" strokeWidth={2} />
             ) : (
-              <Menu className="h-5 w-5 text-[var(--header-text)]" strokeWidth={1.5} />
+              <Menu className="h-5 w-5" strokeWidth={2} />
             )}
           </button>
 
-          <Link href="/docs" className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-[var(--accent-bg)]" strokeWidth={1.5} />
-            <span className="text-base font-semibold tracking-tight text-[var(--header-text)]">
-              Research Viewer
+          <Link
+            href="/docs"
+            className="flex h-14 items-center gap-3 px-4 brutal-border-r border-[var(--border-primary)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)]"
+          >
+            <span className="brutal-label text-[var(--accent-bg)] group-hover:text-[var(--accent-text)]">
+              [001]
+            </span>
+            <span className="brutal-display text-base text-[var(--header-text)] group-hover:text-[var(--accent-text)]">
+              RESEARCH/VIEWER
             </span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex h-14 items-center">
           {mounted && <PaletteSelector />}
           {mounted && (
             <button
+              type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-[var(--radius-md)] p-2 text-[var(--header-text-secondary)] transition-colors duration-200 hover:text-[var(--header-text)] hover:bg-white/10 cursor-pointer"
+              className="flex h-14 w-14 items-center justify-center brutal-border-l border-[var(--border-primary)] text-[var(--header-text)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
               aria-label="テーマ切替"
             >
               {theme === "dark" ? (
-                <Sun className="h-[18px] w-[18px]" strokeWidth={1.5} />
+                <Sun className="h-[18px] w-[18px]" strokeWidth={2} />
               ) : (
-                <Moon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+                <Moon className="h-[18px] w-[18px]" strokeWidth={2} />
               )}
             </button>
           )}
 
           <button
+            type="button"
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-1.5 text-sm text-[var(--header-text-secondary)] transition-colors duration-200 hover:text-[var(--header-text)] hover:bg-white/10 cursor-pointer"
+            className="flex h-14 items-center gap-2 px-4 brutal-border-l border-[var(--border-primary)] brutal-label text-[var(--header-text)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
           >
-            <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
-            ログアウト
+            <LogOut className="h-3.5 w-3.5" strokeWidth={2} />
+            LOGOUT
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="border-t border-white/10 px-4 py-3 md:hidden">
+        <nav className="brutal-border-t border-[var(--border-primary)] bg-[var(--header-bg)] md:hidden">
           <Link
             href="/docs"
-            className="block py-2 text-sm text-[var(--header-text-secondary)] hover:text-[var(--header-text)]"
+            className="block brutal-border-b border-[var(--border-primary)] px-4 py-3 brutal-label text-[var(--header-text)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)]"
             onClick={() => setMenuOpen(false)}
           >
-            ドキュメント
+            &gt; DOCS
           </Link>
         </nav>
       )}

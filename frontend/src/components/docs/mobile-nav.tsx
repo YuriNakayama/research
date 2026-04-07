@@ -25,11 +25,12 @@ export function MobileNav({ tree, currentPath }: MobileNavProps) {
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent-bg)] text-[var(--accent-text)] shadow-lg lg:hidden cursor-pointer"
+        className="fixed bottom-20 right-5 z-40 flex h-14 w-14 items-center justify-center brutal-border-strong brutal-shadow bg-[var(--accent-bg)] text-[var(--accent-text)] transition-transform active:translate-x-[2px] active:translate-y-[2px] lg:hidden cursor-pointer"
         aria-label="ナビゲーションを開く"
       >
-        <Menu className="h-5 w-5" strokeWidth={1.5} />
+        <Menu className="h-6 w-6" strokeWidth={2.5} />
       </button>
 
       {open && (
@@ -38,23 +39,25 @@ export function MobileNav({ tree, currentPath }: MobileNavProps) {
           onClick={() => setOpen(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-[var(--surface-elevated)] p-8"
+            className="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto brutal-border-t border-[var(--border-primary)] bg-[var(--sidebar-bg)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[var(--border-primary)]" />
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
-                ナビゲーション
+            <div className="sticky top-0 flex items-center justify-between brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)] px-4 py-3">
+              <p className="brutal-label text-[var(--text-inverse)]">
+                [NAV] / INDEX
               </p>
               <button
+                type="button"
                 onClick={() => setOpen(false)}
                 aria-label="ナビゲーションを閉じる"
-                className="rounded-[var(--radius-sm)] p-1 text-[var(--text-tertiary)] transition-colors duration-200 hover:bg-[var(--surface-tertiary)] hover:text-[var(--text-primary)] cursor-pointer"
+                className="flex h-7 w-7 items-center justify-center text-[var(--text-inverse)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
               >
-                <X className="h-5 w-5" strokeWidth={1.5} />
+                <X className="h-4 w-4" strokeWidth={2.5} />
               </button>
             </div>
-            <DirectoryTree nodes={tree} currentPath={currentPath} />
+            <div className="px-3 py-4">
+              <DirectoryTree nodes={tree} currentPath={currentPath} />
+            </div>
           </div>
         </div>
       )}

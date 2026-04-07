@@ -292,9 +292,35 @@ If "Deep-dive into a specific cluster" is selected, show a follow-up AskUserQues
 
 ## Output Location
 
-- File input: Output in the same directory as the input file
-- Conversational input: Output under `docs/research/` in the current working directory (create if it doesn't exist)
-- Filename: `research-clustering-{topic-slug}.md` (single file) or `research-clustering-{topic-slug}/` (directory)
+**MUST READ FIRST**: Before deciding the output path, read `docs/research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
+
+### Path resolution
+
+1. Identify the **domain** (`<domain>`, `snake_case`):
+   - Infer from input file path if it lives under `docs/research/(runs|domains)/<domain>/...`
+   - Otherwise infer from the research theme or ask the user
+2. If `docs/research/domains/<domain>/domain.yaml` exists and defines `output_paths.clustering`, use it.
+3. Otherwise use the default path:
+
+   ```
+   docs/research/runs/<domain>/clustering/<YYYYMMDD>/
+   ```
+
+   - Output `index.md` and `cluster-NN-*.md` files inside this directory.
+   - `<YYYYMMDD>` is today's date (UTC or JST is acceptable, use whichever the pipeline uses).
+4. **Never write directly under `docs/research/domains/<domain>/`** — that layer is composed of symlinks pointing into `runs/`.
+5. **Never overwrite or modify existing files under `runs/<domain>/clustering/<old_date>/`** — clustering is append-only. Re-clustering creates a NEW dated directory.
+
+### After writing
+
+After the new clustering run is written, update (or instruct the pipeline/user to update) the latest pointer:
+
+```bash
+ln -snf <YYYYMMDD> docs/research/runs/<domain>/clustering/latest
+ln -snf ../../runs/<domain>/clustering/latest docs/research/domains/<domain>/clustering
+```
+
+If the `domains/<domain>/` directory does not yet exist, create it (it is just a view layer).
 
 ## Parallel Processing
 

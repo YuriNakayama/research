@@ -740,11 +740,40 @@ If "Revise specific reports" is selected, present a follow-up AskUserQuestion wi
 
 ## Output Location
 
-- **Gather output as input**: Output in the same directory as the gather file
-- **File input (URLs/PDFs)**: Output in the same directory as the input file
-- **Conversational input**: Output under `docs/research/` in the current working directory (create if needed)
-- **Directory name**: `{topic-slug}-reports/`
-- **Report filenames**: `{NN}-{kebab-case-short-name}.md` (NN = zero-padded sequential number)
+**MUST READ FIRST**: Before deciding the output path, read `docs/research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
+
+### Path resolution
+
+1. Identify the **domain** (`<domain>`, `snake_case`):
+   - If the input is a gather/clustering file under `docs/research/runs/<domain>/...`, use that `<domain>`.
+   - Otherwise infer from context or ask the user.
+2. Identify the **cluster** (`<cluster>`):
+   - From the gather file's cluster context (e.g., `metalearner`, `nl2sql-nl2code`).
+   - If retrieving for a free-form URL/PDF list with no cluster context, use `all`.
+3. If `docs/research/domains/<domain>/domain.yaml` defines `output_paths.retrieval`, use it.
+4. Otherwise use the default path:
+
+   ```
+   docs/research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/
+   ```
+
+   - Place `index.md` and per-resource files (`NN-kebab-case-name.md`) inside this directory.
+5. **Never write directly under `docs/research/domains/<domain>/reports/`** — that layer is symlinks.
+6. **Never overwrite previous retrieval runs** — append-only.
+
+### After writing
+
+Update the latest pointer:
+
+```bash
+ln -snf <YYYYMMDD>_<cluster> docs/research/runs/<domain>/retrieval/latest_<cluster>
+ln -snf ../../../runs/<domain>/retrieval/latest_<cluster> docs/research/domains/<domain>/reports/<cluster>
+```
+
+### Filename conventions
+
+- Report filenames: `{NN}-{kebab-case-short-name}.md` (NN = zero-padded sequential number)
+- Index filename: `index.md`
 
 ## Parallel Processing
 

@@ -387,9 +387,35 @@ AskUserQuestion:
 
 ## Output Location
 
-- **Clustering output as input**: Output in the same directory as the clustering file
-- **Conversational input**: Output under `docs/research/` in the current working directory (create if needed)
-- **Filename convention**: `resources-{topic-slug}.md` (single Markdown file)
+**MUST READ FIRST**: Before deciding the output path, read `docs/research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
+
+### Path resolution
+
+1. Identify the **domain** (`<domain>`, `snake_case`):
+   - If the input is a clustering file under `docs/research/runs/<domain>/clustering/...`, use that `<domain>`.
+   - Otherwise infer from the research theme or ask the user.
+2. Identify the **cluster** (`<cluster>`):
+   - From the clustering result section being processed (cluster ID like `metalearner` / `nl2sql-nl2code`).
+   - If gathering across all clusters / no cluster context, use `all`.
+3. If `docs/research/domains/<domain>/domain.yaml` defines `output_paths.gather`, use it.
+4. Otherwise use the default path:
+
+   ```
+   docs/research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/
+   ```
+
+   - Filename: `resources-<topic-slug>.md` inside this directory.
+5. **Never write directly under `docs/research/domains/<domain>/resources/`** — that layer is symlinks.
+6. **Never overwrite previous gather runs** — append-only.
+
+### After writing
+
+Update the latest pointer:
+
+```bash
+ln -snf <YYYYMMDD>_<cluster> docs/research/runs/<domain>/gather/latest_<cluster>
+ln -snf ../../../runs/<domain>/gather/latest_<cluster> docs/research/domains/<domain>/resources/<cluster>
+```
 
 ## Parallel Processing
 

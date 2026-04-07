@@ -105,6 +105,7 @@ dev/create-worktree  # Create git worktree with .env copy
 | `.claude/rules/backend.md` | `backend/**` | Python code changes, Dockerfile edits, pytest, ruff/mypy configuration |
 | `.claude/rules/infra.md` | `infra/**` | Terraform changes, AWS resource design, module structure decisions |
 | `.claude/rules/frontend.md` | `frontend/**` | Not applicable to this project (legacy, from previous AI Reception project) |
+| `.claude/rules/research.md` | `docs/research/**` | Research output directory layout, phase-specific output paths, domain/cluster naming, latest pointer rules |
 | `.claude/rules/security.md` | Always loaded | Commits, secret handling, IAM design, network security, CI/CD pipeline changes |
 
 ## Response Language

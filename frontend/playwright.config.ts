@@ -1,4 +1,14 @@
+import { randomBytes } from "node:crypto";
 import { defineConfig, devices } from "@playwright/test";
+
+// Generate a fresh bypass token for every Playwright run. The token is passed
+// to the dev server via env var and to the browser via extraHTTPHeaders, so
+// only requests originating from this run can skip the middleware auth check.
+// It is intentionally NOT prefixed with NEXT_PUBLIC_, so it never reaches the
+// client bundle.
+const bypassToken =
+  process.env.E2E_BYPASS_TOKEN ?? randomBytes(32).toString("hex");
+process.env.E2E_BYPASS_TOKEN = bypassToken;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -12,6 +22,9 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    extraHTTPHeaders: {
+      "x-e2e-bypass": bypassToken,
+    },
   },
   projects: [
     {
@@ -24,9 +37,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "NEXT_PUBLIC_E2E_TEST=true npm run dev -- --port 3000",
+    command: "npm run dev -- --port 3000",
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
+    env: {
+      E2E_BYPASS_TOKEN: bypassToken,
+    },
   },
 });

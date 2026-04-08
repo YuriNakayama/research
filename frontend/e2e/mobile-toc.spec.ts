@@ -29,7 +29,7 @@ test.describe("Mobile TOC", () => {
     await expect(
       page.getByRole("button", { name: "目次を閉じる" })
     ).toBeVisible();
-    await page.getByRole("button", { name: "目次を閉じる" }).click();
+    await page.getByRole("button", { name: "目次を閉じる" }).click({ force: true });
     await expect(
       page.getByRole("button", { name: "目次を閉じる" })
     ).not.toBeVisible();

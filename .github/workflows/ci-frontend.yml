@@ -12,10 +12,21 @@ on:
       - ready_for_review
   workflow_dispatch:
 
+# Required for aws-actions/configure-aws-credentials via OIDC.
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  # Terraform-managed secret holding { email, password } for the Cognito E2E
+  # test user. Read at runtime only — never written to disk or logs.
+  E2E_TEST_USER_SECRET_ID: auto_research/dev/e2e-test-user
+
 jobs:
   ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v5
@@ -43,3 +54,51 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npx next build
+        env:
+          NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          NEXT_PUBLIC_COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+
+      # ---------------------------------------------------------------------
+      # E2E (Playwright)
+      # ---------------------------------------------------------------------
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Fetch Cognito E2E test user credentials
+        id: e2e_user
+        run: |
+          set -euo pipefail
+          secret_json=$(aws secretsmanager get-secret-value \
+            --secret-id "$E2E_TEST_USER_SECRET_ID" \
+            --query SecretString --output text)
+          email=$(echo "$secret_json" | jq -r .email)
+          password=$(echo "$secret_json" | jq -r .password)
+          # Mask immediately so no subsequent step can accidentally print them.
+          echo "::add-mask::$email"
+          echo "::add-mask::$password"
+          echo "email=$email" >> "$GITHUB_OUTPUT"
+          echo "password=$password" >> "$GITHUB_OUTPUT"
+
+      - name: Run Playwright
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          NEXT_PUBLIC_COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          E2E_TEST_USER_EMAIL: ${{ steps.e2e_user.outputs.email }}
+          E2E_TEST_USER_PASSWORD: ${{ steps.e2e_user.outputs.password }}
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7

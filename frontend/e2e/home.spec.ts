@@ -4,9 +4,7 @@ test.describe("Home page (docs root)", () => {
   test("redirects to /docs and displays document listing", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveURL("/docs");
-    await expect(
-      page.getByRole("heading", { name: "ドキュメント" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "DOCS" })).toBeVisible();
   });
 
   test("displays root directory entries", async ({ page }) => {

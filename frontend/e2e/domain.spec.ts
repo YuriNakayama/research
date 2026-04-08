@@ -4,7 +4,7 @@ test.describe("Domain page (directory listing)", () => {
   test("displays directory entries for daily/legal_tech", async ({ page }) => {
     await page.goto("/docs/daily/legal_tech");
     await expect(
-      page.getByRole("heading", { name: "legal_tech" })
+      page.getByRole("heading", { name: "LEGAL_TECH" })
     ).toBeVisible();
     const main = page.locator("main");
     await expect(

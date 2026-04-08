@@ -4,8 +4,8 @@ test.describe("Header", () => {
   test("shows logo and navigation controls", async ({ page }) => {
     await page.goto("/docs");
     const header = page.locator("header");
-    await expect(header.getByText("Research Viewer")).toBeVisible();
-    await expect(header.getByText("ログアウト")).toBeVisible();
+    await expect(header.getByText("RESEARCH/VIEWER")).toBeVisible();
+    await expect(header.getByText("LOGOUT")).toBeVisible();
   });
 
   test("theme toggle button is present", async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe("Header", () => {
     await page.goto("/docs/daily");
     await page
       .locator("header")
-      .getByRole("link", { name: "Research Viewer" })
+      .getByRole("link", { name: "RESEARCH/VIEWER" })
       .click();
     await expect(page).toHaveURL("/docs");
   });
@@ -40,8 +40,9 @@ test.describe("Header — mobile", () => {
     const menuButton = page.getByRole("button", { name: "メニューを開く" });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
+    // Mobile nav renders "> DOCS" as a link.
     await expect(
-      page.locator("header nav").getByText("ドキュメント")
+      page.locator("header nav").getByRole("link", { name: /DOCS/ })
     ).toBeVisible();
   });
 });

@@ -78,4 +78,5 @@ __pycache__/
 *.auto.tfvars
 *.auto.tfvars.json
 
-*.db
+*.dbbackend/.coverage
+.claude/skills/list/SKILL.md

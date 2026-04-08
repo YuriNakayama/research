@@ -33,7 +33,12 @@ provider "aws" {
 # Load .env file
 # =============================================================================
 locals {
-  env_file = { for line in compact(split("\n", file("${path.module}/.env"))) :
+  # `.env` is gitignored and only present in developer / apply environments.
+  # In CI (terraform validate) the file is absent, so fall back to an empty
+  # map. Consumers that require a key should fail loudly via lookup(...) or
+  # direct indexing at plan/apply time rather than at validate time.
+  env_file_raw = fileexists("${path.module}/.env") ? file("${path.module}/.env") : ""
+  env_file = { for line in compact(split("\n", local.env_file_raw)) :
     split("=", line)[0] => join("=", slice(split("=", line), 1, length(split("=", line))))
     if !startswith(trimspace(line), "#") && length(trimspace(line)) > 0
   }
@@ -80,6 +85,12 @@ module "secrets" {
 
   environment = var.environment
   project     = var.project
+
+  # E2E test user credentials. The flag is the same var the cognito module
+  # uses, so the secret and the Cognito user are always created together.
+  create_e2e_test_user_secret = var.create_e2e_test_user
+  e2e_test_user_email         = module.cognito.e2e_test_user_email
+  e2e_test_user_password      = module.cognito.e2e_test_user_password
 }
 
 # =============================================================================
@@ -133,8 +144,10 @@ module "monitoring" {
 module "cognito" {
   source = "./modules/cognito"
 
-  environment = var.environment
-  project     = var.project
+  environment          = var.environment
+  project              = var.project
+  create_e2e_test_user = var.create_e2e_test_user
+  e2e_test_user_email  = var.e2e_test_user_email
 }
 
 # =============================================================================
@@ -146,7 +159,7 @@ module "amplify" {
   environment           = var.environment
   project               = var.project
   github_repo           = var.github_repo
-  github_token          = local.env_file["GITHUB_ACCESS_TOKEN"]
+  github_token          = lookup(local.env_file, "GITHUB_ACCESS_TOKEN", "")
   cognito_user_pool_id  = module.cognito.user_pool_id
   cognito_app_client_id = module.cognito.app_client_id
   domain_name           = var.domain_name
@@ -160,13 +173,15 @@ module "amplify" {
 module "cicd" {
   source = "./modules/cicd"
 
-  environment             = var.environment
-  project                 = var.project
-  github_repo             = var.github_repo
-  ecr_repository_arn      = module.ecr.repository_arn
-  ecs_cluster_arn         = module.ecs.cluster_arn
-  task_definition_arn     = module.ecs.task_definition_arn
-  task_execution_role_arn = module.ecs.task_execution_role_arn
-  task_role_arn           = module.ecs.task_role_arn
-  log_group_name          = module.monitoring.log_group_name
+  environment              = var.environment
+  project                  = var.project
+  github_repo              = var.github_repo
+  ecr_repository_arn       = module.ecr.repository_arn
+  ecs_cluster_arn          = module.ecs.cluster_arn
+  task_definition_arn      = module.ecs.task_definition_arn
+  task_execution_role_arn  = module.ecs.task_execution_role_arn
+  task_role_arn            = module.ecs.task_role_arn
+  log_group_name           = module.monitoring.log_group_name
+  e2e_test_user_secret_arn = module.secrets.e2e_test_user_secret_arn
+  grant_e2e_secret_read    = var.create_e2e_test_user
 }

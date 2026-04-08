@@ -52,3 +52,15 @@ variable "enable_custom_domain" {
   type        = bool
   default     = true
 }
+
+variable "create_e2e_test_user" {
+  description = "Whether to create a Cognito user + Secrets Manager entry for E2E login tests"
+  type        = bool
+  default     = false
+}
+
+variable "e2e_test_user_email" {
+  description = "Email/username for the Cognito E2E test user"
+  type        = string
+  default     = "e2e-test@example.com"
+}

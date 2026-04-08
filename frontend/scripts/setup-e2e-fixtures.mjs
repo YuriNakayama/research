@@ -1,12 +1,23 @@
-/**
- * E2E test fixture setup/teardown.
- * Creates temporary markdown report files under docs/ so pages render correctly.
- */
+#!/usr/bin/env node
+// E2E fixture bootstrap.
+//
+// Playwright specs assert against specific routes (e.g. the `daily/legal_tech`
+// directory listing and a known report). The real `docs/` tree has been
+// reorganised into `docs/research/runs/<domain>/<phase>/<date>/`, so the
+// fixture below reintroduces a deterministic anchor that the specs can rely
+// on without having to track the evolving research layout.
+//
+// Run this BEFORE `next build` so that `generateStaticParams` (which runs at
+// build time with `dynamicParams = false`) sees the fixture routes.
+
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const DOCS_ROOT = path.join(__dirname, "..", "..", "docs");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DOCS_ROOT = path.join(__dirname, "..", "docs");
 const REPORT_DIR = path.join(DOCS_ROOT, "daily", "legal_tech", "report");
+const REPORT_PATH = path.join(REPORT_DIR, "20260329.md");
 
 const FIXTURE_REPORT = `# Natural Language Processing for the Legal Domain
 
@@ -44,22 +55,6 @@ where $TP$ represents true positives and $FP$ represents false positives.
 This survey highlights the growing importance of NLP in the legal domain.
 `;
 
-const createdFiles: string[] = [];
-
-export function setupFixtures(): void {
-  fs.mkdirSync(REPORT_DIR, { recursive: true });
-
-  const reportPath = path.join(REPORT_DIR, "20260329.md");
-  if (!fs.existsSync(reportPath)) {
-    fs.writeFileSync(reportPath, FIXTURE_REPORT, "utf-8");
-    createdFiles.push(reportPath);
-  }
-}
-
-export function teardownFixtures(): void {
-  for (const file of createdFiles) {
-    if (fs.existsSync(file)) {
-      fs.unlinkSync(file);
-    }
-  }
-}
+fs.mkdirSync(REPORT_DIR, { recursive: true });
+fs.writeFileSync(REPORT_PATH, FIXTURE_REPORT, "utf-8");
+console.log(`[e2e-fixtures] wrote ${path.relative(process.cwd(), REPORT_PATH)}`);

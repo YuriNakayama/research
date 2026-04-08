@@ -73,8 +73,10 @@ def get_github_token(region: str = "ap-northeast-1", environment: str = "dev", p
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    token = get_github_token(
+    get_github_token(
         region=os.environ.get("AWS_REGION", "ap-northeast-1"),
         environment=os.environ.get("ENVIRONMENT", "dev"),
     )
-    print(token)
+    # Intentionally do not write the token to stdout. Success is signalled by
+    # the INFO log emitted from get_github_token; printing the token here would
+    # leak a short-lived installation credential into shell history and logs.

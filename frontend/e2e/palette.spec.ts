@@ -36,8 +36,8 @@ test.describe("Palette selector", () => {
       "data-palette",
       "forest"
     );
-    // Navigate to another page
-    await page.getByRole("link", { name: "daily" }).click();
+    // Navigate to another page (match by href since cards include extra labels)
+    await page.locator('main a[href="/docs/daily"]').first().click();
     await expect(page).toHaveURL("/docs/daily");
     // Palette should persist
     await expect(page.locator("html")).toHaveAttribute(

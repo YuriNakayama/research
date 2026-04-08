@@ -19,16 +19,6 @@ function PostLogin() {
 }
 
 export default function LoginPage() {
-  const router = useRouter();
-
-  // In non-production builds, skip the login screen entirely so local
-  // reviewers can reach the authenticated pages without credentials.
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      router.replace("/");
-    }
-  }, [router]);
-
   return (
     <AuthProvider>
       <div className="relative flex min-h-screen items-center justify-center bg-[var(--surface-primary)] px-4 py-12 overflow-hidden">

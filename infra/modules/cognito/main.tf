@@ -42,8 +42,48 @@ resource "aws_cognito_user_pool_client" "main" {
 
   explicit_auth_flows = [
     "ALLOW_USER_SRP_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH"
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    # Required so Playwright / CI can drive InitiateAuth with plain credentials
+    # when verifying the real login flow end-to-end.
+    "ALLOW_USER_PASSWORD_AUTH",
   ]
 
   prevent_user_existence_errors = "ENABLED"
+}
+
+# =============================================================================
+# E2E test user
+# =============================================================================
+# Created only when `create_e2e_test_user = true`. The password is generated
+# here and surfaced via a sensitive output so the root module can push it into
+# Secrets Manager. It is never written to plain .tfvars or logs.
+
+resource "random_password" "e2e_test_user" {
+  count   = var.create_e2e_test_user ? 1 : 0
+  length  = 24
+  special = true
+  # Cognito's default password policy forbids certain characters in URL contexts;
+  # keep the set conservative.
+  override_special = "!@#$%^&*()-_=+"
+}
+
+resource "aws_cognito_user" "e2e_test_user" {
+  count        = var.create_e2e_test_user ? 1 : 0
+  user_pool_id = aws_cognito_user_pool.main.id
+  username     = var.e2e_test_user_email
+
+  attributes = {
+    email          = var.e2e_test_user_email
+    email_verified = "true"
+  }
+
+  # Permanent password so the user is in CONFIRMED state and can log in
+  # without going through a FORCE_CHANGE_PASSWORD challenge in tests.
+  password = random_password.e2e_test_user[0].result
+
+  message_action = "SUPPRESS"
+
+  lifecycle {
+    ignore_changes = [password]
+  }
 }

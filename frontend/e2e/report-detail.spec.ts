@@ -52,7 +52,7 @@ test.describe("Report detail page", () => {
 
   test("shows external link to paper", async ({ page }) => {
     await page.goto(REPORT_URL);
-    await expect(page.getByText("元論文を開く")).toBeVisible();
+    await expect(page.getByText("OPEN SOURCE")).toBeVisible();
   });
 });
 
@@ -62,7 +62,7 @@ test.describe("Report detail page — desktop TOC", () => {
   test("displays table of contents sidebar", async ({ page }) => {
     await page.goto(REPORT_URL);
     const toc = page.locator("aside").last();
-    await expect(toc.getByText("目次")).toBeVisible();
+    await expect(toc.getByText("[003] / TOC")).toBeVisible();
     await expect(toc.getByText("Introduction")).toBeVisible();
     await expect(toc.getByText("Legal NLP Tasks")).toBeVisible();
     await expect(toc.getByText("Conclusion")).toBeVisible();

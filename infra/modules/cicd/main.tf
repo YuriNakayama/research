@@ -67,6 +67,30 @@ resource "aws_iam_role_policy" "github_actions_ecr" {
   })
 }
 
+# =============================================================================
+# GitHub Actions — E2E Secret Read
+# =============================================================================
+# Allows the GitHub Actions OIDC role to read the Cognito E2E test user
+# credentials during Playwright runs in CI. Scoped to the single secret ARN;
+# absent when the E2E test user is not provisioned.
+
+resource "aws_iam_role_policy" "github_actions_e2e_secret" {
+  count = var.grant_e2e_secret_read ? 1 : 0
+  name  = "e2e_test_user_read"
+  role  = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = var.e2e_test_user_secret_arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "github_actions_ecs" {
   count = var.ecs_cluster_arn != "" ? 1 : 0
   name  = "ecs_deploy"

@@ -33,7 +33,12 @@ provider "aws" {
 # Load .env file
 # =============================================================================
 locals {
-  env_file = { for line in compact(split("\n", file("${path.module}/.env"))) :
+  # `.env` is gitignored and only present in developer / apply environments.
+  # In CI (terraform validate) the file is absent, so fall back to an empty
+  # map. Consumers that require a key should fail loudly via lookup(...) or
+  # direct indexing at plan/apply time rather than at validate time.
+  env_file_raw = fileexists("${path.module}/.env") ? file("${path.module}/.env") : ""
+  env_file = { for line in compact(split("\n", local.env_file_raw)) :
     split("=", line)[0] => join("=", slice(split("=", line), 1, length(split("=", line))))
     if !startswith(trimspace(line), "#") && length(trimspace(line)) > 0
   }

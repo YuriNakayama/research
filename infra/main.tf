@@ -80,6 +80,12 @@ module "secrets" {
 
   environment = var.environment
   project     = var.project
+
+  # E2E test user credentials. The flag is the same var the cognito module
+  # uses, so the secret and the Cognito user are always created together.
+  create_e2e_test_user_secret = var.create_e2e_test_user
+  e2e_test_user_email         = module.cognito.e2e_test_user_email
+  e2e_test_user_password      = module.cognito.e2e_test_user_password
 }
 
 # =============================================================================
@@ -133,8 +139,10 @@ module "monitoring" {
 module "cognito" {
   source = "./modules/cognito"
 
-  environment = var.environment
-  project     = var.project
+  environment          = var.environment
+  project              = var.project
+  create_e2e_test_user = var.create_e2e_test_user
+  e2e_test_user_email  = var.e2e_test_user_email
 }
 
 # =============================================================================
@@ -160,13 +168,15 @@ module "amplify" {
 module "cicd" {
   source = "./modules/cicd"
 
-  environment             = var.environment
-  project                 = var.project
-  github_repo             = var.github_repo
-  ecr_repository_arn      = module.ecr.repository_arn
-  ecs_cluster_arn         = module.ecs.cluster_arn
-  task_definition_arn     = module.ecs.task_definition_arn
-  task_execution_role_arn = module.ecs.task_execution_role_arn
-  task_role_arn           = module.ecs.task_role_arn
-  log_group_name          = module.monitoring.log_group_name
+  environment              = var.environment
+  project                  = var.project
+  github_repo              = var.github_repo
+  ecr_repository_arn       = module.ecr.repository_arn
+  ecs_cluster_arn          = module.ecs.cluster_arn
+  task_definition_arn      = module.ecs.task_definition_arn
+  task_execution_role_arn  = module.ecs.task_execution_role_arn
+  task_role_arn            = module.ecs.task_role_arn
+  log_group_name           = module.monitoring.log_group_name
+  e2e_test_user_secret_arn = module.secrets.e2e_test_user_secret_arn
+  grant_e2e_secret_read    = var.create_e2e_test_user
 }

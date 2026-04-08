@@ -52,3 +52,8 @@ output "amplify_custom_domain_url" {
   description = "Amplify custom domain URL"
   value       = module.amplify.custom_domain_url
 }
+
+output "e2e_test_user_secret_arn" {
+  description = "ARN of the Secrets Manager entry holding E2E test user credentials (empty when disabled)"
+  value       = module.secrets.e2e_test_user_secret_arn
+}

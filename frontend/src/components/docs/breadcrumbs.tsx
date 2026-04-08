@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import type { Breadcrumb } from "@/lib/docs-content";
 
 type BreadcrumbsProps = {
@@ -11,23 +10,28 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
 
   return (
     <nav aria-label="パンくずリスト" className="mb-8">
-      <ol className="flex flex-wrap items-center gap-1 text-sm text-[var(--text-tertiary)]">
+      <ol className="flex flex-wrap items-center gap-x-1 gap-y-2 brutal-label text-[var(--text-tertiary)]">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 
           return (
             <li key={item.href} className="flex items-center gap-1">
               {index > 0 && (
-                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+                <span
+                  aria-hidden
+                  className="px-1 brutal-mono text-[var(--text-tertiary)]"
+                >
+                  /
+                </span>
               )}
               {isLast ? (
-                <span className="font-medium text-[var(--text-secondary)]">
+                <span className="bg-[var(--accent-bg)] px-2 py-0.5 text-[var(--accent-text)]">
                   {item.label}
                 </span>
               ) : (
                 <Link
                   href={item.href}
-                  className="transition-colors duration-200 hover:text-[var(--text-link)]"
+                  className="px-2 py-0.5 brutal-border border-transparent transition-colors hover:brutal-invert hover:border-[var(--border-primary)]"
                 >
                   {item.label}
                 </Link>

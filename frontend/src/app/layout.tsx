@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "@fontsource-variable/noto-sans-jp";
+import "@fontsource-variable/jetbrains-mono";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github.css";
 import "@/styles/globals.css";

@@ -27,7 +27,9 @@ export function Toc({ items, className }: TocProps) {
       { rootMargin: "-80px 0px -80% 0px" },
     );
 
-    const headings = document.querySelectorAll("h2[id], h3[id], h4[id], h5[id], h6[id]");
+    const headings = document.querySelectorAll(
+      "h2[id], h3[id], h4[id], h5[id], h6[id]",
+    );
     headings.forEach((h) => observer.observe(h));
 
     return () => observer.disconnect();
@@ -37,26 +39,30 @@ export function Toc({ items, className }: TocProps) {
 
   return (
     <nav className={cn("text-sm", className)} aria-label="目次">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
-        目次
-      </p>
-      <ul className="space-y-1">
-        {items.map((item) => (
-          <li key={item.id} style={{ paddingLeft: `${(item.level - 2) * 12}px` }}>
-            <a
-              href={`#${item.id}`}
-              className={cn(
-                "block truncate border-l-2 py-0.5 pl-2 transition-colors duration-200",
-                item.level >= 4 && "text-xs",
-                activeId === item.id
-                  ? "border-[var(--accent-bg)] font-medium text-[var(--text-accent)]"
-                  : "border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-link)]",
-              )}
-            >
-              {item.text}
-            </a>
-          </li>
-        ))}
+      <ul className="space-y-0">
+        {items.map((item, idx) => {
+          const isActive = activeId === item.id;
+          return (
+            <li key={item.id}>
+              <a
+                href={`#${item.id}`}
+                className={cn(
+                  "flex gap-2 border-l-[3px] py-1.5 pr-2 transition-colors",
+                  item.level >= 4 && "text-xs",
+                  isActive
+                    ? "border-[var(--accent-bg)] bg-[var(--accent-bg)] font-semibold text-[var(--accent-text)]"
+                    : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--text-primary)] hover:bg-[var(--surface-secondary)] hover:text-[var(--text-primary)]",
+                )}
+                style={{ paddingLeft: `${(item.level - 2) * 12 + 10}px` }}
+              >
+                <span className="brutal-mono shrink-0 text-[0.65rem] opacity-70">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <span className="truncate">{item.text}</span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

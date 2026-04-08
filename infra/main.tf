@@ -159,7 +159,7 @@ module "amplify" {
   environment           = var.environment
   project               = var.project
   github_repo           = var.github_repo
-  github_token          = local.env_file["GITHUB_ACCESS_TOKEN"]
+  github_token          = lookup(local.env_file, "GITHUB_ACCESS_TOKEN", "")
   cognito_user_pool_id  = module.cognito.user_pool_id
   cognito_app_client_id = module.cognito.app_client_id
   domain_name           = var.domain_name

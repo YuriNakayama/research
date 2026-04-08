@@ -93,6 +93,10 @@ jobs:
           NEXT_PUBLIC_COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
           E2E_TEST_USER_EMAIL: ${{ steps.e2e_user.outputs.email }}
           E2E_TEST_USER_PASSWORD: ${{ steps.e2e_user.outputs.password }}
+          # CI runs `next start` (NODE_ENV=production) against the build that
+          # includes the E2E bypass token — this is an expected CI-only state,
+          # so explicitly opt in past the next.config.ts safety valve.
+          ALLOW_E2E_BYPASS_IN_PROD: "true"
         run: npx playwright test
 
       - name: Upload Playwright report

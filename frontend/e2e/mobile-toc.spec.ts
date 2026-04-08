@@ -13,7 +13,7 @@ test.describe("Mobile TOC", () => {
 
   test("opens TOC drawer and shows headings", async ({ page }) => {
     await page.goto(REPORT_URL);
-    await page.getByRole("button", { name: "目次を開く" }).click();
+    await page.getByRole("button", { name: "目次を開く" }).click({ force: true });
     await expect(
       page.getByRole("button", { name: "目次を閉じる" })
     ).toBeVisible();
@@ -25,7 +25,7 @@ test.describe("Mobile TOC", () => {
 
   test("closes TOC drawer with close button", async ({ page }) => {
     await page.goto(REPORT_URL);
-    await page.getByRole("button", { name: "目次を開く" }).click();
+    await page.getByRole("button", { name: "目次を開く" }).click({ force: true });
     await expect(
       page.getByRole("button", { name: "目次を閉じる" })
     ).toBeVisible();

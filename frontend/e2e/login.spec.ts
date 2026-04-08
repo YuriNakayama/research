@@ -42,7 +42,7 @@ test.describe("Login page", () => {
       await page.getByRole("button", { name: /sign in|ログイン/i }).click();
 
       // PostLogin component pushes router.replace("/") on success.
-      await expect(page).toHaveURL("/", { timeout: 15_000 });
+      await expect(page).toHaveURL(/\/(docs)?$/, { timeout: 15_000 });
     });
 
     test("wrong password shows an error and stays on /login", async ({

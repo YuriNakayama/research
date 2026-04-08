@@ -17,14 +17,14 @@ test.describe("Login page", () => {
     // Final URL is /login regardless of how many hops the redirect took.
     await expect(page).toHaveURL(/\/login$/);
     // Sanity: the landing page visibly renders as the login form.
-    await expect(page.getByText("Research Viewer")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /RESEARCH/ })).toBeVisible();
     expect(response?.ok()).toBeTruthy();
   });
 
   test("displays login form with heading and logo", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByText("Research Viewer")).toBeVisible();
-    await expect(page.getByText("ログインしてください")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /RESEARCH/ })).toBeVisible();
+    await expect(page.getByText("アクセスにはログインが必要です。")).toBeVisible();
   });
 
   test.describe("real Cognito login", () => {

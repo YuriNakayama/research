@@ -17,6 +17,8 @@ def _make_result(
     success: bool = True,
     output_file: Path | None = None,
     title: str = "Test Paper",
+    summary: str = "",
+    report_url: str = "",
     error: str = "",
 ) -> DomainResult:
     return DomainResult(
@@ -24,6 +26,8 @@ def _make_result(
         success=success,
         output_file=output_file,
         item_title=title,
+        item_summary=summary,
+        report_url=report_url,
         error=error,
     )
 
@@ -71,6 +75,30 @@ class TestNotifyResearchResults:
         assert "legal_tech_20260329.pdf" in raw_data
 
     @patch("src.email_notifier._get_ses_client")
+    def test_body_contains_summary_and_report_url(self, mock_client_factory: MagicMock) -> None:
+        mock_client = MagicMock()
+        mock_client_factory.return_value = mock_client
+
+        results = [
+            _make_result(
+                title="Multi-Agent Survey",
+                summary="LLM マルチエージェント研究のサーベイ論文。",
+                report_url="https://owl.avifauna.click/docs/daily/data_analysis_agent/2026-04-08",
+            )
+        ]
+        notify_research_results(
+            results=results,
+            sender="sender@example.com",
+            recipients=["user@example.com"],
+        )
+
+        call_kwargs = mock_client.send_email.call_args[1]
+        body = call_kwargs["Message"]["Body"]["Text"]["Data"]
+        assert "Multi-Agent Survey" in body
+        assert "LLM マルチエージェント研究のサーベイ論文。" in body
+        assert "https://owl.avifauna.click/docs/daily/data_analysis_agent/2026-04-08" in body
+
+    @patch("src.email_notifier._get_ses_client")
     def test_mixed_success_and_failure(self, mock_client_factory: MagicMock) -> None:
         mock_client = MagicMock()
         mock_client_factory.return_value = mock_client
@@ -88,7 +116,7 @@ class TestNotifyResearchResults:
         call_kwargs = mock_client.send_email.call_args[1]
         assert "1/2 domains" in call_kwargs["Message"]["Subject"]["Data"]
         body = call_kwargs["Message"]["Body"]["Text"]["Data"]
-        assert "✓ legal_tech" in body
+        assert "■ legal_tech" in body
         assert "✗ ai_reg" in body
         assert "Timeout" in body
 

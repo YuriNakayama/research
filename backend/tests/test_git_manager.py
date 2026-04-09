@@ -48,9 +48,9 @@ class TestCreateBranch:
     @patch("src.git_manager.subprocess.run")
     def test_creates_dated_branch(self, mock_run: MagicMock) -> None:
         mock_run.return_value = CompletedProcess(args=[], returncode=0, stdout="", stderr="")
-        branch = create_branch("/tmp/work", prefix="research/auto")
-        assert branch.startswith("research/auto/")
-        assert len(branch.split("/")) == 3
+        branch = create_branch("/tmp/work", prefix="daily")
+        assert branch.startswith("daily/")
+        assert len(branch.split("/")) == 2
 
 
 class TestHasChanges:

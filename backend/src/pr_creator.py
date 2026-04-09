@@ -80,4 +80,47 @@ def create_pr(
 
     pr_url = result.stdout.strip()
     logger.info("PR created: %s", pr_url)
+
+    _enable_auto_merge(pr_url, work_dir)
     return pr_url
+
+
+def _enable_auto_merge(pr_url: str, work_dir: str | Path) -> None:
+    """Enable auto-merge (squash) on the PR.
+
+    Falls back to ``--admin`` immediate merge if auto-merge is not permitted
+    by the repository. Any failure is logged but non-fatal so that the
+    notification email can still reference the PR URL.
+    """
+    try:
+        subprocess.run(
+            ["gh", "pr", "merge", pr_url, "--auto", "--squash"],
+            capture_output=True,
+            text=True,
+            cwd=str(work_dir),
+            check=True,
+        )
+        logger.info("Enabled auto-merge (squash) on %s", pr_url)
+        return
+    except subprocess.CalledProcessError as e:
+        logger.warning(
+            "Auto-merge not available for %s, falling back to --admin: %s",
+            pr_url,
+            e.stderr.strip() if e.stderr else e,
+        )
+
+    try:
+        subprocess.run(
+            ["gh", "pr", "merge", pr_url, "--squash", "--admin"],
+            capture_output=True,
+            text=True,
+            cwd=str(work_dir),
+            check=True,
+        )
+        logger.info("Merged %s with --admin", pr_url)
+    except subprocess.CalledProcessError as e:
+        logger.error(
+            "Failed to merge %s even with --admin: %s",
+            pr_url,
+            e.stderr.strip() if e.stderr else e,
+        )

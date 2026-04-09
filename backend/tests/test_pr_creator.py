@@ -24,7 +24,7 @@ class TestCreatePR:
             DomainResult(
                 domain_name="legal_tech",
                 success=True,
-                output_file=Path("docs/daily/legal_tech/report/20260329.md"),
+                output_file=Path("docs/research/runs/legal_tech/retrieval/20260329_all/20260329.md"),
                 item_title="Test Paper",
             ),
         ]
@@ -38,11 +38,18 @@ class TestCreatePR:
 
         assert pr_url == "https://github.com/owner/repo/pull/42"
 
-        cmd = mock_run.call_args[0][0]
-        assert "gh" in cmd
-        assert "pr" in cmd
-        assert "create" in cmd
-        assert "[Daily Research]" in cmd[cmd.index("--title") + 1]
+        # First subprocess call should be `gh pr create`.
+        create_cmd = mock_run.call_args_list[0][0][0]
+        assert "gh" in create_cmd
+        assert "pr" in create_cmd
+        assert "create" in create_cmd
+        assert "[Daily Research]" in create_cmd[create_cmd.index("--title") + 1]
+
+        # Second subprocess call should enable auto-merge on the PR.
+        merge_cmd = mock_run.call_args_list[1][0][0]
+        assert merge_cmd[:4] == ["gh", "pr", "merge", pr_url]
+        assert "--auto" in merge_cmd
+        assert "--squash" in merge_cmd
 
     @patch("src.pr_creator.subprocess.run")
     def test_pr_body_contains_domain_info(self, mock_run: MagicMock, tmp_path: Path) -> None:
@@ -57,7 +64,7 @@ class TestCreatePR:
             DomainResult(
                 domain_name="legal_tech",
                 success=True,
-                output_file=Path("docs/daily/legal_tech/report/20260329.md"),
+                output_file=Path("docs/research/runs/legal_tech/retrieval/20260329_all/20260329.md"),
                 item_title="Paper A",
             ),
             DomainResult(
@@ -73,8 +80,8 @@ class TestCreatePR:
             results=results,
         )
 
-        cmd = mock_run.call_args[0][0]
-        body = cmd[cmd.index("--body") + 1]
+        create_cmd = mock_run.call_args_list[0][0][0]
+        body = create_cmd[create_cmd.index("--body") + 1]
         assert "legal_tech" in body
         assert "Paper A" in body
         assert "ai_reg" in body

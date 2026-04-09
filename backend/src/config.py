@@ -17,8 +17,9 @@ class DailyDomainConfig:
 @dataclass(frozen=True)
 class DailyConfig:
     domains: list[DailyDomainConfig] = field(default_factory=list)
-    branch_prefix: str = "daily/auto"
+    branch_prefix: str = "daily"
     claude_options: str = ""
+    site_base_url: str = "https://owl.avifauna.click"
 
 
 @dataclass(frozen=True)
@@ -63,8 +64,12 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
 
     daily = DailyConfig(
         domains=domains,
-        branch_prefix=os.environ.get("DAILY_BRANCH_PREFIX", daily_raw.get("branch_prefix", "daily/auto")),
+        branch_prefix=os.environ.get("DAILY_BRANCH_PREFIX", daily_raw.get("branch_prefix", "daily")),
         claude_options=os.environ.get("DAILY_CLAUDE_OPTIONS", daily_raw.get("claude_options", "")),
+        site_base_url=os.environ.get(
+            "DAILY_SITE_BASE_URL",
+            daily_raw.get("site_base_url", "https://owl.avifauna.click"),
+        ),
     )
 
     github = GitHubConfig(

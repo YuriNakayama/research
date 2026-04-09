@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import sys
 import tempfile
+from datetime import UTC, datetime
 from pathlib import Path
 
 from src.config import DailyDomainConfig, load_config
-from src.csv_manager import get_csv_files, get_next_pending, mark_done
+from src.csv_manager import get_csv_files, get_next_pending_across_files, mark_done
 from src.email_notifier import DomainResult, notify_research_results
 from src.git_manager import clone_repo, commit_and_push, configure_git, create_branch
 from src.github_auth import get_github_token
@@ -18,30 +20,58 @@ from src.research_runner import run_research
 
 logger = logging.getLogger(__name__)
 
+_SLUG_SAFE_RE = re.compile(r"[^a-z0-9]+")
+
+
+def _slugify(text: str, max_len: int = 40) -> str:
+    """Produce a filesystem-safe slug from arbitrary text."""
+    lowered = text.lower()
+    slug = _SLUG_SAFE_RE.sub("-", lowered).strip("-")
+    if not slug:
+        slug = "report"
+    return slug[:max_len].rstrip("-") or "report"
+
+
+def _build_report_url(site_base_url: str, output_relative: Path) -> str:
+    """Build the public report URL served by the frontend.
+
+    The frontend's ``/docs/[[...slug]]`` route mirrors the docs directory
+    structure, so a report at ``docs/daily/<domain>/reports/<date>/<slug>.md``
+    is served at ``<base>/docs/daily/<domain>/reports/<date>/<slug>``.
+    """
+    base = site_base_url.rstrip("/")
+    parts = list(output_relative.with_suffix("").parts)
+    # output_relative starts with "docs/..."; map directly under the site.
+    return f"{base}/" + "/".join(parts)
+
 
 def _process_domain(
     domain: DailyDomainConfig,
     work_dir: Path,
     claude_options: str,
+    site_base_url: str,
+    today: str,
 ) -> DomainResult:
-    """Process a single domain: pick next pending item, run research-retrieval skill."""
+    """Process a single domain: pick next pending item, run research-retrieval skill.
+
+    Writes only under ``docs/daily/<domain>/`` — never touches ``docs/research/``.
+    """
     domain_dir = work_dir / "docs" / "daily" / domain.name
     csv_files = get_csv_files(domain_dir)
     if not csv_files:
         return DomainResult(domain_name=domain.name, success=False, error="No CSV files found")
 
-    item = None
-    csv_path = None
-    for csv_file in csv_files:
-        item = get_next_pending(csv_file)
-        if item:
-            csv_path = csv_file
-            break
-
-    if item is None or csv_path is None:
+    picked = get_next_pending_across_files(csv_files)
+    if picked is None:
         return DomainResult(domain_name=domain.name, success=False, error="No pending items")
+    csv_path, item = picked
 
-    output_dir = domain_dir / "report"
+    reports_dir = domain_dir / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    # Use a per-day subdirectory so the frontend URL
+    # /docs/daily/<domain>/<YYYY-MM-DD> resolves to an index page.
+    output_dir = reports_dir / today
     report_files = run_research(
         url=item.url,
         output_dir=output_dir,
@@ -51,13 +81,26 @@ def _process_domain(
 
     mark_done(csv_path, item.row_index)
 
+    # Rename the first generated file to a slug-based name so multiple runs
+    # within the same day remain distinguishable.
     first_report = report_files[0]
-    output_relative = first_report.relative_to(work_dir)
+    target_name = f"{_slugify(item.title)}.md"
+    final_path = first_report.with_name(target_name)
+    if final_path != first_report:
+        if final_path.exists():
+            final_path = first_report.with_name(f"{_slugify(item.title)}-{first_report.stem}.md")
+        first_report.rename(final_path)
+
+    output_relative = final_path.relative_to(work_dir)
+    report_url = _build_report_url(site_base_url, output_relative)
+
     return DomainResult(
         domain_name=domain.name,
         success=True,
         output_file=output_relative,
         item_title=item.title,
+        item_summary=item.summary,
+        report_url=report_url,
     )
 
 
@@ -89,6 +132,7 @@ def main() -> int:
 
     work_dir = Path(tempfile.mkdtemp(prefix="auto-research-"))
     repo_url = f"https://github.com/{config.github.repo}"
+    today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
 
     try:
         git_branch = os.environ.get("GIT_BRANCH")
@@ -102,7 +146,13 @@ def main() -> int:
         for domain in config.daily.domains:
             logger.info("Processing domain: %s", domain.name)
             try:
-                result = _process_domain(domain, work_dir, config.daily.claude_options)
+                result = _process_domain(
+                    domain,
+                    work_dir,
+                    config.daily.claude_options,
+                    config.daily.site_base_url,
+                    today,
+                )
                 results.append(result)
             except Exception as e:
                 logger.exception("Domain %s failed", domain.name)

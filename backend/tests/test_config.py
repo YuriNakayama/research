@@ -85,7 +85,8 @@ github:
 """)
     result = load_config(config)
 
-    assert result.daily.branch_prefix == "daily/auto"
+    assert result.daily.branch_prefix == "daily"
+    assert result.daily.site_base_url == "https://owl.avifauna.click"
     assert result.github.base_branch == "main"
     assert result.email.sender == ""
     assert result.email.recipients == []

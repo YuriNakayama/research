@@ -1,8 +1,9 @@
 daily:
-  branch_prefix: "daily/auto"
+  branch_prefix: "daily"
   claude_options: ""
+  site_base_url: "https://owl.avifauna.click"
   domains:
-    - name: "legal_tech"
+    - name: "data_analysis_agent"
 
 github:
   repo: "YuriNakayama/research"

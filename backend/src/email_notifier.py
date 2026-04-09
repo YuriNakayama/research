@@ -22,6 +22,8 @@ from fpdf.fonts import FontFace
 
 logger = logging.getLogger(__name__)
 
+LATEST_REPORTS_URL = "https://owl.avifauna.click/"
+
 _JAPANESE_FONT_CANDIDATES: list[tuple[str, int]] = [
     ("/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc", 0),
     ("/System/Library/Fonts/Hiragino Sans GB.ttc", 0),
@@ -39,6 +41,8 @@ class DomainResult:
     success: bool
     output_file: Path | None = None
     item_title: str = ""
+    item_summary: str = ""
+    report_url: str = ""
     error: str = ""
 
 
@@ -138,18 +142,33 @@ def _build_results_body(results: list[DomainResult], pr_url: str) -> str:
         "",
         "■ 実行サマリ",
         f"  成功: {success_count} / {total} ドメイン",
-        "",
-        "■ レポート",
     ]
 
     for r in results:
-        if r.success:
-            lines.append(f'  ✓ {r.domain_name}: "{r.item_title}"')
-        else:
+        if not r.success:
+            continue
+        lines.extend(
+            [
+                "",
+                f"■ {r.domain_name}",
+                f"  タイトル: {r.item_title}",
+            ]
+        )
+        if r.item_summary:
+            lines.append(f"  概要  : {r.item_summary}")
+        if r.report_url:
+            lines.append(f"  URL   : {r.report_url}")
+
+    failures = [r for r in results if not r.success]
+    if failures:
+        lines.extend(["", "■ 失敗したドメイン"])
+        for r in failures:
             lines.append(f"  ✗ {r.domain_name}: {r.error}")
 
     if pr_url:
         lines.extend(["", "■ PR", f"  {pr_url}"])
+
+    lines.extend(["", "■ 最新レポート一覧", f"  {LATEST_REPORTS_URL}"])
 
     lines.append("")
     return "\n".join(lines)

@@ -24,8 +24,9 @@ External:
 ## Technology Stack
 
 - **Backend**: Python 3.12+, PyYAML, PyJWT, Requests, Boto3, fpdf2, Markdown
+- **Frontend**: Next.js (App Router) + TypeScript, AWS Amplify (Auth), Playwright (E2E)
 - **Container**: Docker (node:22-bookworm-slim base), Claude CLI, gh CLI, UV
-- **Infrastructure**: AWS (ECS Fargate, EFS, ECR, EventBridge Scheduler, Secrets Manager, CloudWatch), Terraform
+- **Infrastructure**: AWS (ECS Fargate, EFS, ECR, EventBridge Scheduler, Secrets Manager, CloudWatch, Cognito, Amplify Hosting), Terraform
 - **CI/CD**: GitHub Actions (ci-backend.yml)
 - **Auth**: GitHub App (JWT → installation token)
 - **Testing**: Pytest + pytest-cov, Ruff, Mypy
@@ -46,11 +47,26 @@ backend/
     github_auth.py           GitHub App auth (JWT → token)
     pr_creator.py            gh CLI PR creation
     email_notifier.py        Email notification (SES/SMTP)
+    csv_manager.py           Daily CSV queue (pending item 取得・done 更新)
   config/
-    research-config.yaml     Research settings (prompt path, output dir, branch prefix)
+    research-config.yaml     Research settings (domains, branch prefix, github repo, email, site_base_url)
   scripts/
     entrypoint.sh            Container entrypoint (EFS link, GitHub auth, main.py)
+    test_pipeline_local.py   Local pipeline smoke test
+    daily_add.py             /daily-add skill 用 CSV アペンダ CLI
   tests/                     Pytest unit tests
+docs/
+  daily/                     自動実行パイプラインの入出力（append-only）
+    <domain>/
+      list/                  入力 CSV (inbox.csv 等)
+      reports/               自動生成レポート (Markdown)
+  research/                  手動リサーチ領域 (runs / domains / _schema)
+frontend/                    Next.js (App Router, TypeScript) レポート閲覧 UI
+  src/
+    app/                     ルーティング（(authenticated), login, api/docs-assets）
+    components/              layout / docs / markdown / report / auth
+    lib/                     amplify, docs-content, palette, toc, utils
+  e2e/                       Playwright テスト
 infra/
   main.tf                    Root module (provider, backend)
   variables.tf               Input variables
@@ -65,8 +81,8 @@ infra/
     secrets/                 Secrets Manager
     monitoring/              CloudWatch Logs
     cicd/                    CI/CD pipeline resources
-  scripts/
-    init-efs.sh              EFS initial setup (Claude CLI login)
+    cognito/                 Cognito User Pool（フロントエンド認証）
+    amplify/                 Amplify Hosting（フロントエンド配信）
 dev/                         Development scripts
   setup                      Install dependencies (uv sync)
   format                     Code formatting (ruff)
@@ -88,6 +104,14 @@ dev/test-backend     # Backend CI (format check → lint → type check → pyte
 dev/create-worktree  # Create git worktree with .env copy
 ```
 
+## Daily Pipeline ディレクトリ境界
+
+- 自動実行パイプラインは **`docs/daily/**` のみ書き込み可**。`docs/research/**` は絶対に書き換えない。
+- daily の入力 CSV (`docs/daily/<domain>/list/*.csv`) は append-only。`status` 列のみパイプラインが `pending → done` に更新する。
+- daily のレポート出力先は `docs/daily/<domain>/reports/<YYYY-MM-DD>/<slug>.md`。
+- CSV の追記は手動または `/daily-add` skill（`backend/scripts/daily_add.py` を内部で呼ぶ）で行う。
+- ブランチ名は `daily/<timestamp>` 形式で、PR は `gh pr merge --auto --squash` により自動マージされる。
+
 ## Glossary
 
 | Term | Description |
@@ -97,6 +121,8 @@ dev/create-worktree  # Create git worktree with .env copy
 | GitHub App | Authentication mechanism for git push and PR creation |
 | EFS | Elastic File System, persists Claude CLI auth across Fargate tasks |
 | EventBridge Scheduler | AWS service for cron-based Fargate task scheduling |
+| Daily Domain | `docs/daily/<domain>` 単位で管理される自動リサーチ対象領域 |
+| /daily-add | URL を `inbox.csv` に半自動追記する Claude Code skill |
 
 ## Rules
 
@@ -104,7 +130,7 @@ dev/create-worktree  # Create git worktree with .env copy
 |-----------|----------------|----------------------|
 | `.claude/rules/backend.md` | `backend/**` | Python code changes, Dockerfile edits, pytest, ruff/mypy configuration |
 | `.claude/rules/infra.md` | `infra/**` | Terraform changes, AWS resource design, module structure decisions |
-| `.claude/rules/frontend.md` | `frontend/**` | Not applicable to this project (legacy, from previous AI Reception project) |
+| `.claude/rules/frontend.md` | `frontend/**` | Next.js (TypeScript) フロントエンド（`frontend/` 配下）の編集、UI コンポーネント追加、ESLint/Playwright 設定変更時 |
 | `.claude/rules/research.md` | `docs/research/**` | Research output directory layout, phase-specific output paths, domain/cluster naming, latest pointer rules |
 | `.claude/rules/security.md` | Always loaded | Commits, secret handling, IAM design, network security, CI/CD pipeline changes |
 

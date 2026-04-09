@@ -42,7 +42,7 @@ def configure_git(
     _run_git(["config", "user.email", email], cwd=work_dir)
 
 
-def create_branch(work_dir: str | Path, prefix: str = "research/auto") -> str:
+def create_branch(work_dir: str | Path, prefix: str = "daily") -> str:
     """Create and checkout a new feature branch with today's date and time."""
     today = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S")
     branch_name = f"{prefix}/{today}"

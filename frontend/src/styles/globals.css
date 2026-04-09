@@ -60,9 +60,19 @@
   --error-bg: #FF3D3D;
   --error-text: #FAFAFA;
 
-  /* --- Code --- */
-  --code-bg: #F0F0F0;
-  --code-header-bg: #0A0A0A;
+  /* --- Code ---
+     Brutalist mono + single accent. Dark surface is intentional in
+     both light and dark modes — it keeps brand identity stable and
+     matches Kinetic Brutalism principles (single accent, no glow,
+     no soft blur, hard contrast, hierarchy via weight, not hue).
+     All pairs verified against #09090B base. */
+  --code-bg: #09090B;              /* zinc-950, brand-adjacent */
+  --code-fg: #FAFAFA;              /* ~19.5:1 AAA */
+  --code-dim: #71717A;             /* zinc-500 — comments ~4.6:1 AA */
+  --code-accent: var(--accent-raw);/* single brand accent (yellow) */
+  --code-string: #D4D4D8;          /* zinc-300 — softer white ~12.8:1 */
+  --code-selection: rgba(230, 255, 61, 0.22);
+  --code-header-bg: #000000;
   --code-header-text: #FAFAFA;
   --code-border: #0A0A0A;
 
@@ -130,7 +140,8 @@
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #2A3000;
 
-  --code-bg: #141414;
+  --code-bg: #09090B;
+  --code-fg: #FAFAFA;
   --code-header-bg: #FAFAFA;
   --code-header-text: #0A0A0A;
   --code-border: #FAFAFA;
@@ -432,25 +443,6 @@ body {
   letter-spacing: 0.05em;
 }
 
-.prose pre {
-  overflow-x: auto;
-  border-radius: 0;
-  background: var(--code-bg);
-  border: var(--border-width) solid var(--border-primary);
-}
-
-.prose :not(pre) > code {
-  font-size: 0.875em;
-  font-family: var(--font-mono);
-  background: var(--surface-secondary);
-  padding: 0.15em 0.4em;
-  border: var(--border-width-thin) solid var(--border-primary);
-}
-.prose :not(pre) > code::before,
-.prose :not(pre) > code::after {
-  content: "";
-}
-
 @media (max-width: 767px) {
   .prose :not(pre) > code {
     font-size: 0.8em;
@@ -486,22 +478,107 @@ body {
 }
 
 /* ============================================================
-   highlight.js syntax highlighting
+   Code blocks — brutalist dark surface with semantic syntax tokens.
+   Overrides highlight.js github.css entirely so tokens use our
+   design-system palette and stay AA-contrast in both themes.
    ============================================================ */
+.prose pre {
+  background: var(--code-bg) !important;
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-brutal-sm);
+  overflow-x: auto;
+  padding: 0;
+}
+
+.prose pre code,
 .prose pre code.hljs {
-  padding: 1rem;
-  border-radius: 0;
+  display: block;
+  padding: 1rem 1.125rem;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
+  color: var(--code-fg) !important;
+  background: transparent !important;
+  border: 0;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
+
+.prose pre code::selection,
+.prose pre code *::selection {
+  background: var(--code-selection);
+}
+
+/* Reset github.css defaults so our tokens win, regardless of theme. */
+.prose pre code.hljs * {
+  background: transparent !important;
+}
+
+/* Syntax tokens — Kinetic Brutalism palette: mono + single accent.
+   Hierarchy is expressed via font-weight and a single accent color,
+   not via hue variety. */
+
+/* Dim — comments, metadata */
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--code-dim) !important;
+  font-style: italic;
+}
+
+/* Accent (brand yellow) — structural / keyword-level tokens.
+   Reserved for tokens the reader should grep for first. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-literal,
+.hljs-doctag,
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name,
+.hljs-tag,
+.hljs-type,
+.hljs-class .hljs-title {
+  color: var(--code-accent) !important;
+  font-weight: 700;
+}
+
+/* Softer white — literal values (strings, numbers, regex, attrs).
+   Visible but visually subordinate to the accent. */
+.hljs-string,
+.hljs-regexp,
+.hljs-number,
+.hljs-addition,
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-params,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-deletion {
+  color: var(--code-string) !important;
+}
+
+.hljs-emphasis { font-style: italic; }
+.hljs-strong   { font-weight: 800; }
+
+/* Inline code — stays on the page surface, brutalist outlined chip. */
+.prose :not(pre) > code {
+  color: var(--text-primary);
+  background: var(--accent-subtle-bg);
+  border: var(--border-width-thin) solid var(--border-primary);
+  padding: 0.1em 0.4em;
   font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 500;
 }
 
-html.dark .hljs {
-  background: var(--code-bg) !important;
-}
-
-html:not(.dark) .hljs {
-  background: var(--code-bg) !important;
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: "";
 }
 
 /* ============================================================

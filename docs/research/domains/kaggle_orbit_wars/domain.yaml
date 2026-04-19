@@ -1,0 +1,40 @@
+domain: kaggle_orbit_wars
+display_name: Kaggle Orbit Wars (Simulation Competition)
+description: >
+  Kaggle の Simulation 系コンペ「Orbit Wars」参戦準備のための技術調査ドメイン。
+  2D 連続空間上で太陽の周りを公転する惑星を征服する 2P/4P リアルタイム戦略ゲームの
+  bot 設計に向け、公式仕様・ゲーム物理・類似コンペ勝者解法・RL/探索手法を体系的に収集する。
+target_competition:
+  name: Orbit Wars
+  url: https://www.kaggle.com/competitions/orbit-wars
+  platform: Kaggle
+  category: Simulation
+clusters:
+  - id: competition_spec
+    name: コンペ公式仕様
+    keywords: [Kaggle Orbit Wars rules, evaluation, submission format, timeline, kaggle-environments]
+    priority: highest
+  - id: game_mechanics
+    name: ゲームメカニクス
+    keywords: [orbital dynamics, continuous 2D RTS, fleet dispatch, fog of war, win condition]
+    priority: high
+  - id: similar_competitions
+    name: 類似 Kaggle Simulation コンペ
+    keywords: [Lux AI, Halite, Hungry Geese, ConnectX, Kore 2022, 1st place solution]
+    priority: high
+  - id: planet_wars_prior_art
+    name: Planet Wars 既存事例
+    keywords: [Google AI Challenge 2010, Galcon, planet-wars-rts, MCTS Planet Wars]
+    priority: medium
+  - id: rl_methods
+    name: 自己対戦強化学習
+    keywords: [PPO, AlphaStar, MuZero, self-play, league training, entity transformer]
+    priority: high
+  - id: heuristic_search
+    name: 探索・ヒューリスティック
+    keywords: [MCTS, UCT, rule-based bot, neuroevolution, imitation learning, orbital intercept]
+    priority: medium_high
+output_paths:
+  clustering: runs/{domain}/clustering/{date}/
+  gather: runs/{domain}/gather/{date}_{cluster}/
+  retrieval: runs/{domain}/retrieval/{date}_{cluster}/

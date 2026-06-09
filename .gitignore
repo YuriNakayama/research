@@ -80,3 +80,6 @@ __pycache__/
 
 *.dbbackend/.coverage
 .claude/skills/list/SKILL.md
+
+## research artifacts (large zip exports)
+docs/research/runs/**/*.zip

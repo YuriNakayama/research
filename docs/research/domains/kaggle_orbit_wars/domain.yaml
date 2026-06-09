@@ -35,8 +35,8 @@ clusters:
     keywords: [MCTS, UCT, rule-based bot, neuroevolution, orbital intercept]
     priority: medium_high
   - id: imitation_learning
-    name: 模倣学習
-    keywords: [behavioral cloning, DAgger, meta kaggle episodes, top bot replay, AlphaStar supervised, IL to RL hybrid, Kore 2022 autoregressive IL, Hungry Geese BC, Halite semantic segmentation IL]
+    name: 模倣学習モデル設計
+    keywords: [behavioral cloning, DAgger, autoregressive policy, pointer network, parameterized action space, meta kaggle episodes, top bot replay, AlphaStar Unplugged, AlphaStar supervised, IL to RL hybrid, Kore 2022 autoregressive IL, Hungry Geese BC, Halite semantic segmentation IL]
     priority: high
 output_paths:
   clustering: runs/{domain}/clustering/{date}/

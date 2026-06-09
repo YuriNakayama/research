@@ -32,8 +32,12 @@ clusters:
     priority: high
   - id: heuristic_search
     name: 探索・ヒューリスティック
-    keywords: [MCTS, UCT, rule-based bot, neuroevolution, imitation learning, orbital intercept]
+    keywords: [MCTS, UCT, rule-based bot, neuroevolution, orbital intercept]
     priority: medium_high
+  - id: imitation_learning
+    name: 模倣学習
+    keywords: [behavioral cloning, DAgger, meta kaggle episodes, top bot replay, AlphaStar supervised, IL to RL hybrid, Kore 2022 autoregressive IL, Hungry Geese BC, Halite semantic segmentation IL]
+    priority: high
 output_paths:
   clustering: runs/{domain}/clustering/{date}/
   gather: runs/{domain}/gather/{date}_{cluster}/

@@ -34,6 +34,10 @@ clusters:
     name: 探索・ヒューリスティック
     keywords: [MCTS, UCT, rule-based bot, neuroevolution, imitation learning, orbital intercept]
     priority: medium_high
+  - id: imitation_learning
+    name: 模倣学習モデル設計
+    keywords: [behavior cloning, autoregressive policy, pointer network, parameterized action space, AlphaStar Unplugged, Kore 2022]
+    priority: high
 output_paths:
   clustering: runs/{domain}/clustering/{date}/
   gather: runs/{domain}/gather/{date}_{cluster}/

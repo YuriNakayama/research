@@ -81,5 +81,8 @@ __pycache__/
 *.dbbackend/.coverage
 .claude/skills/list/SKILL.md
 
+# claude code agent worktrees (per-agent runtime repo copies; never commit)
+.claude/worktrees/
+
 ## research artifacts (large zip exports)
 docs/research/runs/**/*.zip

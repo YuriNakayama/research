@@ -1,0 +1,29 @@
+domain: rl_gpu_acceleration
+display_name: 強化学習の GPU 高速化技術 (RL GPU Acceleration)
+description: >
+  強化学習（RL）の学習・推論を GPU/TPU 上で桁違いに高速化する技術の体系的調査ドメイン。
+  JAX による end-to-end GPU RL（PureJaxRL/Brax/JaxMARL）、PyTorch/ネイティブコード系
+  （PufferLib/EnvPool/Isaac Lab/Madrona）、および高速化の技術原理（host転送排除・ベクトル化・
+  JIT融合・Anakin/Sebulba）と実装/選定指針を、フレームワーク網羅・原理解説・実践ガイドの
+  3 軸でカバーする。
+clusters:
+  - id: principles
+    name: 高速化の技術原理
+    keywords: [host-device transfer, vectorized env, SIMT, JIT, XLA fusion, lax.scan, vmap, Anakin, Sebulba, mixed precision, CUDA graphs, sim-bound vs learner-bound, sample efficiency, Amdahl]
+    priority: highest
+  - id: jax_ecosystem
+    name: JAX エコシステム
+    keywords: [JAX, jit, vmap, pmap, lax.scan, XLA, PureJaxRL, Brax, MJX, gymnax, JaxMARL, Stoix, rejax, Mava, Jumanji, evosax, Craftax, Kinetix, Podracer]
+    priority: highest
+  - id: pytorch_native
+    name: PyTorch / ネイティブコード系
+    keywords: [PufferLib, PuffeRL, Ocean, EnvPool, Sample Factory, APPO, Isaac Gym, Isaac Lab, Newton, Madrona, GPUDrive, WarpDrive, TorchRL, TensorDict, torch.compile, CUDA graphs, LeanRL, CleanRL, Rust sim, PyO3]
+    priority: high
+  - id: selection_guide
+    name: 実装・選定実践ガイド
+    keywords: [PyTorch vs JAX, decision tree, hardware tier, migration cost, optimization checklist, pitfalls, jittable env, consumer GPU, TPU pod]
+    priority: high
+output_paths:
+  clustering: runs/{domain}/clustering/{date}/
+  gather: runs/{domain}/gather/{date}_{cluster}/
+  retrieval: runs/{domain}/retrieval/{date}_{cluster}/

@@ -1,0 +1,40 @@
+domain: kaggle_ptcg
+display_name: Pokémon TCG AI Battle Challenge (Kaggle Simulation Competition)
+description: >
+  Kaggle「Pokémon TCG AI Battle Challenge」(#PokécaABC, 2026) 参戦準備のための技術調査ドメイン。
+  不完全情報・確率的・逐次型のトレーディングカードゲーム agent コンペ。相手の手札と山札順は隠蔽され、
+  ドロー／コイントスといった確率要素を伴う。提出した agent は cabt Engine 上で 24h 自己対戦を行い、
+  ガウス分布ベース (TrueSkill 系) のレーティングでランク付けされる。過去の類似コンペ
+  (不完全情報ゲーム AI / Kaggle Simulation 系 / カードゲーム AI) の勝者解法を体系的に収集し、戦略を立てる。
+target_competition:
+  name: Pokémon TCG AI Battle Challenge
+  url: https://www.kaggle.com/competitions/pokemon-tcg-ai-battle
+  platform: Kaggle
+  category: Simulation + Strategy (2 tracks)
+  organizer: The Pokémon Company / Matsuo Institute (U-Tokyo) / HEROZ
+  engine: cabt Engine
+clusters:
+  - id: target_competition_spec
+    name: コンペ公式仕様
+    keywords: [PTCG AI Battle Challenge, cabt Engine, Gaussian rating, imperfect information, Simulation track, Strategy track, 10-min time limit]
+    priority: highest
+  - id: imperfect_info_games
+    name: 不完全情報ゲーム AI の系譜
+    keywords: [CFR, MCCFR, CFR+, Deep CFR, Libratus, Pluribus, DeepStack, Hanabi, Stratego DeepNash, NFSP, ISMCTS, determinization]
+    priority: highest
+  - id: card_game_ai
+    name: カードゲーム / TCG AI コンペ
+    keywords: [Legends of Code and Magic, LOCM, Strategy Card Game AI, Hearthstone AI, dynamic lookahead, deck building, ByteRL, RLCard, MtG undecidable]
+    priority: high
+  - id: kaggle_simulation
+    name: Kaggle Simulation 系コンペ勝者解法
+    keywords: [Lux AI, Halite, Kore 2022, Hungry Geese, ConnectX, Google Research Football, kaggle-environments, TrueSkill, imitation learning, league self-play]
+    priority: high
+  - id: stochastic_rng_milestones
+    name: RNG 重め大規模確率ゲーム
+    keywords: [Suphx mahjong, DouZero DouDizhu, Deep Monte Carlo, global reward prediction, oracle guiding, bridge determinization, Maven Scrabble, AlphaStar, CICERO piKL]
+    priority: medium_high
+output_paths:
+  clustering: runs/{domain}/clustering/{date}/
+  gather: runs/{domain}/gather/{date}_{cluster}/
+  retrieval: runs/{domain}/retrieval/{date}_{cluster}/

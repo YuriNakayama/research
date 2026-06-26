@@ -1,0 +1,18 @@
+domain: kaggle_ptcg_ai_battle
+display_name: Kaggle PTCG AI Battle Challenge (Pokémon TCG AI 対戦コンペ)
+description: >
+  株式会社ポケモン主催の Kaggle コンペ「PTCG AI Battle Challenge」の調査ドメイン。
+  ポケモンカードゲーム（スタンダード）をプレイする AI エージェントを開発し、
+  cabt Engine（東大松尾研開発）上で自動対戦する。Simulation / Strategy の2部門制。
+host: The Pokémon Company
+collaborator: 東京大学 松尾研究所 (cabt Engine)
+competitions:
+  simulation: https://www.kaggle.com/competitions/pokemon-tcg-ai-battle
+  strategy: https://www.kaggle.com/competitions/pokemon-tcg-ai-battle-challenge-strategy
+clusters:
+  - id: competition_spec
+    keywords: [cabt Engine, agent interface, obs_dict, deck.csv, kaggle-environments, rating, timeline, prizes]
+output_paths:
+  clustering: runs/{domain}/clustering/{date}/
+  gather:     runs/{domain}/gather/{date}_{cluster}/
+  retrieval:  runs/{domain}/retrieval/{date}_{cluster}/

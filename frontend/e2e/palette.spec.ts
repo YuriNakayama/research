@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Palette selector", () => {
   test("opens palette dropdown and shows all palettes", async ({ page }) => {
-    await page.goto("/docs");
+    await page.goto("/research");
     const button = page.getByRole("button", { name: "カラーパレット切替" });
     await expect(button).toBeVisible();
     await button.click();
@@ -15,7 +15,7 @@ test.describe("Palette selector", () => {
   });
 
   test("switches palette and applies data attribute", async ({ page }) => {
-    await page.goto("/docs");
+    await page.goto("/research");
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
@@ -27,7 +27,7 @@ test.describe("Palette selector", () => {
   });
 
   test("persists palette selection across navigation", async ({ page }) => {
-    await page.goto("/docs");
+    await page.goto("/research");
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
@@ -37,8 +37,8 @@ test.describe("Palette selector", () => {
       "forest"
     );
     // Navigate to another page (match by href since cards include extra labels)
-    await page.locator('main a[href="/docs/daily"]').first().click();
-    await expect(page).toHaveURL("/docs/daily");
+    await page.locator('main a[href="/research/_e2e_fixture"]').first().click();
+    await expect(page).toHaveURL("/research/_e2e_fixture");
     // Palette should persist
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
@@ -47,7 +47,7 @@ test.describe("Palette selector", () => {
   });
 
   test("closes dropdown on escape key", async ({ page }) => {
-    await page.goto("/docs");
+    await page.goto("/research");
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
@@ -59,7 +59,7 @@ test.describe("Palette selector", () => {
   test("switching back to default removes data attribute", async ({
     page,
   }) => {
-    await page.goto("/docs");
+    await page.goto("/research");
     // Switch to non-default
     await page
       .getByRole("button", { name: "カラーパレット切替" })

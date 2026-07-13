@@ -40,7 +40,7 @@ export function Header() {
           </button>
 
           <Link
-            href="/docs"
+            href="/research"
             className="flex h-14 items-center gap-3 px-4 brutal-border-r border-[var(--border-primary)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)]"
           >
             <span className="brutal-label text-[var(--accent-bg)] group-hover:text-[var(--accent-text)]">
@@ -84,11 +84,11 @@ export function Header() {
       {menuOpen && (
         <nav className="brutal-border-t border-[var(--border-primary)] bg-[var(--header-bg)] md:hidden">
           <Link
-            href="/docs"
+            href="/research"
             className="block brutal-border-b border-[var(--border-primary)] px-4 py-3 brutal-label text-[var(--header-text)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)]"
             onClick={() => setMenuOpen(false)}
           >
-            &gt; DOCS
+            &gt; RESEARCH
           </Link>
         </nav>
       )}

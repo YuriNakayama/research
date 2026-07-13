@@ -15,7 +15,7 @@ type DirectoryIndexProps = {
 export function DirectoryIndex({ entries, parentSlug }: DirectoryIndexProps) {
   const title =
     parentSlug.length === 0
-      ? "DOCS"
+      ? "RESEARCH"
       : (parentSlug[parentSlug.length - 1] ?? "").toUpperCase();
 
   const directories = entries.filter((e) => e.isDirectory);
@@ -63,7 +63,7 @@ export function DirectoryIndex({ entries, parentSlug }: DirectoryIndexProps) {
                 {directories.map((entry, idx) => (
                   <Link
                     key={entry.slug.join("/")}
-                    href={`/docs/${entry.slug.join("/")}`}
+                    href={`/research/${entry.slug.join("/")}`}
                     className={`group relative flex items-start justify-between gap-3 border-[var(--border-primary)] p-5 transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] ${
                       idx % 3 !== 2 ? "lg:border-r-2" : ""
                     } ${idx % 2 !== 1 ? "sm:border-r-2 lg:border-r-0" : ""} ${
@@ -107,7 +107,7 @@ export function DirectoryIndex({ entries, parentSlug }: DirectoryIndexProps) {
                     }
                   >
                     <Link
-                      href={`/docs/${entry.slug.join("/")}`}
+                      href={`/research/${entry.slug.join("/")}`}
                       className="group flex items-center gap-4 px-5 py-3 transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)]"
                     >
                       <span className="brutal-label w-10 shrink-0 text-[var(--text-tertiary)] group-hover:text-[var(--accent-text)]">

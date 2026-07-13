@@ -1,4 +1,4 @@
-// Validates every ```mermaid code block in the docs tree by running it through
+// Validates every ```mermaid code block in the research tree by running it through
 // mermaid's own parser (the same library the viewer uses at runtime, pinned to
 // the same version). A broken diagram renders as "Syntax error in text" in the
 // browser, so catching it here keeps the published site free of broken figures.
@@ -22,7 +22,7 @@ const { default: mermaid } = await import("mermaid");
 mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const DOCS_ROOT = path.resolve(process.argv[2] ?? path.join(HERE, "..", "..", "docs"));
+const DOCS_ROOT = path.resolve(process.argv[2] ?? path.join(HERE, "..", "..", "research"));
 
 const BLOCK_RE = /```mermaid\r?\n([\s\S]*?)```/g;
 

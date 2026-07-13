@@ -50,21 +50,21 @@ function resolveImageSrc(src: string | Blob | undefined, basePath: string | unde
   if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) {
     return src;
   }
-  // Relative path — resolve against basePath via /api/docs-assets/
+  // Relative path — resolve against basePath via /api/research-assets/
   if (basePath) {
-    return `/api/docs-assets/${basePath}/${src}`;
+    return `/api/research-assets/${basePath}/${src}`;
   }
   return src;
 }
 
 /**
- * Resolve a markdown hyperlink so that internal .md links become /docs/<slug>.
+ * Resolve a markdown hyperlink so that internal .md links become /research/<slug>.
  *
  * Rules:
  * - External URLs, mailto/tel, and in-page anchors pass through unchanged.
  * - Links already starting with "/" pass through unchanged.
  * - For relative paths ending in .md (or .mdx), resolve against basePath and
- *   prefix with /docs/. Strip the extension. Trailing /index becomes the
+ *   prefix with /research/. Strip the extension. Trailing /index becomes the
  *   directory slug.
  * - Query/hash fragments on the source href are preserved.
  */
@@ -114,7 +114,7 @@ function resolveDocHref(href: string | undefined, basePath: string | undefined):
     }
   }
 
-  return `/docs/${resolved.join("/")}${suffix}`;
+  return `/research/${resolved.join("/")}${suffix}`;
 }
 
 export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {

@@ -1,9 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const DOCS_ROOT = path.join(process.cwd(), "docs");
-
-const SCAN_DIRS = ["research", "daily"] as const;
+const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
 const IGNORED_NAMES = new Set(["node_modules", ".git", ".DS_Store"]);
 
@@ -41,8 +39,8 @@ function validateSlug(slug: string[]): void {
 
 function resolveDocsPath(slug: string[]): string {
   validateSlug(slug);
-  const resolved = path.resolve(DOCS_ROOT, ...slug);
-  if (!resolved.startsWith(DOCS_ROOT + path.sep) && resolved !== DOCS_ROOT) {
+  const resolved = path.resolve(RESEARCH_ROOT, ...slug);
+  if (!resolved.startsWith(RESEARCH_ROOT + path.sep) && resolved !== RESEARCH_ROOT) {
     throw new Error("Path traversal detected");
   }
   return resolved;
@@ -61,15 +59,11 @@ function shouldInclude(name: string): boolean {
 }
 
 export function getRootEntries(): { name: string; isDirectory: boolean; slug: string[] }[] {
-  return SCAN_DIRS.filter((dir) => fs.existsSync(path.join(DOCS_ROOT, dir))).map(
-    (dir) => ({ name: dir, isDirectory: true, slug: [dir] }),
-  );
+  return getDirectoryEntries([]);
 }
 
 export function getDocsTree(): TreeNode[] {
-  return SCAN_DIRS.filter((dir) => fs.existsSync(path.join(DOCS_ROOT, dir))).map(
-    (dir) => buildTree(path.join(DOCS_ROOT, dir), dir, `/docs/${dir}`),
-  );
+  return buildTree(RESEARCH_ROOT, "research", "/research").children;
 }
 
 function buildTree(fullPath: string, name: string, urlPath: string): TreeNode {
@@ -150,12 +144,12 @@ export function getDirectoryEntries(
 }
 
 export function getBreadcrumbs(slug: string[]): Breadcrumb[] {
-  const crumbs: Breadcrumb[] = [{ label: "Docs", href: "/docs" }];
+  const crumbs: Breadcrumb[] = [{ label: "Research", href: "/research" }];
 
   for (let i = 0; i < slug.length; i++) {
     crumbs.push({
       label: slug[i],
-      href: `/docs/${slug.slice(0, i + 1).join("/")}`,
+      href: `/research/${slug.slice(0, i + 1).join("/")}`,
     });
   }
 

@@ -373,7 +373,11 @@ body {
    Prose (Markdown content) overrides
    ============================================================ */
 .prose {
-  max-width: 72ch;
+  /* Use the full width of the content column instead of the default 72ch
+     reading measure. On wide screens the 72ch cap left the article pinned to
+     the left with a large empty gutter on the right; the sidebar + ToC columns
+     already frame the content, so let prose fill the remaining space. */
+  max-width: none;
   --tw-prose-body: var(--text-primary);
   --tw-prose-headings: var(--text-primary);
   --tw-prose-links: var(--text-primary);

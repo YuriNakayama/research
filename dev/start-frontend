@@ -14,13 +14,8 @@ WEB_PORT="${1:-3000}"
 MOCKOON_PORT="${2:-8000}"
 
 # Mockoon 起動
-if ! command -v mockoon-cli &>/dev/null; then
-  echo "mockoon-cli が見つかりません。インストールします..."
-  npm install -g @mockoon/cli
-fi
-
 echo "== Mockoon 起動 (port ${MOCKOON_PORT}) =="
-mockoon-cli start --data ./mock/mockoon/ai-reception.json --port "$MOCKOON_PORT" &
+bunx @mockoon/cli start --data ./mock/mockoon/ai-reception.json --port "$MOCKOON_PORT" &
 MOCKOON_PID=$!
 
 cleanup() {
@@ -41,4 +36,4 @@ done
 # Next.js 起動
 echo "== Next.js 起動 (port ${WEB_PORT}) → backend :${MOCKOON_PORT} =="
 export NEXT_PUBLIC_BACKEND_URL="http://localhost:${MOCKOON_PORT}"
-exec npx next dev --turbopack --port "$WEB_PORT"
+exec bunx next dev --turbopack --port "$WEB_PORT"

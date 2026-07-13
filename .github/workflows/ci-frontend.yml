@@ -36,12 +36,17 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - name: Copy docs into frontend
         run: cp -r docs frontend/docs
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       # E2E specs assert against a deterministic report; add it to the copied
       # docs tree before `next build` so that generateStaticParams sees it.
@@ -51,21 +56,21 @@ jobs:
 
       - name: Type check
         working-directory: frontend
-        run: npx tsc --noEmit
+        run: bun run type-check
 
       - name: Lint
         working-directory: frontend
-        run: npx next lint
+        run: bun run lint
 
       # Validate the docs content itself: markdownlint for broken markup and a
       # mermaid parse pass so no diagram renders as "Syntax error" on the site.
       - name: Check docs (markdown + mermaid)
         working-directory: frontend
-        run: npm run check:docs
+        run: bun run check:docs
 
       - name: Build
         working-directory: frontend
-        run: npx next build
+        run: bunx next build
         env:
           NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
           NEXT_PUBLIC_COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
@@ -75,7 +80,7 @@ jobs:
       # ---------------------------------------------------------------------
       - name: Install Playwright browsers
         working-directory: frontend
-        run: npx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -105,7 +110,7 @@ jobs:
           NEXT_PUBLIC_COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
           E2E_TEST_USER_EMAIL: ${{ steps.e2e_user.outputs.email }}
           E2E_TEST_USER_PASSWORD: ${{ steps.e2e_user.outputs.password }}
-        run: npx playwright test
+        run: bunx playwright test
 
       - name: Upload Playwright report
         if: always()

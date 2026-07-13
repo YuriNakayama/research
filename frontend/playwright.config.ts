@@ -35,8 +35,8 @@ export default defineConfig({
     // server (much faster page loads than `next dev`). Locally fall back to
     // the dev server for the usual iteration workflow.
     command: process.env.CI
-      ? "npx next start --port 3000"
-      : "npm run dev -- --port 3000",
+      ? "bunx next start --port 3000"
+      : "bun run dev -- --port 3000",
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

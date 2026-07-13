@@ -39,7 +39,7 @@ export function MobileNav({ tree, currentPath }: MobileNavProps) {
           onClick={() => setOpen(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto brutal-border-t border-[var(--border-primary)] bg-[var(--sidebar-bg)]"
+            className="scroll-contain absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto brutal-border-t border-[var(--border-primary)] bg-[var(--sidebar-bg)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 flex items-center justify-between brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)] px-4 py-3">

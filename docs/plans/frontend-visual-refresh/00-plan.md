@@ -27,6 +27,7 @@
 |------|------|
 | 配色の方針 | **ブルータリズムの骨格（radius 0・太ボーダー・ハードシャドウ）は維持したまま、色だけ 3〜5 色に増やす** |
 | 配色トークン | 各パレットが単一 `--accent-bg` ではなく `surface / accent / accent-2 / muted` 等 **3〜5 色の役割トークン**を駆動する |
+| 配色の出典 | **`palette.ts` の 4 色スウォッチをベースにする**。コントラスト確保・ボーダー/シャドウ用の派生色追加は可だが、**できるだけ 4 色に忠実**に、追加は最小限に留める |
 | `dark-teal`（デフォルト）| 現状 CSS 定義が欠落 → 追加する |
 | 列幅リサイズの永続化 | **ページ単位で localStorage 保存**（リロードしても維持） |
 | 変更範囲 | **`frontend/` 配下に限定**。`docs/research/**`・`docs/daily/**` は一切触らない（CLAUDE.md ルール遵守） |
@@ -96,7 +97,7 @@
   - アクセシビリティ: ハンドルは `role="separator"` `aria-orientation="vertical"` `aria-label` 付与、
     キーボード（←→）でも幅調整可。
   - `touch-action: none`（ドラッグ中）、`prefers-reduced-motion` 尊重。
-  - モバイルは横スクロール維持（ハンドルは md 以上で表示）。
+  - **タッチデバイスも対応**：pointer イベントで統一し、モバイルでもハンドルを表示して幅調整可能にする。横スクロールと共存させる（ハンドル操作領域を確保しつつ、リサイズしない範囲では従来通りスクロール）。
 - **列幅をページ単位で localStorage に永続化**するカスタムフック（例: `useColumnWidths(storageKey)`）。
   storageKey は現在の docs slug（ページ）＋テーブル index を用いる。
 - `markdown-renderer.tsx` の `table` コンポーネントを `ResizableTable` に差し替える。

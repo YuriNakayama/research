@@ -9,6 +9,7 @@ export function ImageWithCaption({ alt, ...props }: ImageWithCaptionProps) {
       alt={alt ?? ""}
       className="max-w-full rounded"
       loading="lazy"
+      decoding="async"
       title={alt ?? undefined}
       {...props}
     />

@@ -40,7 +40,10 @@ export default function LoginPage() {
         <div className="pointer-events-none absolute right-6 top-6 brutal-label text-[var(--text-tertiary)]">
           AUTH / SECURE
         </div>
-        <div className="pointer-events-none absolute bottom-6 left-6 brutal-label text-[var(--text-tertiary)]">
+        <div
+          className="pointer-events-none absolute bottom-6 left-6 brutal-label text-[var(--text-tertiary)]"
+          suppressHydrationWarning
+        >
           © {new Date().getFullYear()}
         </div>
         <div className="pointer-events-none absolute bottom-6 right-6 brutal-label text-[var(--text-tertiary)]">

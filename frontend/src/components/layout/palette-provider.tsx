@@ -34,6 +34,9 @@ export function PaletteProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     const html = document.documentElement;
+    // The default palette (dark-teal) is defined directly on :root/.dark so it
+    // renders flash-free before hydration; other palettes override via the
+    // [data-palette="..."] attribute.
     if (palette === DEFAULT_PALETTE) {
       html.removeAttribute("data-palette");
     } else {

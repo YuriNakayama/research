@@ -51,7 +51,7 @@ export function Toc({ items, className }: TocProps) {
                   item.level >= 4 && "text-xs",
                   isActive
                     ? "border-[var(--accent-bg)] bg-[var(--accent-bg)] font-semibold text-[var(--accent-text)]"
-                    : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--text-primary)] hover:bg-[var(--surface-secondary)] hover:text-[var(--text-primary)]",
+                    : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--accent-2-bg)] hover:bg-[var(--surface-tint)] hover:text-[var(--text-primary)]",
                 )}
                 style={{ paddingLeft: `${(item.level - 2) * 12 + 10}px` }}
               >

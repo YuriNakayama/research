@@ -34,6 +34,12 @@ docs/works
 /frontend/.next/
 /frontend/out/
 
+## playwright (E2E artifacts)
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/blob-report/
+/frontend/.playwright/
+
 ## production
 /frontend/build
 

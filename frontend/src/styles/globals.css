@@ -37,7 +37,7 @@
   /* --- Border (heavy, mono) --- */
   --border-primary: #0A0A0A;
   --border-secondary: #0A0A0A;
-  --border-active: #E6FF3D;
+  --border-active: #00ADB5;
   --border-width: 2px;
   --border-width-strong: 3px;
   --border-width-thin: 1px;
@@ -50,11 +50,19 @@
   --text-link: #0A0A0A;
   --text-accent: #0A0A0A;
 
-  /* --- Accent (Electric Yellow) --- */
-  --accent-bg: #E6FF3D;
+  /* --- Accent (default: Dark Teal palette) ---
+     Role-token model: every palette drives 3–5 colors, not one accent.
+     - accent    : primary action / hover / active swatch  (c2 in palette.ts)
+     - accent-2  : secondary accent for ToC/blockquote/table-header rails (c0/c1)
+     - surface-tint : subtle section fill (light swatch c3 in light mode)
+     All pairings AA-verified — see palette.ts. */
+  --accent-bg: #00ADB5;            /* dark-teal c2 — 7.21:1 on black */
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #F5FFB8;
-  --accent-raw: #E6FF3D;
+  --accent-subtle-bg: #D6F5F6;     /* teal tint — text-primary AA */
+  --accent-raw: #00ADB5;
+  --accent-2-bg: #222831;          /* dark-teal c0 — 14.21:1 vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #EEEEEE;         /* dark-teal c3 — 17.06:1 vs black */
 
   /* --- Error --- */
   --error-bg: #FF3D3D;
@@ -71,7 +79,7 @@
   --code-dim: #71717A;             /* zinc-500 — comments ~4.6:1 AA */
   --code-accent: var(--accent-raw);/* single brand accent (yellow) */
   --code-string: #D4D4D8;          /* zinc-300 — softer white ~12.8:1 */
-  --code-selection: rgba(230, 255, 61, 0.22);
+  --code-selection: rgba(0, 173, 181, 0.22);
   --code-header-bg: #000000;
   --code-header-text: #FAFAFA;
   --code-border: #0A0A0A;
@@ -80,7 +88,7 @@
   --sidebar-bg: #FAFAFA;
   --sidebar-text: #0A0A0A;
   --sidebar-text-secondary: #6A6A6A;
-  --sidebar-active-bg: #E6FF3D;
+  --sidebar-active-bg: #00ADB5;
   --sidebar-active-text: #0A0A0A;
   --sidebar-active-indicator: #0A0A0A;
   --sidebar-hover-bg: #F0F0F0;
@@ -127,7 +135,7 @@
 
   --border-primary: #FAFAFA;
   --border-secondary: #FAFAFA;
-  --border-active: #E6FF3D;
+  --border-active: #00C2CB;
 
   --text-primary: #FAFAFA;
   --text-secondary: #D8D8D8;
@@ -136,9 +144,14 @@
   --text-link: #FAFAFA;
   --text-accent: #FAFAFA;
 
-  --accent-bg: #E6FF3D;
+  /* Dark-teal defaults (dark mode). surface-tint is a DARK tint here so it
+     stays AA against white body text. */
+  --accent-bg: #00C2CB;            /* brighter teal for dark bg — AA on black */
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #2A3000;
+  --accent-subtle-bg: #06312E;
+  --accent-2-bg: #00ADB5;
+  --accent-2-text: #0A0A0A;
+  --surface-tint: #16232A;         /* dark teal-tinted surface, 14+:1 vs white */
 
   --code-bg: #09090B;
   --code-fg: #FAFAFA;
@@ -149,7 +162,7 @@
   --sidebar-bg: #0A0A0A;
   --sidebar-text: #FAFAFA;
   --sidebar-text-secondary: #8A8A8A;
-  --sidebar-active-bg: #E6FF3D;
+  --sidebar-active-bg: #00C2CB;
   --sidebar-active-text: #0A0A0A;
   --sidebar-active-indicator: #FAFAFA;
   --sidebar-hover-bg: #1E1E1E;
@@ -162,14 +175,45 @@
 
 /* ============================================================
    Palettes — each enforces brutalist rules (radius 0, heavy
-   borders) but substitutes its own single accent color.
+   borders) but drives a 3–5 color ROLE-TOKEN set derived from
+   its 4 swatches in palette.ts:
+     accent (c2-ish) · accent-2 (c0/c1) · surface-tint (light swatch)
+   surface-tint flips to a dark tint in .dark so body text stays AA.
+   All bg/text pairs verified ≥4.5:1 (AA) — see palette.ts header.
    ============================================================ */
 
-/* Pastel Mint → Mint Green accent */
+/* Dark Teal (DEFAULT) — mirrors :root/.dark so an explicit
+   data-palette="dark-teal" renders identically to the no-attribute base. */
+[data-palette="dark-teal"] {
+  --accent-bg: #00ADB5;
+  --accent-text: #0A0A0A;
+  --accent-subtle-bg: #D6F5F6;
+  --accent-2-bg: #222831;
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #EEEEEE;
+  --sidebar-active-bg: #00ADB5;
+  --sidebar-active-text: #0A0A0A;
+  --border-active: #00ADB5;
+  --shadow-brutal-accent: 4px 4px 0 0 #00ADB5;
+}
+[data-palette="dark-teal"].dark {
+  --accent-bg: #00C2CB;
+  --accent-subtle-bg: #06312E;
+  --accent-2-bg: #00ADB5;
+  --accent-2-text: #0A0A0A;
+  --surface-tint: #16232A;
+  --sidebar-active-bg: #00C2CB;
+  --border-active: #00C2CB;
+}
+
+/* Pastel Mint — accent c2 mint · accent-2 c0 pink · tint c1 sky */
 [data-palette="pastel-mint"] {
   --accent-bg: #3CFFB0;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #D8FFEC;
+  --accent-2-bg: #F9B2D7;      /* c0 — 11.67:1 vs black */
+  --accent-2-text: #0A0A0A;
+  --surface-tint: #CFECF3;     /* c1 — 15.98:1 vs black */
   --sidebar-active-bg: #3CFFB0;
   --border-active: #3CFFB0;
   --shadow-brutal-accent: 4px 4px 0 0 #3CFFB0;
@@ -178,15 +222,21 @@
   --accent-bg: #3CFFB0;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #0A2A1C;
+  --accent-2-bg: #7A3A5C;      /* muted pink, AA vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #0A2A1C;
   --sidebar-active-bg: #3CFFB0;
   --border-active: #3CFFB0;
 }
 
-/* Pop Blue → Electric Blue accent */
+/* Pop Blue — accent c3 blue · accent-2 c0 pink · tint c1 lemon */
 [data-palette="pop-blue"] {
   --accent-bg: #2E5BFF;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #D8E2FF;
+  --accent-2-bg: #FE9EC7;      /* c0 — 10.3:1 vs black */
+  --accent-2-text: #0A0A0A;
+  --surface-tint: #F9F6C4;     /* c1 — 17.92:1 vs black */
   --sidebar-active-bg: #2E5BFF;
   --sidebar-active-text: #FAFAFA;
   --border-active: #2E5BFF;
@@ -196,16 +246,22 @@
   --accent-bg: #2E5BFF;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #0A1230;
+  --accent-2-bg: #7A2E52;      /* muted pink, AA vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #0A1230;
   --sidebar-active-bg: #2E5BFF;
   --sidebar-active-text: #FAFAFA;
   --border-active: #2E5BFF;
 }
 
-/* Forest → Deep Green accent */
+/* Forest — accent green · accent-2 c1 deep green · tint c3 pale green */
 [data-palette="forest"] {
   --accent-bg: #00B84D;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #D0F5DC;
+  --accent-2-bg: #285A48;      /* c1 — 7.6:1 vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #B0E4CC;     /* c3 — 13.97:1 vs black */
   --sidebar-active-bg: #00B84D;
   --sidebar-active-text: #FAFAFA;
   --border-active: #00B84D;
@@ -215,16 +271,22 @@
   --accent-bg: #00E860;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #002A12;
+  --accent-2-bg: #285A48;
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #002A12;
   --sidebar-active-bg: #00E860;
   --sidebar-active-text: #0A0A0A;
   --border-active: #00E860;
 }
 
-/* Sunset → Orange accent */
+/* Sunset — accent orange · accent-2 c0 navy · tint c3 amber */
 [data-palette="sunset"] {
   --accent-bg: #FF6B00;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #FFE0C8;
+  --accent-2-bg: #003049;      /* c0 — 13.25:1 vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #FCBF49;     /* c3 — 11.96:1 vs black */
   --sidebar-active-bg: #FF6B00;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF6B00;
@@ -234,16 +296,22 @@
   --accent-bg: #FF8C1A;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #2A1400;
+  --accent-2-bg: #0A4E73;      /* lightened navy, AA vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #2A1400;
   --sidebar-active-bg: #FF8C1A;
   --sidebar-active-text: #0A0A0A;
   --border-active: #FF8C1A;
 }
 
-/* Coral → Hot Pink accent */
+/* Coral — accent pink · accent-2 c3 teal-blue · tint c2 aqua */
 [data-palette="coral"] {
   --accent-bg: #FF006E;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #FFD8E8;
+  --accent-2-bg: #2C687B;      /* c3 — 5.96:1 vs white */
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #8CC7C4;     /* c2 — 10.45:1 vs black */
   --sidebar-active-bg: #FF006E;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF006E;
@@ -253,6 +321,9 @@
   --accent-bg: #FF3D8A;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #2A001A;
+  --accent-2-bg: #2C687B;
+  --accent-2-text: #FAFAFA;
+  --surface-tint: #2A001A;
   --sidebar-active-bg: #FF3D8A;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF3D8A;
@@ -264,6 +335,11 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Native form controls, scrollbars and the address bar follow the theme. */
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -360,6 +436,12 @@ body {
 .brutal-mono {
   font-family: var(--font-mono);
 }
+/* Keep scroll momentum inside drawers/sidebars from chaining to the page and
+   triggering pull-to-refresh / rubber-banding on touch devices. */
+.scroll-contain {
+  overscroll-behavior: contain;
+  touch-action: manipulation;
+}
 .brutal-invert {
   background: var(--text-primary);
   color: var(--text-inverse);
@@ -397,6 +479,16 @@ body {
   font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: -0.02em;
+  /* Even out ragged headings and keep anchored headings clear of the sticky
+     header (h-14 = 3.5rem + border) when jumped to via a #hash. */
+  text-wrap: balance;
+  scroll-margin-top: 4rem;
+}
+
+/* Body copy: avoid orphans / awkward line breaks. */
+.prose p,
+.prose li {
+  text-wrap: pretty;
 }
 
 .prose h2 {
@@ -418,8 +510,9 @@ body {
 
 .prose blockquote {
   border-left-width: var(--border-width-strong);
+  border-left-color: var(--accent-2-bg);
   font-style: normal;
-  background: var(--surface-secondary);
+  background: var(--surface-tint);
   padding: var(--space-md) var(--space-lg);
   quotes: none;
 }
@@ -435,16 +528,83 @@ body {
   border: var(--border-width) solid var(--border-primary);
 }
 
+/* ------------------------------------------------------------
+   Resizable tables (ResizableTable component)
+   The scroll container is position:relative so drag handles can
+   be absolutely positioned along column boundaries and scroll
+   together with the (max-content width) table.
+   ------------------------------------------------------------ */
+.resizable-table-scroll {
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+/* When JS has taken over, the inner <table> is a normal table (not display:block)
+   so table-layout:fixed + colgroup widths apply. */
+.prose .resizable-table-scroll > table {
+  display: table;
+  margin-top: 0;
+  margin-bottom: 0;
+  border: var(--border-width) solid var(--border-primary);
+}
+.resizable-table-handles {
+  position: absolute;
+  inset: 0;
+  width: max-content;
+  pointer-events: none;
+}
+.resizable-table-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 11px;
+  margin-left: -6px;
+  cursor: col-resize;
+  pointer-events: auto;
+  touch-action: none;
+  /* Invisible hit area with a thin visible seam on hover/focus. */
+  background: transparent;
+  z-index: 2;
+}
+.resizable-table-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: var(--border-width);
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+.resizable-table-handle:hover::after,
+.resizable-table-handle:focus-visible::after {
+  background: var(--accent-2-bg);
+}
+.resizable-table-handle:focus-visible {
+  outline: 2px solid var(--accent-bg);
+  outline-offset: -1px;
+}
+
 .prose thead {
-  background: var(--text-primary);
-  color: var(--text-inverse);
+  background: var(--accent-2-bg);
+  color: var(--accent-2-text);
 }
 .prose thead th {
-  color: var(--text-inverse);
+  color: var(--accent-2-text);
   font-family: var(--font-mono);
   text-transform: uppercase;
   font-size: 0.8em;
   letter-spacing: 0.05em;
+}
+/* Zebra rows use the subtle surface tint so the palette's light swatch
+   appears in body content, not just accents. */
+.prose tbody tr:nth-child(even) {
+  background: var(--surface-tint);
+}
+
+/* Align digits in data tables so columns of numbers line up. */
+.prose td,
+.prose th {
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 767px) {

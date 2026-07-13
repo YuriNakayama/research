@@ -46,6 +46,36 @@ test.describe("Palette selector", () => {
     );
   });
 
+  test("drives multi-color role tokens per palette", async ({ page }) => {
+    await page.goto("/docs");
+
+    const readTokens = () =>
+      page.evaluate(() => {
+        const s = getComputedStyle(document.documentElement);
+        return {
+          accent: s.getPropertyValue("--accent-bg").trim(),
+          accent2: s.getPropertyValue("--accent-2-bg").trim(),
+          tint: s.getPropertyValue("--surface-tint").trim(),
+        };
+      });
+
+    // Default (dark-teal) exposes all three role tokens.
+    const dflt = await readTokens();
+    expect(dflt.accent).not.toBe("");
+    expect(dflt.accent2).not.toBe("");
+    expect(dflt.tint).not.toBe("");
+
+    // Switching palette changes the secondary accent + surface tint, proving the
+    // 3–5 color role tokens (not just the single accent) are wired up.
+    await page.getByRole("button", { name: "カラーパレット切替" }).click();
+    await page.getByText("Coral").click();
+    await expect(page.locator("html")).toHaveAttribute("data-palette", "coral");
+
+    const coral = await readTokens();
+    expect(coral.accent2).not.toBe(dflt.accent2);
+    expect(coral.tint).not.toBe(dflt.tint);
+  });
+
   test("closes dropdown on escape key", async ({ page }) => {
     await page.goto("/docs");
     await page

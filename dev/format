@@ -4,14 +4,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT_DIR="$(pwd)"
 
-# Backend
-if [ -d "backend" ]; then
-  echo "== backend: format =="
-  cd backend
-  uv run ruff format .
-  cd "$ROOT_DIR"
-fi
-
 # Frontend
 if [ -d "frontend" ]; then
   echo "== frontend: format =="

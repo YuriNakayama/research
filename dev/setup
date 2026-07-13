@@ -13,11 +13,4 @@ if [ -d "frontend" ]; then
   echo "[frontend] 完了"
 fi
 
-# Backend
-if [ -d "backend" ]; then
-  echo "[backend] 依存関係をインストール中..."
-  cd backend && uv sync --quiet && cd "$ROOT_DIR"
-  echo "[backend] 完了"
-fi
-
 echo "== セットアップ完了 =="

@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../frontend"
 
 echo "== e2e: install playwright browsers =="
-pnpm exec playwright install --with-deps chromium webkit
+bunx playwright install --with-deps chromium webkit
 
 echo "== e2e: playwright test =="
-pnpm exec playwright test "$@"
+bunx playwright test "$@"

@@ -19,7 +19,7 @@ fi
 if [ -d "frontend" ]; then
   echo "== frontend: lint =="
   cd frontend
-  npm run lint || EXIT_CODE=1
+  bun run lint || EXIT_CODE=1
   cd "$ROOT_DIR"
 fi
 

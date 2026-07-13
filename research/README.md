@@ -1,6 +1,6 @@
 # Research Directory Layout
 
-このディレクトリは Auto Research Pipeline と research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先です。**skill とユーザーは出力先を決める前に必ず本ファイルを読んでください**。
+このディレクトリは research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先であり、viewer（`/research`）が配信する表示用リサーチ成果物領域です。**skill とユーザーは出力先を決める前に必ず本ファイルを読んでください**。
 
 ## 設計原則
 
@@ -12,7 +12,7 @@
 ## ディレクトリ構成
 
 ```
-docs/research/
+research/
 ├── README.md                                # このファイル（構成の単一情報源）
 │
 ├── domains/                                 # 【最新ビュー】ドメイン中心
@@ -49,20 +49,20 @@ docs/research/
 skill は次の手順で出力先を決定します。
 
 1. **ドメイン名 `<domain>` を特定**
-   - 入力ファイルパスから推定 (`docs/research/runs/<domain>/...` / `docs/research/domains/<domain>/...`)
+   - 入力ファイルパスから推定 (`research/runs/<domain>/...` / `research/domains/<domain>/...`)
    - 推定不能ならユーザーに確認、または会話文脈から `snake_case` のドメイン名を生成
-2. **`docs/research/domains/<domain>/domain.yaml` が存在すれば読む** — `output_paths` テンプレが定義されていればそれに従う
+2. **`research/domains/<domain>/domain.yaml` が存在すれば読む** — `output_paths` テンプレが定義されていればそれに従う
 3. **存在しない場合は下表の既定パスを使用**
 4. **`<date>` は実行日 (`YYYYMMDD`)、`<cluster>` は対象クラスタ ID (`snake_case` or `kebab-case`)**
-5. **完了後、`domains/<domain>/<phase>` 配下の `latest` ポインタを更新**（pipeline / 人手）
+5. **完了後、`domains/<domain>/<phase>` 配下の `latest` ポインタを更新**（skill / 人手）
 
 ### phase 別の既定出力先
 
 | phase       | skill                | 既定出力先                                                   |
 |-------------|----------------------|--------------------------------------------------------------|
-| clustering  | `research-clustering`| `docs/research/runs/<domain>/clustering/<YYYYMMDD>/`         |
-| gather      | `research-gather`    | `docs/research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/`   |
-| retrieval   | `research-retrieval` | `docs/research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/`|
+| clustering  | `research-clustering`| `research/runs/<domain>/clustering/<YYYYMMDD>/`         |
+| gather      | `research-gather`    | `research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/`   |
+| retrieval   | `research-retrieval` | `research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/`|
 
 クラスタ単位ではなくドメイン全体を対象にする場合は `<cluster>` を `all` とします。
 
@@ -76,8 +76,8 @@ skill は次の手順で出力先を決定します。
 シンボリックリンク作成例:
 
 ```bash
-ln -snf ../../runs/cate/clustering/latest docs/research/domains/cate/clustering
-ln -snf ../../../runs/cate/retrieval/latest_metalearner docs/research/domains/cate/reports/metalearner
+ln -snf ../../runs/cate/clustering/latest research/domains/cate/clustering
+ln -snf ../../../runs/cate/retrieval/latest_metalearner research/domains/cate/reports/metalearner
 ```
 
 ## ドメインメタファイル `domain.yaml`（任意）
@@ -117,7 +117,3 @@ output_paths:
 | clustering | ドメインをサブクラスタに分割               | キーワード / テーマ        | `index.md` + `cluster-NN-*.md`      |
 | gather     | クラスタ単位でリソース一覧化               | clustering 出力 / キーワード | `resources-<topic>.md`              |
 | retrieval  | リソースごとの詳細レポート生成             | gather 出力 / URL / PDF    | `index.md` + `NN-*.md`              |
-
-## 既存の `daily/` について
-
-`docs/daily/` は legacy 配置です。今後は `domains/<domain>/` に統合してください（移行は別タスク）。

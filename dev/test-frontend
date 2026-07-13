@@ -1,29 +1,24 @@
 #!/bin/bash
 # フロントエンドテスト（ci-frontend.yml 相当）
-# type check → format check → lint → Mockoon + Playwright
+# type check → lint → docs check → Mockoon + Playwright
 set -euo pipefail
 
 cd "$(dirname "$0")/../frontend"
 
 echo "== frontend: type check =="
-pnpm type-check
-
-echo "== frontend: format check =="
-pnpm format:check
+bun run type-check
 
 echo "== frontend: lint =="
-pnpm lint
+bun run lint
+
+echo "== frontend: docs check =="
+bun run check:docs
 
 echo "== frontend: install playwright browsers =="
-pnpm exec playwright install --with-deps chromium firefox webkit
+bunx playwright install --with-deps chromium firefox webkit
 
 echo "== frontend: start mockoon =="
-if ! command -v mockoon-cli &>/dev/null; then
-  echo "mockoon-cli が見つかりません。インストールします..."
-  npm install -g @mockoon/cli
-fi
-
-mockoon-cli start --data ./mock/mockoon/ai-reception.json --port 8000 &
+bunx @mockoon/cli start --data ./mock/mockoon/ai-reception.json --port 8000 &
 MOCKOON_PID=$!
 
 cleanup() {
@@ -43,4 +38,4 @@ for i in $(seq 1 30); do
 done
 
 echo "== frontend: playwright test =="
-pnpm exec playwright test "$@"
+bunx playwright test "$@"

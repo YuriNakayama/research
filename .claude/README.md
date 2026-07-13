@@ -58,7 +58,7 @@
 1. **環境変数**: `CLAUDE_PACKAGE_MANAGER`
 2. **プロジェクト設定**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` フィールド
-4. **ロックファイル**: package-lock.json、yarn.lock、pnpm-lock.yaml、bun.lockb から検出
+4. **ロックファイル**: package-lock.json、yarn.lock、pnpm-lock.yaml、bun.lock から検出
 5. **グローバル設定**: `~/.claude/package-manager.json`
 6. **フォールバック**: 最初に見つかったパッケージマネージャー
 
@@ -66,10 +66,10 @@
 
 ```bash
 # 環境変数で設定
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export CLAUDE_PACKAGE_MANAGER=bun
 
 # グローバル設定で設定
-node scripts/setup-package-manager.js --global pnpm
+node scripts/setup-package-manager.js --global bun
 
 # プロジェクト設定で設定
 node scripts/setup-package-manager.js --project bun

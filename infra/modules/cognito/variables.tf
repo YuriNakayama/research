@@ -19,3 +19,16 @@ variable "e2e_test_user_email" {
   type        = string
   default     = "e2e-test@example.com"
 }
+
+variable "e2e_test_user_password" {
+  description = <<-EOT
+    Fixed password for the E2E test user. Leave empty (the default) to have
+    Terraform generate a strong random password instead. A fixed value is only
+    intended for non-production environments where a known credential makes
+    local manual login convenient; production/staging should leave this empty
+    so the password stays random and never appears in tfvars.
+  EOT
+  type        = string
+  default     = ""
+  sensitive   = true
+}

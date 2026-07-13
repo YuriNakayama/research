@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-// The login tests intentionally disable the middleware bypass header so that
-// requests flow through the real Cognito auth path. Every other spec keeps the
-// bypass so it does not need a real user.
-test.use({ extraHTTPHeaders: {} });
+// The login flow must be exercised from an unauthenticated state, so override
+// the project-level storageState with an empty one. Every other spec inherits
+// the authenticated storageState produced by auth.setup.ts.
+test.use({ storageState: { cookies: [], origins: [] } });
 
 const testUserEmail = process.env.E2E_TEST_USER_EMAIL;
 const testUserPassword = process.env.E2E_TEST_USER_PASSWORD;

@@ -22,10 +22,13 @@ resource "aws_amplify_app" "main" {
             preBuild:
               commands:
                 - cp -r ../docs ./docs
-                - npm ci
+                - curl -fsSL https://bun.sh/install | bash
+                - export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH"
+                - bun install --frozen-lockfile
             build:
               commands:
-                - npx next build
+                - export PATH="$HOME/.bun/bin:$PATH"
+                - bunx next build
           artifacts:
             baseDirectory: .next
             files:
@@ -34,6 +37,7 @@ resource "aws_amplify_app" "main" {
             paths:
               - node_modules/**/*
               - .next/cache/**/*
+              - $HOME/.bun/install/cache/**/*
   YAML
 
   environment_variables = {

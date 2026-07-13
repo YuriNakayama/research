@@ -105,17 +105,17 @@ $$\widehat{\tau}_{\mathrm{EIF}} = \frac{\mathbb{P}_n\big[\widehat{\phi}_{1,10}^{
 
 ```mermaid
 flowchart TD
-    A[試験 R=1: X,A,C,Y] --> B[コンプライアンス確率 p_a(X)]
-    A --> C[条件付きアウトカム μ_ac(X)]
-    D[ターゲット R=0: X のみ] --> E[参加確率 ρ(X)=P(R=1|X)]
+    A["試験 R=1: X,A,C,Y"] --> B["コンプライアンス確率 p_a(X)"]
+    A --> C["条件付きアウトカム μ_ac(X)"]
+    D["ターゲット R=0: X のみ"] --> E["参加確率 ρ(X)=P(R=1|X)"]
     A --> E
-    B --> F[principal score e_10=p_1−p_0]
-    F --> G[主成層: complier U=10]
-    E --> H[EIF 成分 φ_1,10 / φ_0,10 / λ_10]
+    B --> F["principal score e_10=p_1−p_0"]
+    F --> G["主成層: complier U=10"]
+    E --> H["EIF 成分 φ_1,10 / φ_0,10 / λ_10"]
     C --> H
     G --> H
-    H --> I[one-step: τ̂_EIF = P_n[φ_1−φ_0]/P_n[λ_10]]
-    I --> J[ターゲット母集団の complier への τ_10^0]
+    H --> I["one-step: τ̂_EIF = P_n[φ_1−φ_0]/P_n[λ_10]"]
+    I --> J["ターゲット母集団の complier への τ_10^0"]
 ```
 
 ---

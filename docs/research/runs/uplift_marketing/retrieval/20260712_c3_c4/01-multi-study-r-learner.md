@@ -136,13 +136,13 @@ return {τ̂_k}, τ̂
 
 ```mermaid
 flowchart TD
-    A[統合データ<br/>複数研究 S=1..K] --> B[Step1: 研究固有 nuisance<br/>ê_k(x), m̂_k(x)<br/>cross-fitting]
-    A --> C[Step2: 所属確率<br/>p̂(k|x)<br/>multinomial regression / ML]
-    B --> D[Robinson 変換<br/>残差 Y-m と 擬似特徴 A-e_k]
+    A["統合データ<br/>複数研究 S=1..K"] --> B["Step1: 研究固有 nuisance<br/>ê_k(x), m̂_k(x)<br/>cross-fitting"]
+    A --> C["Step2: 所属確率<br/>p̂(k|x)<br/>multinomial regression / ML"]
+    B --> D["Robinson 変換<br/>残差 Y-m と 擬似特徴 A-e_k"]
     C --> D
-    D --> E[Step3: multi-study R-loss 最小化<br/>+ 正則化 Λ_τk]
-    E --> F[研究固有 HTE τ̂_k(x)]
-    F --> G[全体 HTE 合成<br/>τ̂(x)=Σ_k τ̂_k(x) p̂(k|x)]
+    D --> E["Step3: multi-study R-loss 最小化<br/>+ 正則化 Λ_τk"]
+    E --> F["研究固有 HTE τ̂_k(x)"]
+    F --> G["全体 HTE 合成<br/>τ̂(x)=Σ_k τ̂_k(x) p̂(k|x)"]
 ```
 
 特殊ケースによる直観:

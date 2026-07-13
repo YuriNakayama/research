@@ -57,6 +57,12 @@ jobs:
         working-directory: frontend
         run: npx next lint
 
+      # Validate the docs content itself: markdownlint for broken markup and a
+      # mermaid parse pass so no diagram renders as "Syntax error" on the site.
+      - name: Check docs (markdown + mermaid)
+        working-directory: frontend
+        run: npm run check:docs
+
       - name: Build
         working-directory: frontend
         run: npx next build

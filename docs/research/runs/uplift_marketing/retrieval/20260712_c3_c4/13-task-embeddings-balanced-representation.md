@@ -104,14 +104,14 @@ for each subset S:      τ̂_AIE(S) = mean_x Σ_{Q⊆S} (−1)^{|S|−|Q|} h([Φ
 ```mermaid
 flowchart LR
     X[共変量 x ∈ R^d] --> PHI[表現学習ネット Φ]
-    T[処置ベクトル t（2進）] --> TE[task embedding MLP_w → 5次元]
-    PHI --> CAT[連結 Φ(x) ; t_w(t)]
+    T["処置ベクトル t（2進）"] --> TE[task embedding MLP_w → 5次元]
+    PHI --> CAT["連結 Φ(x) ; t_w(t)"]
     TE --> CAT
     CAT --> H[共有 outcome ネット h]
     H --> Y[予測 ŷ]
     PHI -. balancing penalty L_Φ .-> IPM[処置パターン間 Wasserstein IPM]
     IPM -. 分布を揃える .-> PHI
-    Y --> LOSS[L = L_y + α L_Φ + β||w||]
+    Y --> LOSS["L = L_y + α L_Φ + β||w||"]
 ```
 
 ## Figures & Tables

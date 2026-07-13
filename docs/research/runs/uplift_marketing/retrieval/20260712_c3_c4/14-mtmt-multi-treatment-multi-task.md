@@ -91,16 +91,16 @@ for minibatch B:
 
 ```mermaid
 flowchart TB
-    X[ユーザ特徴 x_i] --> MMOE[MMOE: n エキスパート + タスク別ゲート]
-    T[処置 t, 種別 m] --> TENC[Treatment Encoder ε_i]
+    X[ユーザ特徴 x_i] --> MMOE["MMOE: n エキスパート + タスク別ゲート"]
+    T["処置 t, 種別 m"] --> TENC[Treatment Encoder ε_i]
     MMOE --> PHI[タスク別表現 φ_i^k]
-    PHI --> INT[Treatment-User Interaction<br/>self-attention]
+    PHI --> INT["Treatment-User Interaction<br/>self-attention"]
     TENC --> INT
-    PHI --> Y0[自然反応 ȳ^k(0)]
-    INT --> TAU[base τ̂^k + incremental τ_m^k]
-    Y0 --> ADD[ȳ^k(m) = ȳ^k(0)+τ̂^k+τ_m^k]
+    PHI --> Y0["自然反応 ȳ^k(0)"]
+    INT --> TAU["base τ̂^k + incremental τ_m^k"]
+    Y0 --> ADD["ȳ^k(m) = ȳ^k(0)+τ̂^k+τ_m^k"]
     TAU --> ADD
-    ADD --> LOSS[マルチタスク損失 短期/長期タスク]
+    ADD --> LOSS["マルチタスク損失 短期/長期タスク"]
 ```
 
 ## Figures & Tables

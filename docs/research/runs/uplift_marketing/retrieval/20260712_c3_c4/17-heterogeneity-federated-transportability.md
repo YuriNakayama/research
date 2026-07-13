@@ -98,16 +98,16 @@ return ψ̂_{XS} = ψ̂_{e*}   # 互換 site のみで構成、漸近正規
 
 ```mermaid
 flowchart TB
-    T[ターゲット site 0<br/>ψ̂^<0>（分散大）]
-    S1[source 1: ψ̂^<1>]
-    S2[source 2: ψ̂^<2>]
-    SK[source K: ψ̂^<K>]
-    S1 --> W[Step1: Federated Weighting<br/>乖離 δ^(k) penalty で w_k 最適化]
+    T["ターゲット site 0<br/>ψ̂^<0>（分散大）"]
+    S1["source 1: ψ̂^<1>"]
+    S2["source 2: ψ̂^<2>"]
+    SK["source K: ψ̂^<K>"]
+    S1 --> W["Step1: Federated Weighting<br/>乖離 δ^(k) penalty で w_k 最適化"]
     S2 --> W
     SK --> W
     T --> W
-    W --> SEL[Step2: Adaptive Selection<br/>しきい値 e* を MSE 最小化で選択]
-    SEL --> OUT[最終推定量 ψ̂_XS<br/>互換 site のみ・分散削減]
+    W --> SEL["Step2: Adaptive Selection<br/>しきい値 e* を MSE 最小化で選択"]
+    SEL --> OUT["最終推定量 ψ̂_XS<br/>互換 site のみ・分散削減"]
     T -.比較基準.-> SEL
 ```
 

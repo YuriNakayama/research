@@ -234,17 +234,17 @@ graph LR
 ```mermaid
 quadrantChart
     title エージェントシステムのポジショニング
-    x-axis 低い自律性 --> 高い自律性
-    y-axis 単純タスク --> 複雑タスク
-    quadrant-1 動的マルチエージェント
-    quadrant-2 マルチエージェント協調
-    quadrant-3 単一エージェント
-    quadrant-4 自律パイプライン
+    x-axis "低い自律性" --> "高い自律性"
+    y-axis "単純タスク" --> "複雑タスク"
+    quadrant-1 "動的マルチエージェント"
+    quadrant-2 "マルチエージェント協調"
+    quadrant-3 "単一エージェント"
+    quadrant-4 "自律パイプライン"
     ChatDev: [0.7, 0.8]
     MetaGPT: [0.75, 0.85]
-    Data Interpreter: [0.8, 0.7]
+    "Data Interpreter": [0.8, 0.7]
     SELA: [0.85, 0.6]
-    AutoML-Agent: [0.9, 0.5]
+    "AutoML-Agent": [0.9, 0.5]
     EvoMAC: [0.85, 0.9]
     SoA: [0.9, 0.85]
 ```

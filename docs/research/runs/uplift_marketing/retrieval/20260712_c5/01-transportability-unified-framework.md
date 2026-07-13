@@ -129,20 +129,20 @@ $$\tau_\Phi^T = \Phi\!\left(\mathbb{E}_T\big[\Gamma(\tau_\Phi^S(X),\ \mu_{(0)}^T
 
 ```mermaid
 flowchart TD
-    A[RCT source S=1: X,A,Y] --> C[密度比 r(X)=P_T/P_S をロジスティックで推定]
-    B[Target S=0: X のみ] --> C
-    A --> D[アウトカム回帰 μ_S(a)(X)]
+    A["RCT source S=1: X,A,Y"] --> C["密度比 r(X)=P_T/P_S をロジスティックで推定"]
+    B["Target S=0: X のみ"] --> C
+    A --> D["アウトカム回帰 μ_S(a)(X)"]
     C --> E{識別戦略}
     D --> E
-    E -->|exch. in mean| F[wHT / G-formula / EIF]
-    E -->|exch. in effect + Y(0)_target| G[transported Γ-formula / EIF]
-    F --> H[プラグイン ψ̂_1, ψ̂_0]
+    E -->|exch. in mean| F["wHT / G-formula / EIF"]
+    E -->|"exch. in effect + Y(0)_target"| G["transported Γ-formula / EIF"]
+    F --> H["プラグイン ψ̂_1, ψ̂_0"]
     G --> H
     H --> I1[one-step 補正]
     H --> I2[estimating equation]
-    I1 --> J[Φ 適用 → τ̂_Φ^T]
+    I1 --> J["Φ 適用 → τ̂_Φ^T"]
     I2 --> J
-    J --> K[RD/RR/OR/NNT/SR を一括出力]
+    J --> K["RD/RR/OR/NNT/SR を一括出力"]
 ```
 
 ---

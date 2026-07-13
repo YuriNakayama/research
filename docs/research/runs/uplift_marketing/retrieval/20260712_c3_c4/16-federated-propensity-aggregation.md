@@ -91,16 +91,16 @@ for each site k:
 ```mermaid
 flowchart TB
     subgraph Sites[分散 site（個人データ非共有）]
-      S1[site 1: ê_1, 局所統計]
-      S2[site 2: ê_2, 局所統計]
-      SK[site K: ê_K, 局所統計]
+      S1["site 1: ê_1, 局所統計"]
+      S2["site 2: ê_2, 局所統計"]
+      SK["site K: ê_K, 局所統計"]
     end
-    S1 --> FL[FedAvg: Membership Weights ω_k(x)<br/>+ アウトカムモデル μ_0,μ_1]
+    S1 --> FL["FedAvg: Membership Weights ω_k(x)<br/>+ アウトカムモデル μ_0,μ_1"]
     S2 --> FL
     SK --> FL
-    FL --> GE[グローバル傾向スコア<br/>e(x)=Σ ω_k(x) e_k(x)]
-    GE --> EST[各 site 局所 Fed-IPW/AIPW]
-    EST --> AGG[n_k/n 加重集約 → ATE]
+    FL --> GE["グローバル傾向スコア<br/>e(x)=Σ ω_k(x) e_k(x)"]
+    GE --> EST["各 site 局所 Fed-IPW/AIPW"]
+    EST --> AGG["n_k/n 加重集約 → ATE"]
 ```
 
 ## Figures & Tables

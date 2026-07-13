@@ -1,0 +1,55 @@
+{
+  // Markdown lint config for the research docs.
+  //
+  // These docs are long-form research reports (Japanese prose, dense tables,
+  // math, mermaid). Cosmetic rules like line-length or table pipe spacing are
+  // noise here and would flag thousands of pre-existing lines, so we disable
+  // them and keep only rules that catch genuinely broken markup — unclosed
+  // code fences, malformed links/images, duplicate headings, etc.
+  "config": {
+    "default": true,
+
+    // --- Disabled: cosmetic / prose-style rules irrelevant to research docs ---
+    "MD013": false, // line-length
+    "MD060": false, // table pipe spacing
+    "MD033": false, // inline HTML (we use <br/>, <sub>, etc. in tables)
+    "MD041": false, // first line must be a top-level heading
+    "MD024": false, // duplicate headings (common across report sections)
+    "MD034": false, // bare URLs (frequent in resource lists)
+    "MD036": false, // emphasis used instead of heading
+    "MD029": false, // ordered list item prefix
+    "MD007": false, // unordered list indentation
+    "MD012": false, // multiple consecutive blank lines
+    "MD026": false, // trailing punctuation in heading
+    "MD028": false, // blank line inside blockquote
+    "MD001": false, // heading levels increment by one
+    "MD025": false, // multiple top-level headings
+    "MD004": false, // unordered list style
+    "MD022": false, // headings surrounded by blank lines
+    "MD032": false, // lists surrounded by blank lines
+    "MD031": false, // fenced code blocks surrounded by blank lines
+    "MD058": false, // tables surrounded by blank lines
+    "MD009": false, // trailing spaces
+    "MD047": false, // file should end with single newline
+    "MD010": false, // hard tabs
+    "MD040": false, // fenced code language (docs use bare ``` for pseudo-math)
+    "MD018": false, // space after # (false-positives on "#25/#26" prose)
+    "MD056": false, // table column count (false-positives on `|` in math cells)
+    "MD049": false, // emphasis style (_ vs *) — cosmetic
+    "MD037": false, // spaces inside emphasis — cosmetic
+    "MD038": false, // spaces in code span — cosmetic
+    "MD059": false, // link text should be descriptive — noisy
+    "MD052": false, // reference-link labels — false-positives on `[炎][超]`,
+    //                 citation markers `[35][36]`, TCG energy tags `[C][C]`
+    "MD045": false // images without alt text (research figures rarely have alt)
+
+    // --- Kept (genuinely broken markup) ---
+    // MD042 (empty links), MD051 (broken link fragments),
+    // MD011 (reversed link syntax), MD005 (inconsistent list indent)
+    // remain enabled by "default": true and catch real rendering breakage.
+  },
+  "globs": ["docs/**/*.md"],
+  // latest*/ entries are symlinks to a dated run dir; linting both the symlink
+  // view and the real dir would double-report. Ignore the symlink views.
+  "ignores": ["**/node_modules/**", "docs/research/domains/**", "**/latest*/**"]
+}

@@ -151,12 +151,12 @@ Output: CATE posterior mean m^e(.) and 95% credible intervals
 
 ```mermaid
 flowchart TD
-    A[RCT data D_e<br/>小・低バイアス] --> C[Joint Multi-Task Dataset<br/>study index s∈{e,o}]
-    B[Observational data D_o<br/>大・交絡バイアス] --> C
-    C --> D[ICM Kernel  K = B ⊗ k<br/>B = 1,ρ / ρ,1]
-    D --> E[周辺尤度最大化で<br/>ハイパーパラメータ学習]
-    E --> F[重み付き CV で ρ* 選択<br/>RCT hold-out のみ / IPW]
-    F --> G[事後分布 f^e | D<br/>~ N m^e, V^e]
+    A["RCT data D_e<br/>小・低バイアス"] --> C["Joint Multi-Task Dataset<br/>study index s∈{e,o}"]
+    B["Observational data D_o<br/>大・交絡バイアス"] --> C
+    C --> D["ICM Kernel  K = B ⊗ k<br/>B = 1,ρ / ρ,1"]
+    D --> E["周辺尤度最大化で<br/>ハイパーパラメータ学習"]
+    E --> F["重み付き CV で ρ* 選択<br/>RCT hold-out のみ / IPW"]
+    F --> G["事後分布 f^e | D<br/>~ N m^e, V^e"]
     G --> H[CATE 点推定 + 95% 信用区間]
     F -. 分散下界 V^e ≥ 1-ρ² V^e_De .-> G
 ```

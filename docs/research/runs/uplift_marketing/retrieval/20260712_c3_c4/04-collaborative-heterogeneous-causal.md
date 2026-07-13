@@ -141,7 +141,7 @@ Algorithm 2: Clb-AIPW (二重頑健 + フェデレーテッド)
 
 ```mermaid
 flowchart TD
-    T[ターゲット母集団 p(X)] -->|Sampling-Selecting| S1[Site 1 D^1]
+    T["ターゲット母集団 p(X)"] -->|Sampling-Selecting| S1[Site 1 D^1]
     T --> S2[Site 2 D^2]
     T --> SK[Site K D^K]
 
@@ -154,9 +154,9 @@ flowchart TD
     EK --> AGG
 
     AGG -->|共有スコアを分母に| M1["各サイト局所モーメント\nμ̂_Clb,1^k, μ̂_Clb,0^k, N̂^k"]
-    M1 -->|統計量のみ送信 (privacy)| SRV[中央サーバ集約]
+    M1 -->|"統計量のみ送信 (privacy)"| SRV[中央サーバ集約]
 
-    PUB["公開センサス D^t"] --> OM[フェデレーテッド結果モデル\nm̂_1, m̂_0 (Eq.23 IPW損失)]
+    PUB["公開センサス D^t"] --> OM["フェデレーテッド結果モデル\nm̂_1, m̂_0 (Eq.23 IPW損失)"]
     OM -->|残差化 + 二重頑健補正| SRV
     SRV --> OUT["τ̂_Clb / τ̂_Clb-aipw (ATE)"]
 ```

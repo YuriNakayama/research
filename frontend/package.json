@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "check:mermaid": "node scripts/check-mermaid.mjs",
+    "check:markdown": "markdownlint-cli2 --config ../.markdownlint-cli2.jsonc \"../docs/**/*.md\"",
+    "check:docs": "npm run check:markdown && npm run check:mermaid"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.2.0",
@@ -41,6 +44,8 @@
     "@types/react-dom": "^19.1.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.3.0",
+    "jsdom": "^29.1.1",
+    "markdownlint-cli2": "^0.23.0",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "tsx": "^4.19.0",

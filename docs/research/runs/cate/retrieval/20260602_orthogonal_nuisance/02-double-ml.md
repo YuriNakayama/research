@@ -188,16 +188,16 @@ E_P[ ψ(W; θ₀, η₀) ] = 0
 
 ```mermaid
 flowchart TD
-    A[全データ n 件] --> B[K-fold にランダム分割]
-    B --> C{各 fold k}
-    C -->|補集合 I_k^c で学習| D[ML で局外関数推定<br/>ĝ_k = E Y|X, m̂_k = E D|X]
-    D -->|fold I_k に当てはめ| E[直交スコア ψ で θ̌_k を解く]
-    E --> F[全 fold を集約 DML1/DML2]
-    F --> G[θ̌, 標準誤差 σ̂, 95% CI]
+    A["全データ n 件"] --> B["K-fold にランダム分割"]
+    B --> C{"各 fold k"}
+    C -->|補集合 I_k^c で学習| D["ML で局外関数推定<br/>ĝ_k = E Y|X, m̂_k = E D|X"]
+    D -->|fold I_k に当てはめ| E["直交スコア ψ で θ̌_k を解く"]
+    E --> F["全 fold を集約 DML1/DML2"]
+    F --> G["θ̌, 標準誤差 σ̂, 95% CI"]
 
     subgraph 精度向上の二本柱
-      H[Neyman 直交性<br/>→ 一次バイアス除去]
-      I[cross-fitting<br/>→ 過学習バイアス除去]
+      H["Neyman 直交性<br/>→ 一次バイアス除去"]
+      I["cross-fitting<br/>→ 過学習バイアス除去"]
     end
     H -.-> E
     I -.-> D

@@ -148,21 +148,21 @@ Phase 3: Pipeline Assembly & Verification
 graph TB
     subgraph "DataFlow Framework"
         subgraph "Storage Layer"
-            S1[Unified Tabular Storage<br/>JSON/JSONL/CSV/Parquet]
+            S1["Unified Tabular Storage<br/>JSON/JSONL/CSV/Parquet"]
         end
         
         subgraph "Programming Interfaces"
-            P1[LLM Serving API<br/>vLLM/SGLang/ChatGPT/Gemini]
-            P2[Operator Interface<br/>init() + run()]
-            P3[Prompt Templates<br/>build_prompt()]
-            P4[Pipeline Composition<br/>init() + forward() + compile()]
+            P1["LLM Serving API<br/>vLLM/SGLang/ChatGPT/Gemini"]
+            P2["Operator Interface<br/>init() + run()"]
+            P3["Prompt Templates<br/>build_prompt()"]
+            P4["Pipeline Composition<br/>init() + forward() + compile()"]
         end
         
         subgraph "Operator Library (~200)"
-            O1[Generate<br/>*Generator, *RowGenerator]
-            O2[Evaluate<br/>SampleEvaluator, DatasetEvaluator]
-            O3[Filter<br/>行削減演算子]
-            O4[Refine<br/>*Refiner]
+            O1["Generate<br/>*Generator, *RowGenerator"]
+            O2["Evaluate<br/>SampleEvaluator, DatasetEvaluator"]
+            O3["Filter<br/>行削減演算子"]
+            O4["Refine<br/>*Refiner"]
         end
         
         subgraph "Domain Pipelines (6)"
@@ -187,18 +187,18 @@ graph TB
 
 ```mermaid
 graph LR
-    A[自然言語仕様] --> B[Intent Analysis<br/>Agent]
-    B --> C[Data Routing<br/>Agent]
-    C --> D[Operator Retrieval<br/>Agent<br/>RAG検索]
-    D --> E{既存演算子で<br/>対応可能?}
-    E -->|Yes| F[Operator Reuse<br/>Agent]
-    E -->|No| G[Operator Synthesis<br/>Agent]
-    F --> H[Operator Sequencing<br/>Agent]
+    A[自然言語仕様] --> B["Intent Analysis<br/>Agent"]
+    B --> C["Data Routing<br/>Agent"]
+    C --> D["Operator Retrieval<br/>Agent<br/>RAG検索"]
+    D --> E{"既存演算子で<br/>対応可能?"}
+    E -->|Yes| F["Operator Reuse<br/>Agent"]
+    E -->|No| G["Operator Synthesis<br/>Agent"]
+    F --> H["Operator Sequencing<br/>Agent"]
     G --> H
-    H --> I[Pipeline Construction<br/>Agent]
-    I --> J[Pipeline Verification<br/>Agent]
+    H --> I["Pipeline Construction<br/>Agent"]
+    I --> J["Pipeline Verification<br/>Agent"]
     J -->|エラー| J
-    J -->|成功| K[Result Reporting<br/>Agent]
+    J -->|成功| K["Result Reporting<br/>Agent"]
     K --> L[実行可能パイプライン]
 ```
 

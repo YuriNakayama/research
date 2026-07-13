@@ -58,3 +58,10 @@ variable "e2e_test_user_email" {
   type        = string
   default     = "e2e-test@example.com"
 }
+
+variable "e2e_test_user_password" {
+  description = "Fixed password for the Cognito E2E test user. Empty (default) => Terraform generates a random one. Set a known value only in non-prod (e.g. dev) via a gitignored terraform.tfvars for convenient local login."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

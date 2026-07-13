@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-// The login tests intentionally disable the middleware bypass header so that
-// requests flow through the real Cognito auth path. Every other spec keeps the
-// bypass so it does not need a real user.
-test.use({ extraHTTPHeaders: {} });
+// The login flow must be exercised from an unauthenticated state, so override
+// the project-level storageState with an empty one. Every other spec inherits
+// the authenticated storageState produced by auth.setup.ts.
+test.use({ storageState: { cookies: [], origins: [] } });
 
 const testUserEmail = process.env.E2E_TEST_USER_EMAIL;
 const testUserPassword = process.env.E2E_TEST_USER_PASSWORD;
@@ -41,8 +41,8 @@ test.describe("Login page", () => {
       await page.fill('input[name="password"]', testUserPassword!);
       await page.getByRole("button", { name: /sign in|ログイン/i }).click();
 
-      // PostLogin component pushes router.replace("/") on success.
-      await expect(page).toHaveURL(/\/(docs)?$/, { timeout: 15_000 });
+      // PostLogin component pushes router.replace("/") → redirects to /research.
+      await expect(page).toHaveURL(/\/(research)?$/, { timeout: 15_000 });
     });
 
     test("wrong password shows an error and stays on /login", async ({

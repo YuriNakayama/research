@@ -1,3 +1,17 @@
 region      = "ap-northeast-1"
 environment = "dev"
 project     = "auto_research"
+
+# E2E login tests (Playwright).
+# Set to true to provision a dedicated Cognito test user plus a Secrets Manager
+# entry (<project>/<environment>/e2e-test-user) that CI reads at Playwright
+# startup. Leave false in environments that do not run the authenticated E2E suite.
+create_e2e_test_user = true
+e2e_test_user_email  = "test@example.com"
+
+# Fixed password for the test user (dev convenience only). Leaving this unset
+# makes Terraform generate a strong random password instead — do that in
+# staging/prod. Set a known value ONLY in dev, in your gitignored
+# terraform.tfvars (not here), so local manual login is easy. The test user
+# holds no real data or permissions.
+#   e2e_test_user_password = "Pass1234"

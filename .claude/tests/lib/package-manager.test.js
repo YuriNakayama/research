@@ -52,6 +52,7 @@ function runTests() {
     assert.ok(pm.PACKAGE_MANAGERS.npm, 'Should have npm');
     assert.ok(pm.PACKAGE_MANAGERS.pnpm, 'Should have pnpm');
     assert.ok(pm.PACKAGE_MANAGERS.yarn, 'Should have yarn');
+    assert.ok(pm.PACKAGE_MANAGERS.bun, 'Should have bun');
   })) passed++; else failed++;
 
   if (test('Each manager has required properties', () => {
@@ -94,6 +95,17 @@ function runTests() {
       fs.writeFileSync(path.join(testDir, 'yarn.lock'), '');
       const result = pm.detectFromLockFile(testDir);
       assert.strictEqual(result, 'yarn');
+    } finally {
+      cleanupTestDir(testDir);
+    }
+  })) passed++; else failed++;
+
+  if (test('detects bun from bun.lock', () => {
+    const testDir = createTestDir();
+    try {
+      fs.writeFileSync(path.join(testDir, 'bun.lock'), '');
+      const result = pm.detectFromLockFile(testDir);
+      assert.strictEqual(result, 'bun');
     } finally {
       cleanupTestDir(testDir);
     }
@@ -249,6 +261,21 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  if (test('returns correct install command for bun', () => {
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'bun';
+      const cmd = pm.getRunCommand('install');
+      assert.strictEqual(cmd, 'bun install');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      } else {
+        delete process.env.CLAUDE_PACKAGE_MANAGER;
+      }
+    }
+  })) passed++; else failed++;
+
   if (test('returns correct test command', () => {
     const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
     try {
@@ -297,6 +324,21 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  if (test('returns correct exec command for bun', () => {
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'bun';
+      const cmd = pm.getExecCommand('eslint', '.');
+      assert.strictEqual(cmd, 'bunx eslint .');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      } else {
+        delete process.env.CLAUDE_PACKAGE_MANAGER;
+      }
+    }
+  })) passed++; else failed++;
+
   // getCommandPattern tests
   console.log('\ngetCommandPattern:');
 
@@ -305,6 +347,7 @@ function runTests() {
     assert.ok(pattern.includes('npm run dev'), 'Should include npm');
     assert.ok(pattern.includes('pnpm'), 'Should include pnpm');
     assert.ok(pattern.includes('yarn dev'), 'Should include yarn');
+    assert.ok(pattern.includes('bun'), 'Should include bun');
   })) passed++; else failed++;
 
   if (test('pattern matches actual commands', () => {
@@ -314,7 +357,16 @@ function runTests() {
     assert.ok(regex.test('npm test'), 'Should match npm test');
     assert.ok(regex.test('pnpm test'), 'Should match pnpm test');
     assert.ok(regex.test('yarn test'), 'Should match yarn test');
+    assert.ok(regex.test('bun test'), 'Should match bun test');
     assert.ok(!regex.test('cargo test'), 'Should not match cargo test');
+  })) passed++; else failed++;
+
+  if (test('pattern matches bun run dev', () => {
+    const pattern = pm.getCommandPattern('dev');
+    const regex = new RegExp(pattern);
+
+    assert.ok(regex.test('bun run dev'), 'Should match bun run dev');
+    assert.ok(regex.test('bun dev'), 'Should match bun dev');
   })) passed++; else failed++;
 
   // getSelectionPrompt tests

@@ -42,12 +42,13 @@ Package Managers:
   npm             Node Package Manager (default with Node.js)
   pnpm            Fast, disk space efficient package manager
   yarn            Classic Yarn package manager
+  bun             Fast all-in-one JavaScript runtime & package manager
 Examples:
   # Detect current package manager
   node scripts/setup-package-manager.js --detect
 
-  # Set pnpm as global preference
-  node scripts/setup-package-manager.js --global pnpm
+  # Set bun as global preference
+  node scripts/setup-package-manager.js --global bun
 
   # Set npm for current project
   node scripts/setup-package-manager.js --project npm

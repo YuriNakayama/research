@@ -144,10 +144,11 @@ module "monitoring" {
 module "cognito" {
   source = "./modules/cognito"
 
-  environment          = var.environment
-  project              = var.project
-  create_e2e_test_user = var.create_e2e_test_user
-  e2e_test_user_email  = var.e2e_test_user_email
+  environment            = var.environment
+  project                = var.project
+  create_e2e_test_user   = var.create_e2e_test_user
+  e2e_test_user_email    = var.e2e_test_user_email
+  e2e_test_user_password = var.e2e_test_user_password
 }
 
 # =============================================================================

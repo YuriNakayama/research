@@ -54,7 +54,7 @@ Opus 4.5での長いコーディングセッション後にデッドコードや
 {
   "PreToolUse": [
     {
-      "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm|pnpm|yarn|cargo|pytest)\"",
+      "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm|pnpm|yarn|bun|cargo|pytest)\"",
       "hooks": [
         {
           "type": "command",
@@ -343,7 +343,7 @@ mgrep@Mixedbread-Grep                  # より良い検索
 ```json
 {
   "PreToolUse": [
-    { "matcher": "npm|pnpm|yarn|cargo|pytest", "hooks": ["tmuxリマインダー"] },
+    { "matcher": "npm|pnpm|yarn|bun|cargo|pytest", "hooks": ["tmuxリマインダー"] },
     { "matcher": "Write && .mdファイル", "hooks": ["README/CLAUDE以外はブロック"] },
     { "matcher": "git push", "hooks": ["レビュー用にエディタを開く"] }
   ],

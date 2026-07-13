@@ -53,7 +53,7 @@
   "postStartCommand": "bash .devcontainer/scripts/post-start.sh",
   "remoteUser": "node",
   "mounts": [
-    "source=ai-reception-pnpm-store,target=/home/node/.local/share/pnpm/store,type=volume"
+    "source=ai-reception-bun-cache,target=/home/node/.bun/install/cache,type=volume"
   ],
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},

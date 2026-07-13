@@ -30,7 +30,7 @@ External:
 - **CI/CD**: GitHub Actions (ci-backend.yml)
 - **Auth**: GitHub App (JWT → installation token)
 - **Testing**: Pytest + pytest-cov, Ruff, Mypy
-- **Package Management**: UV (Python)
+- **Package Management**: UV (Python), bun (Node/frontend)
 
 ## Folder Structure
 

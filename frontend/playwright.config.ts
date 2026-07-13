@@ -1,14 +1,5 @@
-import { randomBytes } from "node:crypto";
 import { defineConfig, devices } from "@playwright/test";
-
-// Generate a fresh bypass token for every Playwright run. The token is passed
-// to the dev server via env var and to the browser via extraHTTPHeaders, so
-// only requests originating from this run can skip the middleware auth check.
-// It is intentionally NOT prefixed with NEXT_PUBLIC_, so it never reaches the
-// client bundle.
-const bypassToken =
-  process.env.E2E_BYPASS_TOKEN ?? randomBytes(32).toString("hex");
-process.env.E2E_BYPASS_TOKEN = bypassToken;
+import { STORAGE_STATE } from "./e2e/auth-state";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -21,18 +12,22 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
-    extraHTTPHeaders: {
-      "x-e2e-bypass": bypassToken,
-    },
   },
   projects: [
+    // 認証済み storageState を生成するセットアッププロジェクト。
+    { name: "setup", testMatch: /auth\.setup\.ts/ },
+
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], storageState: STORAGE_STATE },
+      dependencies: ["setup"],
+      testIgnore: /auth\.setup\.ts/,
     },
     {
       name: "mobile-chrome",
-      use: { ...devices["Pixel 7"] },
+      use: { ...devices["Pixel 7"], storageState: STORAGE_STATE },
+      dependencies: ["setup"],
+      testIgnore: /auth\.setup\.ts/,
     },
   ],
   webServer: {
@@ -40,13 +35,17 @@ export default defineConfig({
     // server (much faster page loads than `next dev`). Locally fall back to
     // the dev server for the usual iteration workflow.
     command: process.env.CI
-      ? "npx next start --port 3000"
-      : "npm run dev -- --port 3000",
+      ? "bunx next start --port 3000"
+      : "bun run dev -- --port 3000",
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // 認証は実 Cognito を通すため、dev/prod サーバに Cognito 設定を渡す。
     env: {
-      E2E_BYPASS_TOKEN: bypassToken,
+      NEXT_PUBLIC_COGNITO_USER_POOL_ID:
+        process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID ?? "",
+      NEXT_PUBLIC_COGNITO_APP_CLIENT_ID:
+        process.env.NEXT_PUBLIC_COGNITO_APP_CLIENT_ID ?? "",
     },
   },
 });

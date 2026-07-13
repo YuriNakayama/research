@@ -54,12 +54,22 @@ resource "aws_cognito_user_pool_client" "main" {
 # =============================================================================
 # E2E test user
 # =============================================================================
-# Created only when `create_e2e_test_user = true`. The password is generated
-# here and surfaced via a sensitive output so the root module can push it into
-# Secrets Manager. It is never written to plain .tfvars or logs.
+# Created only when `create_e2e_test_user = true`. The effective password is
+# either a caller-supplied fixed value (non-prod convenience) or a strong
+# random one generated here. It is surfaced via a sensitive output so the root
+# module can push it into Secrets Manager, and is never written to plain
+# .tfvars or logs.
+
+locals {
+  # Generate a random password only when no fixed one was supplied.
+  e2e_use_fixed_password = var.create_e2e_test_user && var.e2e_test_user_password != ""
+  e2e_test_user_password = local.e2e_use_fixed_password ? var.e2e_test_user_password : (
+    var.create_e2e_test_user ? random_password.e2e_test_user[0].result : ""
+  )
+}
 
 resource "random_password" "e2e_test_user" {
-  count   = var.create_e2e_test_user ? 1 : 0
+  count   = var.create_e2e_test_user && var.e2e_test_user_password == "" ? 1 : 0
   length  = 24
   special = true
   # Cognito's default password policy forbids certain characters in URL contexts;
@@ -79,7 +89,7 @@ resource "aws_cognito_user" "e2e_test_user" {
 
   # Permanent password so the user is in CONFIRMED state and can log in
   # without going through a FORCE_CHANGE_PASSWORD challenge in tests.
-  password = random_password.e2e_test_user[0].result
+  password = local.e2e_test_user_password
 
   message_action = "SUPPRESS"
 

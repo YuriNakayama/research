@@ -54,7 +54,7 @@ export default async function DocsPage({ params }: PageProps) {
   const tree = getDocsTree();
   const currentSlug = slug ?? [];
   const breadcrumbs = getBreadcrumbs(currentSlug);
-  const currentPath = currentSlug.length > 0 ? `/docs/${currentSlug.join("/")}` : "/docs";
+  const currentPath = currentSlug.length > 0 ? `/research/${currentSlug.join("/")}` : "/research";
 
   // Top page: show root directories
   if (currentSlug.length === 0) {

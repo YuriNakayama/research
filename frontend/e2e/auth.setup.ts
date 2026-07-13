@@ -20,8 +20,8 @@ setup("authenticate via Cognito", async ({ page }) => {
   await page.fill('input[name="password"]', password!);
   await page.getByRole("button", { name: /sign in|ログイン/i }).click();
 
-  // PostLogin が router.replace("/") → 最終 URL は "/" または "/docs"。
-  await expect(page).toHaveURL(/\/(docs)?$/, { timeout: 15_000 });
+  // PostLogin が router.replace("/") → ルートは /research にリダイレクトされる。
+  await expect(page).toHaveURL(/\/(research)?$/, { timeout: 15_000 });
 
   // Cookie(Amplify ssr) と localStorage を含む認証済み状態を保存する。
   await page.context().storageState({ path: STORAGE_STATE });

@@ -29,12 +29,6 @@ variable "github_token" {
   default     = ""
 }
 
-variable "schedule_enabled" {
-  description = "Whether EventBridge schedule is enabled"
-  type        = bool
-  default     = true
-}
-
 variable "domain_name" {
   description = "Custom domain name for Amplify app (e.g. avifauna.click)"
   type        = string

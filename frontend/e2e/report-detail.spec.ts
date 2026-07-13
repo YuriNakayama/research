@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const REPORT_URL = "/docs/daily/legal_tech/report/20260329";
+const REPORT_URL = "/research/_e2e_fixture/legal_tech/report/20260329";
 
 test.describe("Report detail page", () => {
   test("displays report title and metadata", async ({ page }) => {
@@ -35,9 +35,9 @@ test.describe("Report detail page", () => {
     await page.goto(REPORT_URL);
     const breadcrumb = page.locator("nav[aria-label='パンくずリスト']");
     await expect(breadcrumb).toBeVisible();
-    await expect(breadcrumb.getByText("Docs")).toBeVisible();
+    await expect(breadcrumb.getByText("Research")).toBeVisible();
     await expect(
-      breadcrumb.getByRole("link", { name: "daily" })
+      breadcrumb.getByRole("link", { name: "_e2e_fixture" })
     ).toBeVisible();
   });
 
@@ -45,9 +45,9 @@ test.describe("Report detail page", () => {
     await page.goto(REPORT_URL);
     const breadcrumb = page.locator("nav[aria-label='パンくずリスト']");
     await expect(breadcrumb).toBeVisible();
-    const link = breadcrumb.getByRole("link", { name: "daily" });
+    const link = breadcrumb.getByRole("link", { name: "_e2e_fixture" });
     await link.click();
-    await expect(page).toHaveURL("/docs/daily", { timeout: 15_000 });
+    await expect(page).toHaveURL("/research/_e2e_fixture", { timeout: 15_000 });
   });
 
   test("shows external link to paper", async ({ page }) => {

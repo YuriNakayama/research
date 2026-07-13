@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
 
-const DOCS_ROOT = path.join(process.cwd(), "docs");
+const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
 const MIME_TYPES: Record<string, string> = {
   ".png": "image/png",
@@ -26,10 +26,10 @@ export async function GET(
     }
   }
 
-  const filePath = path.resolve(DOCS_ROOT, ...segments);
+  const filePath = path.resolve(RESEARCH_ROOT, ...segments);
 
-  // Ensure resolved path is within DOCS_ROOT
-  if (!filePath.startsWith(DOCS_ROOT + path.sep)) {
+  // Ensure resolved path is within RESEARCH_ROOT
+  if (!filePath.startsWith(RESEARCH_ROOT + path.sep)) {
     return new NextResponse("Not Found", { status: 404 });
   }
 

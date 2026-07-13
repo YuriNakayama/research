@@ -26,9 +26,9 @@ docs/works
 ## testing
 /frontend/coverage
 
-## docs (build-time copy from root docs/)
-/frontend/docs/
-/frontend/docs
+## research content (build-time copy from root research/)
+/frontend/research/
+/frontend/research
 
 ## next.js
 /frontend/.next/
@@ -92,4 +92,4 @@ terraform.tfvars
 .claude/worktrees/
 
 ## research artifacts (large zip exports)
-docs/research/runs/**/*.zip
+research/runs/**/*.zip

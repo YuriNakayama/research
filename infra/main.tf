@@ -45,39 +45,6 @@ locals {
 }
 
 # =============================================================================
-# Networking
-# =============================================================================
-module "networking" {
-  source = "./modules/networking"
-
-  environment = var.environment
-  project     = var.project
-}
-
-# =============================================================================
-# EFS (Claude CLI credentials persistence)
-# =============================================================================
-module "efs" {
-  source = "./modules/efs"
-
-  environment        = var.environment
-  project            = var.project
-  vpc_id             = module.networking.vpc_id
-  private_subnet_ids = module.networking.private_subnet_ids
-  fargate_sg_id      = module.ecs.fargate_sg_id
-}
-
-# =============================================================================
-# ECR (Docker image repository)
-# =============================================================================
-module "ecr" {
-  source = "./modules/ecr"
-
-  environment = var.environment
-  project     = var.project
-}
-
-# =============================================================================
 # Secrets Manager
 # =============================================================================
 module "secrets" {
@@ -91,51 +58,6 @@ module "secrets" {
   create_e2e_test_user_secret = var.create_e2e_test_user
   e2e_test_user_email         = module.cognito.e2e_test_user_email
   e2e_test_user_password      = module.cognito.e2e_test_user_password
-}
-
-# =============================================================================
-# ECS (Fargate cluster and task definition)
-# =============================================================================
-module "ecs" {
-  source = "./modules/ecs"
-
-  environment                  = var.environment
-  project                      = var.project
-  vpc_id                       = module.networking.vpc_id
-  private_subnet_ids           = module.networking.private_subnet_ids
-  ecr_repository_url           = module.ecr.repository_url
-  efs_file_system_id           = module.efs.file_system_id
-  efs_access_point_id          = module.efs.access_point_id
-  github_app_key_secret_arn    = module.secrets.github_app_key_arn
-  github_app_config_secret_arn = module.secrets.github_app_config_arn
-  log_group_name               = module.monitoring.log_group_name
-}
-
-# =============================================================================
-# EventBridge Scheduler
-# =============================================================================
-module "scheduler" {
-  source = "./modules/scheduler"
-
-  environment             = var.environment
-  project                 = var.project
-  ecs_cluster_arn         = module.ecs.cluster_arn
-  task_definition_arn     = module.ecs.task_definition_arn
-  public_subnet_ids       = module.networking.public_subnet_ids
-  fargate_sg_id           = module.ecs.fargate_sg_id
-  task_execution_role_arn = module.ecs.task_execution_role_arn
-  task_role_arn           = module.ecs.task_role_arn
-  schedule_enabled        = var.schedule_enabled
-}
-
-# =============================================================================
-# Monitoring (CloudWatch)
-# =============================================================================
-module "monitoring" {
-  source = "./modules/monitoring"
-
-  environment = var.environment
-  project     = var.project
 }
 
 # =============================================================================
@@ -169,7 +91,7 @@ module "amplify" {
 }
 
 # =============================================================================
-# CI/CD (GitHub Actions OIDC role for ECR push)
+# CI/CD (GitHub Actions OIDC role for E2E secret read)
 # =============================================================================
 module "cicd" {
   source = "./modules/cicd"
@@ -177,12 +99,6 @@ module "cicd" {
   environment              = var.environment
   project                  = var.project
   github_repo              = var.github_repo
-  ecr_repository_arn       = module.ecr.repository_arn
-  ecs_cluster_arn          = module.ecs.cluster_arn
-  task_definition_arn      = module.ecs.task_definition_arn
-  task_execution_role_arn  = module.ecs.task_execution_role_arn
-  task_role_arn            = module.ecs.task_role_arn
-  log_group_name           = module.monitoring.log_group_name
   e2e_test_user_secret_arn = module.secrets.e2e_test_user_secret_arn
   grant_e2e_secret_read    = var.create_e2e_test_user
 }

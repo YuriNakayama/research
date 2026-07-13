@@ -1,137 +1,102 @@
-# Auto Research Pipeline
+# Research Viewer
 
-Automated research pipeline that runs daily via ECS Fargate, executes research prompts using Claude CLI, and delivers results as GitHub Pull Requests with Slack/email notifications.
+手動リサーチ成果物（Markdown）を Next.js の閲覧 UI で配信するリポジトリ。表示用コンテンツは `research/`、開発時ドキュメント（プラン等）は `docs/` に置く。フロントエンドは AWS Amplify Hosting で配信し、Cognito で認証する。
 
 ## Architecture
 
 ```
-EventBridge Scheduler (cron: JST 09:00)
-  ↓ RunTask
-ECS Fargate Task (Private Subnet)
-  ├── Claude CLI (claude -p) — research execution
-  ├── git clone/push — branch & commit
-  ├── gh pr create — Pull Request creation
-  └── Slack/Email notification
-  ↕ mount
-EFS (/claude-config) — Claude CLI auth persistence
+research/**（表示用 Markdown: runs / domains / _schema）
+  ↓ build-time copy (cp -r research frontend/research)
+Next.js (App Router) — /research 配下でオンデマンド描画
+  ├── /research/[[...slug]]          ディレクトリ一覧 / Markdown 表示
+  └── /api/research-assets/[...path] 画像等アセット配信
+  ↓ deploy
+AWS Amplify Hosting（Next.js standalone）
+  └── Cognito User Pool — 認証
 
 External:
-  Secrets Manager — GitHub App key, Slack Webhook
-  ECR — Docker image (auto-research-task)
-  CloudWatch Logs — /ecs/auto-research
+  Secrets Manager — Cognito E2E テストユーザ資格情報
+  GitHub Actions OIDC role — CI(Playwright) が上記 secret を読む
 ```
 
 ## Technology Stack
 
-- **Backend**: Python 3.12+, PyYAML, PyJWT, Requests, Boto3, fpdf2, Markdown
-- **Frontend**: Next.js (App Router) + TypeScript, AWS Amplify (Auth), Playwright (E2E)
-- **Container**: Docker (node:22-bookworm-slim base), Claude CLI, gh CLI, UV
-- **Infrastructure**: AWS (ECS Fargate, EFS, ECR, EventBridge Scheduler, Secrets Manager, CloudWatch, Cognito, Amplify Hosting), Terraform
-- **CI/CD**: GitHub Actions (ci-backend.yml)
-- **Auth**: GitHub App (JWT → installation token)
-- **Testing**: Pytest + pytest-cov, Ruff, Mypy
-- **Package Management**: UV (Python), bun (Node/frontend)
+- **Frontend**: Next.js (App Router) + TypeScript, AWS Amplify (Auth/Hosting), Playwright (E2E)
+- **Infrastructure**: AWS (Cognito, Amplify Hosting, Secrets Manager, GitHub Actions OIDC), Terraform
+- **CI/CD**: GitHub Actions (ci-frontend.yml, ci-infra.yml)
+- **Package Management**: bun (Node/frontend)
+- **Content**: 手動リサーチ成果物 Markdown（`research/**`, append-only）
 
 ## Folder Structure
 
 ```
-backend/
-  Dockerfile               Fargate task Docker image
-  pyproject.toml            Python dependencies (UV managed)
-  uv.lock                   Lock file
-  src/
-    main.py                 Entrypoint: orchestrates full pipeline
-    config.py               YAML config + env var loading
-    research_runner.py       Claude CLI execution logic
-    git_manager.py           git clone/branch/commit/push operations
-    github_auth.py           GitHub App auth (JWT → token)
-    pr_creator.py            gh CLI PR creation
-    email_notifier.py        Email notification (SES/SMTP)
-    csv_manager.py           Daily CSV queue (pending item 取得・done 更新)
-  config/
-    research-config.yaml     Research settings (domains, branch prefix, github repo, email, site_base_url)
-  scripts/
-    entrypoint.sh            Container entrypoint (EFS link, GitHub auth, main.py)
-    test_pipeline_local.py   Local pipeline smoke test
-    daily_add.py             /daily-add skill 用 CSV アペンダ CLI
-  tests/                     Pytest unit tests
-docs/
-  daily/                     自動実行パイプラインの入出力（append-only）
-    <domain>/
-      list/                  入力 CSV (inbox.csv 等)
-      reports/               自動生成レポート (Markdown)
-  research/                  手動リサーチ領域 (runs / domains / _schema)
+research/                    表示用リサーチ成果物（append-only）
+  runs/<domain>/<phase>/<date>[_<cluster>]/   実体の出力
+  domains/<domain>/          runs への symlink 構成
+  _schema/                   スキーマ定義
 frontend/                    Next.js (App Router, TypeScript) レポート閲覧 UI
   src/
-    app/                     ルーティング（(authenticated), login, api/docs-assets）
+    app/                     ルーティング（(authenticated)/research, login, api/research-assets）
     components/              layout / docs / markdown / report / auth
     lib/                     amplify, docs-content, palette, toc, utils
   e2e/                       Playwright テスト
+  scripts/
+    setup-e2e-fixtures.mjs   E2E 用の決定的フィクスチャ生成
+    check-mermaid.mjs        research 内 mermaid 図のパース検証
 infra/
   main.tf                    Root module (provider, backend)
   variables.tf               Input variables
   outputs.tf                 Output values
   terraform.tfvars.example   Sample tfvars
   modules/
-    networking/              VPC, subnets, NAT gateway
-    efs/                     EFS file system, access point
-    ecr/                     ECR repository
-    ecs/                     ECS cluster, task definition, IAM roles
-    scheduler/               EventBridge Scheduler
-    secrets/                 Secrets Manager
-    monitoring/              CloudWatch Logs
-    cicd/                    CI/CD pipeline resources
     cognito/                 Cognito User Pool（フロントエンド認証）
     amplify/                 Amplify Hosting（フロントエンド配信）
-dev/                         Development scripts
-  setup                      Install dependencies (uv sync)
-  format                     Code formatting (ruff)
-  lint                       Static analysis (ruff + mypy)
-  test-backend               Backend CI (format check → lint → type check → pytest)
-  create-worktree            Create git worktree with .env copy
-docs/
+    secrets/                 Secrets Manager（E2E テストユーザ資格情報）
+    cicd/                    GitHub Actions OIDC role（E2E secret 読み取り）
+docs/                        開発用ドキュメント
   plans/                     Feature plans
-  research/                  Research prompts and outputs
+dev/                         Development scripts
+  setup                      Install dependencies (frontend: pnpm install)
+  format                     Code formatting (frontend)
+  lint                       Static analysis (frontend)
+  create-worktree            Create git worktree with .env copy
 ```
 
 ## Commands
 
 ```bash
-dev/setup            # Install dependencies (uv sync in backend/)
-dev/format           # Code formatting (backend: ruff)
-dev/lint             # Static analysis (backend: ruff + mypy)
-dev/test-backend     # Backend CI (format check → lint → type check → pytest)
+dev/setup            # Install dependencies (frontend: pnpm install)
+dev/format           # Code formatting (frontend)
+dev/lint             # Static analysis (frontend)
 dev/create-worktree  # Create git worktree with .env copy
 ```
 
-## Daily Pipeline ディレクトリ境界
+フロントエンドの検証は `frontend/` で `npx tsc --noEmit` / `npx next lint` / `npx next build` / `npx playwright test`。research コンテンツの検証は `npm run check:docs`（markdownlint + mermaid parse）。
 
-- 自動実行パイプラインは **`docs/daily/**` のみ書き込み可**。`docs/research/**` は絶対に書き換えない。
-- daily の入力 CSV (`docs/daily/<domain>/list/*.csv`) は append-only。`status` 列のみパイプラインが `pending → done` に更新する。
-- daily のレポート出力先は `docs/daily/<domain>/reports/<YYYY-MM-DD>/<slug>.md`。
-- CSV の追記は手動または `/daily-add` skill（`backend/scripts/daily_add.py` を内部で呼ぶ）で行う。
-- ブランチ名は `daily/<timestamp>` 形式で、PR は `gh pr merge --auto --squash` により自動マージされる。
+## 表示用コンテンツと viewer の境界
+
+- **`research/**` が唯一の表示用領域**。ビルド時に `frontend/research` へコピーされ、`/research` 配下で描画される。
+- `research/**` は append-only。既存 run の中身は改変せず、新規は `runs/<domain>/<phase>/<date>[_<cluster>]/` に追加する（詳細は `.claude/rules/research.md`）。
+- `docs/**` は開発用。viewer の表示対象ではない。
+- viewer のアセット参照は `/api/research-assets/<path>`、内部 Markdown リンクは `/research/<slug>` に解決される。
 
 ## Glossary
 
 | Term | Description |
 |------|-------------|
-| Research Prompt | Markdown file defining research topic, executed by Claude CLI |
-| Research Runner | Module that executes `claude -p` with prompt file |
-| GitHub App | Authentication mechanism for git push and PR creation |
-| EFS | Elastic File System, persists Claude CLI auth across Fargate tasks |
-| EventBridge Scheduler | AWS service for cron-based Fargate task scheduling |
-| Daily Domain | `docs/daily/<domain>` 単位で管理される自動リサーチ対象領域 |
-| /daily-add | URL を `inbox.csv` に半自動追記する Claude Code skill |
+| Research Content | `research/**` に置く手動リサーチ成果物 Markdown（append-only） |
+| Viewer | `research/**` を `/research` 配下で描画する Next.js UI |
+| research-assets | viewer が画像等を配信する API ルート（`/api/research-assets/<path>`） |
+| Cognito | viewer の認証を担う AWS User Pool |
+| E2E fixture | Playwright が参照する決定的アンカー（`research/_e2e_fixture/...`、ビルド時生成） |
 
 ## Rules
 
 | Rule file | Auto-loaded for | When to read manually |
 |-----------|----------------|----------------------|
-| `.claude/rules/backend.md` | `backend/**` | Python code changes, Dockerfile edits, pytest, ruff/mypy configuration |
 | `.claude/rules/infra.md` | `infra/**` | Terraform changes, AWS resource design, module structure decisions |
 | `.claude/rules/frontend.md` | `frontend/**` | Next.js (TypeScript) フロントエンド（`frontend/` 配下）の編集、UI コンポーネント追加、ESLint/Playwright 設定変更時 |
-| `.claude/rules/research.md` | `docs/research/**` | Research output directory layout, phase-specific output paths, domain/cluster naming, latest pointer rules |
+| `.claude/rules/research.md` | `research/**` | Research output directory layout, phase-specific output paths, domain/cluster naming, latest pointer rules |
 | `.claude/rules/security.md` | Always loaded | Commits, secret handling, IAM design, network security, CI/CD pipeline changes |
 
 ## Response Language

@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - "frontend/**"
-      - "docs/**"
+      - "research/**"
       - ".github/workflows/ci-frontend.yml"
     types:
       - opened
@@ -41,15 +41,15 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Copy docs into frontend
-        run: cp -r docs frontend/docs
+      - name: Copy research content into frontend
+        run: cp -r research frontend/research
 
       - name: Install dependencies
         working-directory: frontend
         run: bun install --frozen-lockfile
 
       # E2E specs assert against a deterministic report; add it to the copied
-      # docs tree before `next build` so that generateStaticParams sees it.
+      # research tree before `next build` so that generateStaticParams sees it.
       - name: Setup E2E fixtures
         working-directory: frontend
         run: node scripts/setup-e2e-fixtures.mjs
@@ -62,9 +62,9 @@ jobs:
         working-directory: frontend
         run: bun run lint
 
-      # Validate the docs content itself: markdownlint for broken markup and a
-      # mermaid parse pass so no diagram renders as "Syntax error" on the site.
-      - name: Check docs (markdown + mermaid)
+      # Validate the research content itself: markdownlint for broken markup and
+      # a mermaid parse pass so no diagram renders as "Syntax error" on the site.
+      - name: Check research content (markdown + mermaid)
         working-directory: frontend
         run: bun run check:docs
 

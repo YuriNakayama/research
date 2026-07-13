@@ -17,7 +17,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "check:mermaid": "node scripts/check-mermaid.mjs",
-    "check:markdown": "markdownlint-cli2 --config ../.markdownlint-cli2.jsonc \"../docs/**/*.md\"",
+    "check:markdown": "markdownlint-cli2 --config ../.markdownlint-cli2.jsonc \"../research/**/*.md\"",
     "check:docs": "bun run check:markdown && bun run check:mermaid"
   },
   "dependencies": {

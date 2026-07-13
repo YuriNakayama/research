@@ -1,8 +1,10 @@
-data "aws_caller_identity" "current" {}
-
 # =============================================================================
-# GitHub Actions OIDC IAM Role (for ECR push)
+# GitHub Actions OIDC IAM Role
 # =============================================================================
+# Federated role assumed by GitHub Actions (via OIDC) so the frontend CI
+# (Playwright) can read the Cognito E2E test user credentials from Secrets
+# Manager. No container/registry permissions — the backend pipeline has been
+# retired, leaving only the viewer (Amplify) and its E2E test flow.
 data "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 }
@@ -36,37 +38,6 @@ resource "aws_iam_role" "github_actions" {
   }
 }
 
-resource "aws_iam_role_policy" "github_actions_ecr" {
-  name = "ecr_push"
-  role = aws_iam_role.github_actions.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetAuthorizationToken"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:PutImage",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload"
-        ]
-        Resource = var.ecr_repository_arn
-      }
-    ]
-  })
-}
-
 # =============================================================================
 # GitHub Actions — E2E Secret Read
 # =============================================================================
@@ -86,57 +57,6 @@ resource "aws_iam_role_policy" "github_actions_e2e_secret" {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
         Resource = var.e2e_test_user_secret_arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "github_actions_ecs" {
-  count = var.ecs_cluster_arn != "" ? 1 : 0
-  name  = "ecs_deploy"
-  role  = aws_iam_role.github_actions.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ecs:RunTask",
-          "ecs:DescribeTasks",
-          "ecs:DescribeTaskDefinition"
-        ]
-        Resource = "*"
-        Condition = {
-          ArnEquals = {
-            "ecs:cluster" = var.ecs_cluster_arn
-          }
-        }
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecs:DescribeTaskDefinition"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "iam:PassRole"
-        ]
-        Resource = [
-          var.task_execution_role_arn,
-          var.task_role_arn
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:GetLogEvents",
-          "logs:FilterLogEvents"
-        ]
-        Resource = "arn:aws:logs:*:${data.aws_caller_identity.current.account_id}:log-group:${var.log_group_name}:*"
       }
     ]
   })

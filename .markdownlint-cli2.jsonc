@@ -48,8 +48,8 @@
     // MD011 (reversed link syntax), MD005 (inconsistent list indent)
     // remain enabled by "default": true and catch real rendering breakage.
   },
-  "globs": ["docs/**/*.md"],
+  "globs": ["research/**/*.md"],
   // latest*/ entries are symlinks to a dated run dir; linting both the symlink
   // view and the real dir would double-report. Ignore the symlink views.
-  "ignores": ["**/node_modules/**", "docs/research/domains/**", "**/latest*/**"]
+  "ignores": ["**/node_modules/**", "research/domains/**", "**/latest*/**"]
 }

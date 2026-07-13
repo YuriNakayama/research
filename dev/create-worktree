@@ -65,7 +65,7 @@ else
 fi
 
 # .env ファイルのコピー（メインのワークツリーを基準にコピー元を探す）
-ENV_DIRS=("frontend" "backend" "infra")
+ENV_DIRS=("frontend" "infra")
 COPIED=()
 
 for dir in "${ENV_DIRS[@]}"; do

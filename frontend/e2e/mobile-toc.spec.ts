@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const REPORT_URL = "/docs/daily/legal_tech/report/20260329";
+const REPORT_URL = "/research/_e2e_fixture/legal_tech/report/20260329";
 
 test.describe("Mobile TOC", () => {
   test.use({ viewport: { width: 375, height: 812 } });

@@ -19,7 +19,7 @@ output "e2e_test_user_email" {
 }
 
 output "e2e_test_user_password" {
-  description = "Password of the Cognito E2E test user (sensitive, empty when disabled)"
-  value       = var.create_e2e_test_user ? random_password.e2e_test_user[0].result : ""
+  description = "Password of the Cognito E2E test user (sensitive, empty when disabled). Fixed value if supplied, otherwise the generated random one."
+  value       = local.e2e_test_user_password
   sensitive   = true
 }

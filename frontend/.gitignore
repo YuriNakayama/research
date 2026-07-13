@@ -1,0 +1,6 @@
+# Playwright auth storage state (generated per run)
+e2e/.auth/
+
+# Playwright generated artifacts
+playwright-report/
+test-results/

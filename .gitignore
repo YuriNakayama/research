@@ -74,7 +74,8 @@ __pycache__/
 .terraform.lock.hcl
 .infracost
 
-# Terraform variables
+# Terraform variables (may contain secrets; keep only *.example in git)
+terraform.tfvars
 *.auto.tfvars
 *.auto.tfvars.json
 

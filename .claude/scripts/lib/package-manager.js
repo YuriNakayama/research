@@ -2,7 +2,7 @@
  * Package Manager Detection and Selection
  * Automatically detects the preferred package manager or lets user choose
  *
- * Supports: npm, pnpm, yarn
+ * Supports: npm, pnpm, yarn, bun
  */
 
 const fs = require('fs');
@@ -41,10 +41,20 @@ const PACKAGE_MANAGERS = {
     buildCmd: 'yarn build',
     devCmd: 'yarn dev'
   },
+  bun: {
+    name: 'bun',
+    lockFile: 'bun.lock',
+    installCmd: 'bun install',
+    runCmd: 'bun run',
+    execCmd: 'bunx',
+    testCmd: 'bun test',
+    buildCmd: 'bun run build',
+    devCmd: 'bun run dev'
+  },
 };
 
 // Priority order for detection
-const DETECTION_PRIORITY = ['npm', 'pnpm', 'yarn'];
+const DETECTION_PRIORITY = ['npm', 'pnpm', 'yarn', 'bun'];
 
 // Config file path
 function getConfigPath() {
@@ -310,8 +320,8 @@ function getSelectionPrompt() {
 
   message += '\nTo set your preferred package manager:\n';
   message += '  - Global: Set CLAUDE_PACKAGE_MANAGER environment variable\n';
-  message += '  - Or add to ~/.claude/package-manager.json: {"packageManager": "pnpm"}\n';
-  message += '  - Or add to package.json: {"packageManager": "pnpm@8"}\n';
+  message += '  - Or add to ~/.claude/package-manager.json: {"packageManager": "bun"}\n';
+  message += '  - Or add to package.json: {"packageManager": "bun@1.1"}\n';
 
   return message;
 }
@@ -327,32 +337,37 @@ function getCommandPattern(action) {
     patterns.push(
       'npm run dev',
       'pnpm( run)? dev',
-      'yarn dev'
+      'yarn dev',
+      'bun( run)? dev'
     );
   } else if (action === 'install') {
     patterns.push(
       'npm install',
       'pnpm install',
-      'yarn( install)?'
+      'yarn( install)?',
+      'bun install'
     );
   } else if (action === 'test') {
     patterns.push(
       'npm test',
       'pnpm test',
-      'yarn test'
+      'yarn test',
+      'bun test'
     );
   } else if (action === 'build') {
     patterns.push(
       'npm run build',
       'pnpm( run)? build',
-      'yarn build'
+      'yarn build',
+      'bun( run)? build'
     );
   } else {
     // Generic run command
     patterns.push(
       `npm run ${action}`,
       `pnpm( run)? ${action}`,
-      `yarn ${action}`
+      `yarn ${action}`,
+      `bun( run)? ${action}`
     );
   }
 

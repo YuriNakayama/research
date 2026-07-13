@@ -107,35 +107,6 @@ function buildTree(fullPath: string, name: string, urlPath: string): TreeNode {
   return { name, path: urlPath, isDirectory: true, children };
 }
 
-export function getAllDocsSlugs(): string[][] {
-  const slugs: string[][] = [];
-
-  for (const dir of SCAN_DIRS) {
-    const dirPath = path.join(DOCS_ROOT, dir);
-    if (!fs.existsSync(dirPath)) continue;
-    collectSlugs(dirPath, [dir], slugs);
-  }
-
-  return slugs;
-}
-
-function collectSlugs(dirPath: string, prefix: string[], slugs: string[][]): void {
-  // Add directory itself as a slug (for index pages)
-  slugs.push([...prefix]);
-
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (!shouldInclude(entry.name)) continue;
-
-    if (entry.isDirectory()) {
-      collectSlugs(path.join(dirPath, entry.name), [...prefix, entry.name], slugs);
-    } else if (isMarkdownFile(entry.name)) {
-      slugs.push([...prefix, stripMdExtension(entry.name)]);
-    }
-  }
-}
-
 export function getDocContent(slug: string[]): DocContent | null {
   const mdPath = resolveDocsPath([...slug.slice(0, -1), `${slug[slug.length - 1]}.md`]);
 

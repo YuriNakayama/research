@@ -103,16 +103,16 @@ Step 3（集約）:
 
 ```mermaid
 flowchart TD
-    A1[Site 1: X,A,Y] --> B1[τ̂^(1) 柔軟ML]
-    A2[Site 2: X,A,Y] --> B2[τ̂^(2) 柔軟ML]
-    AS[Site S: X,A,Y] --> BS[τ̂^(S) 柔軟ML]
-    B1 --> C[グラム行列 Γ̂_{k,l}=Ê_Q[τ̂^k·τ̂^l]]
+    A1["Site 1: X,A,Y"] --> B1["τ̂^(1) 柔軟ML"]
+    A2["Site 2: X,A,Y"] --> B2["τ̂^(2) 柔軟ML"]
+    AS["Site S: X,A,Y"] --> BS["τ̂^(S) 柔軟ML"]
+    B1 --> C["グラム行列 Γ̂_{k,l}=Ê_Q[τ̂^k·τ̂^l]"]
     B2 --> C
     BS --> C
     T[ターゲット共変量 Q_X] --> C
-    C --> D[二次計画: q̂ = argmin q^T Γ̂ q − q^T d̂, q∈単体]
-    D --> E[集約: f̂_regret = Σ q̂_s τ̂^(s)]
-    E --> F[一般化 CATE: worst-case regret 最小]
+    C --> D["二次計画: q̂ = argmin q^T Γ̂ q − q^T d̂, q∈単体"]
+    D --> E["集約: f̂_regret = Σ q̂_s τ̂^(s)"]
+    E --> F["一般化 CATE: worst-case regret 最小"]
 ```
 
 ---

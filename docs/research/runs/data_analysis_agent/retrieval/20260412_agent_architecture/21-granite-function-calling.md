@@ -134,9 +134,9 @@ graph TB
 
     subgraph "評価パイプライン"
         I --> J[7つのOODデータセット]
-        J --> K1[BFCL: AST/Exec/Relevance]
-        J --> K2[ToolLLM: F1/LCS/EM]
-        J --> K3[API-Bank: BERTScore/ROUGE/BLEU]
+        J --> K1["BFCL: AST/Exec/Relevance"]
+        J --> K2["ToolLLM: F1/LCS/EM"]
+        J --> K3["API-Bank: BERTScore/ROUGE/BLEU"]
     end
 ```
 
@@ -144,9 +144,9 @@ graph TB
 graph LR
     subgraph "関数呼び出しタスク階層"
         direction TB
-        H1[複合タスク] --> H2[ネスト: f(g(x))]
-        H1 --> H3[チェイン: f→g→h]
-        H1 --> H4[並列: f(a),f(b),f(c)]
+        H1[複合タスク] --> H2["ネスト: f(g(x))"]
+        H1 --> H3["チェイン: f→g→h"]
+        H1 --> H4["並列: f(a),f(b),f(c)"]
     end
 
     subgraph "基本タスク"

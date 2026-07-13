@@ -194,18 +194,18 @@ $$
 
 ```mermaid
 flowchart TD
-    A[観測データ d] --> B[train / valid / test 分割]
-    B --> C[415 CATE推定器を学習<br/>ニューサンスは AutoML(FLAML)]
-    B --> D[34 代理指標のニューサンスを<br/>valid で AutoML 調整]
-    C --> E[各指標 m で全推定器をスコアリング]
+    A["観測データ d"] --> B["train / valid / test 分割"]
+    B --> C["415 CATE推定器を学習<br/>ニューサンスは AutoML(FLAML)"]
+    B --> D["34 代理指標のニューサンスを<br/>valid で AutoML 調整"]
+    C --> E["各指標 m で全推定器をスコアリング"]
     D --> E
-    E --> F[単一最良 argmin M を選択]
-    E --> G[2段階選択: クラス内→クラス間]
-    E --> H[因果アンサンブル exp(κ·M) 重み]
-    F --> I[test で真のPEHEを計算<br/>反実仮想既知]
+    E --> F["単一最良 argmin M を選択"]
+    E --> G["2段階選択: クラス内→クラス間"]
+    E --> H["因果アンサンブル exp(κ·M) 重み"]
+    F --> I["test で真のPEHEを計算<br/>反実仮想既知"]
     G --> I
     H --> I
-    I --> J[Normalized-PEHE で<br/>指標の選択品質を順位付け]
+    I --> J["Normalized-PEHE で<br/>指標の選択品質を順位付け"]
 ```
 
 ```

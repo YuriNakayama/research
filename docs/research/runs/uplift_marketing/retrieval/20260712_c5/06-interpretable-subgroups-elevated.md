@@ -137,16 +137,16 @@ Hypothesis test H0: τ(A*) = 0  (or compare two subgroups via σ²_Δ)
 
 ```mermaid
 flowchart TD
-    A[観測データ X, 処置 W, 結果 Y] --> B[CATE 推定<br/>causal forest 等 → τ̂_i]
-    B --> C[候補条件の生成<br/>連続: 閾値 ≥/<, 離散: カテゴリ一致]
+    A["観測データ X, 処置 W, 結果 Y"] --> B["CATE 推定<br/>causal forest 等 → τ̂_i"]
+    B --> C["候補条件の生成<br/>連続: 閾値 ≥/<, 離散: カテゴリ一致"]
     C --> D{α を固定}
-    D --> E[Simulated Annealing 探索<br/>ADD/CUT/REPLACE (+cond 版)]
-    E --> F[目的関数 F(A,X,τ̂;α) 最大化<br/>制約 L_max, C_max]
-    F --> G[rule set A* 出力]
-    D -->|α を掃引| H[Pareto frontier<br/>support × effect の非劣解集合]
-    G --> I[Sample splitting による推論<br/>train:発見 / test:効果推定・検定]
+    D --> E["Simulated Annealing 探索<br/>ADD/CUT/REPLACE (+cond 版)"]
+    E --> F["目的関数 F(A,X,τ̂;α) 最大化<br/>制約 L_max, C_max"]
+    F --> G["rule set A* 出力"]
+    D -->|α を掃引| H["Pareto frontier<br/>support × effect の非劣解集合"]
+    G --> I["Sample splitting による推論<br/>train:発見 / test:効果推定・検定"]
     H --> I
-    I --> J[解釈可能サブグループ + 有意性]
+    I --> J["解釈可能サブグループ + 有意性"]
 ```
 
 ---

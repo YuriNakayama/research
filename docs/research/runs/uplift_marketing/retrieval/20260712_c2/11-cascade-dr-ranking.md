@@ -113,12 +113,12 @@ return V_hat
 
 ```mermaid
 flowchart TD
-    A[ログデータ D: x, ランキング a, 位置別報酬 r_1..r_L] --> B[報酬回帰 q_hat_k の学習<br/>特徴 = 上位 1:k のアクション]
-    A --> C[top-k importance weight w_i,k<br/>= π(a_1:k|x)/π0(a_1:k|x)]
+    A["ログデータ D: x, ランキング a, 位置別報酬 r_1..r_L"] --> B["報酬回帰 q_hat_k の学習<br/>特徴 = 上位 1:k のアクション"]
+    A --> C["top-k importance weight w_i,k<br/>= π(a_1:k|x)/π0(a_1:k|x)"]
     B --> D[Cascade-DR 位置別推定 V_k]
     C --> D
     D --> E{全ポジション k=1..L を合算}
-    E --> F[V_hat(π) = Σ_k V_k<br/>ランキング方策価値の推定]
+    E --> F["V_hat(π) = Σ_k V_k<br/>ランキング方策価値の推定"]
     style D fill:#cde,stroke:#333
     style F fill:#dfd,stroke:#333
 ```

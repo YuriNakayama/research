@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  getAllDocsSlugs,
   getDocContent,
   isDirectory,
   getDirectoryEntries,
@@ -18,14 +17,17 @@ import { Toc } from "@/components/report/toc";
 import { MobileToc } from "@/components/report/mobile-toc";
 import { Breadcrumbs } from "@/components/docs/breadcrumbs";
 
-export const dynamicParams = false;
+// Render docs pages on demand instead of statically pre-generating every one.
+// The number of Markdown docs grows without bound, and pre-rendering all of
+// them (HTML + RSC + JSON, duplicated again inside the standalone bundle) made
+// the Amplify build artifact exceed its size limit. On-demand rendering keeps
+// the artifact size independent of the document count. Pages are still cached
+// after first render via ISR (see `revalidate`).
+export const dynamicParams = true;
+export const revalidate = 3600;
 
 export function generateStaticParams(): { slug?: string[] }[] {
-  const slugs = getAllDocsSlugs();
-  return [
-    { slug: undefined }, // /docs/ top page
-    ...slugs.map((s) => ({ slug: s })),
-  ];
+  return [];
 }
 
 type PageProps = {

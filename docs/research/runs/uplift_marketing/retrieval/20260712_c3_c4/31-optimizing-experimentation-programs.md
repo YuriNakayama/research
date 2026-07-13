@@ -143,19 +143,19 @@ Theorem 1 の 3 レジーム（x* = テストあたり最適サイズ）:
 
 ```mermaid
 flowchart TD
-    A[過去の関連実験プール D] -->|empirical Bayes| B[事前分布 G = N(mu, tau^2)]
-    B --> C[production function f(n)]
-    C --> D[DP 配分最適化 F(I,N)]
-    D --> E[配分 {n_i}]
-    B --> F[ローンチ規準: 事後平均 > 0]
-    F --> G[p 値しきい値 alpha に翻訳 (Prop.1)]
-    C --> H[metaproduction F=max i*f(N/i)]
-    H --> I[最適テスト本数 i*]
+    A[過去の関連実験プール D] -->|empirical Bayes| B["事前分布 G = N(mu, tau^2)"]
+    B --> C["production function f(n)"]
+    C --> D["DP 配分最適化 F(I,N)"]
+    D --> E["配分 {n_i}"]
+    B --> F["ローンチ規準: 事後平均 > 0"]
+    F --> G["p 値しきい値 alpha に翻訳 (Prop.1)"]
+    C --> H["metaproduction F=max i*f(N/i)"]
+    H --> I["最適テスト本数 i*"]
     E --> J[プログラム実行]
     G --> J
     I --> J
     J -.フィードバック新実験.-> A
-    D --> K[複数プログラム拡張 M(a,b) / M(I,P)]
+    D --> K["複数プログラム拡張 M(a,b) / M(I,P)"]
 ```
 
 ---

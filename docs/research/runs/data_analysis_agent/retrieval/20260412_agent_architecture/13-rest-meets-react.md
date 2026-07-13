@@ -72,21 +72,21 @@ The paper addresses challenges in answering complex questions requiring multi-st
 graph TB
     subgraph "ReST + ReAct 統合フレームワーク"
         subgraph "ReAct エージェント（推論時）"
-            D[判断ステップ<br/>追加情報の要否判定] --> S[Web検索<br/>外部API呼び出し]
-            S --> SUM[要約<br/>検索結果の統合]
-            SUM --> A[回答生成<br/>初期ドラフト]
-            A --> SR[自己修正<br/>関連性・根拠チェック]
+            D["判断ステップ<br/>追加情報の要否判定"] --> S["Web検索<br/>外部API呼び出し"]
+            S --> SUM["要約<br/>検索結果の統合"]
+            SUM --> A["回答生成<br/>初期ドラフト"]
+            A --> SR["自己修正<br/>関連性・根拠チェック"]
         end
 
         subgraph "ReST 反復訓練"
-            G[Grow フェーズ<br/>軌跡生成 (2000問)] --> F[フィルタリング<br/>LLM報酬モデルによるランク付け]
-            F --> I[Improve フェーズ<br/>選択データでファインチューニング]
+            G["Grow フェーズ<br/>軌跡生成 (2000問)"] --> F["フィルタリング<br/>LLM報酬モデルによるランク付け"]
+            F --> I["Improve フェーズ<br/>選択データでファインチューニング"]
             I -->|次の反復| G
         end
 
         subgraph "モデル階層"
-            TM[教師モデル<br/>PaLM 2-L] -->|蒸留| SM[生徒モデル<br/>PaLM 2-XS/S]
-            RM[報酬モデル<br/>PaLM 2-L] -->|品質評価| F
+            TM["教師モデル<br/>PaLM 2-L"] -->|蒸留| SM["生徒モデル<br/>PaLM 2-XS/S"]
+            RM["報酬モデル<br/>PaLM 2-L"] -->|品質評価| F
         end
     end
 ```

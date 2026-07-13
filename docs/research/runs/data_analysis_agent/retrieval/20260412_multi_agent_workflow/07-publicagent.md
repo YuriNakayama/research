@@ -179,12 +179,12 @@ mindmap
 
 ```mermaid
 graph TD
-    subgraph 致命的障害（出力なし）
+    subgraph "致命的障害（出力なし）"
         A[Discovery除去] --> A1[243件の完全障害]
         B[Analysis除去] --> B1[280件の完全障害]
     end
 
-    subgraph 品質劣化（出力あり）
+    subgraph "品質劣化（出力あり）"
         C[Report除去] --> C1[詳細不足・論理的不整合]
         D[Intent除去] --> D1[スコープ逸脱・曖昧さ残存]
     end

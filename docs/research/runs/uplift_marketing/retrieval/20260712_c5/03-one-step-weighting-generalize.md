@@ -104,14 +104,14 @@ $$V_\tau^{*} = \mathbb{E}_T\!\Big(\frac{\sigma_1^2(X)}{\pi(X)e(X)} + \frac{\sigm
 
 ```mermaid
 flowchart TD
-    A[研究サンプル D=1: X,Z,Y] --> C[各処置群 z]
-    B[ターゲット: 共変量プロファイル B̄*] --> C
-    C --> D[凸最適化 式7: min L2ノルム s.t. B_k を B̄* にバランス]
+    A["研究サンプル D=1: X,Z,Y"] --> C[各処置群 z]
+    B["ターゲット: 共変量プロファイル B̄*"] --> C
+    C --> D["凸最適化 式7: min L2ノルム s.t. B_k を B̄* にバランス"]
     D --> E[one-step 重み w_i]
-    E --> F[Hájek 推定 Ê_T Y(1), Ê_T Y(0)]
-    F --> G[τ̂ = TATE]
-    E -.双対問題.-> H[IPW / 逆オッズ重みに接続]
-    D -.バランス条件.-> I[アウトカムモデルに接続 → multiply robust]
+    E --> F["Hájek 推定 Ê_T Y(1), Ê_T Y(0)"]
+    F --> G["τ̂ = TATE"]
+    E -.双対問題.-> H["IPW / 逆オッズ重みに接続"]
+    D -.バランス条件.-> I["アウトカムモデルに接続 → multiply robust"]
 ```
 
 ---

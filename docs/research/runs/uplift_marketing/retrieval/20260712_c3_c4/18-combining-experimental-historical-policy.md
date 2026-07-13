@@ -105,18 +105,18 @@ CI = τ̂_w ± Φ⁻¹(1−α) √Var̂(τ̂_w)
 
 ```mermaid
 flowchart TB
-    EXP[実験データ O_e<br/>処置+対照・少量・不偏]
-    HIS[履歴データ O_h<br/>対照のみ・大量・シフトあり]
-    EXP --> TE[EDO 推定量 τ̂_e<br/>不偏・高分散]
-    EXP --> TH[履歴推定量 τ̂_h]
+    EXP["実験データ O_e<br/>処置+対照・少量・不偏"]
+    HIS["履歴データ O_h<br/>対照のみ・大量・シフトあり"]
+    EXP --> TE["EDO 推定量 τ̂_e<br/>不偏・高分散"]
+    EXP --> TH["履歴推定量 τ̂_h"]
     HIS --> TH
-    TE --> BIAS[reward shift バイアス<br/>b̂_h = τ̂_e − τ̂_h]
+    TE --> BIAS["reward shift バイアス<br/>b̂_h = τ̂_e − τ̂_h"]
     TH --> BIAS
-    BIAS --> W[重み最適化<br/>非悲観 ŵ / 悲観 ŵ_u]
-    TE --> COMB[統合推定量<br/>τ̂_w = ŵ τ̂_e + (1−ŵ) τ̂_h]
+    BIAS --> W["重み最適化<br/>非悲観 ŵ / 悲観 ŵ_u"]
+    TE --> COMB["統合推定量<br/>τ̂_w = ŵ τ̂_e + (1−ŵ) τ̂_h"]
     TH --> COMB
     W --> COMB
-    COMB --> CI[Wald 型 CI]
+    COMB --> CI["Wald 型 CI"]
 ```
 
 ## Figures & Tables

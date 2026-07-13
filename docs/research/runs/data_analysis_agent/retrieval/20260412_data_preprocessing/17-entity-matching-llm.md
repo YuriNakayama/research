@@ -82,14 +82,14 @@ s_i = 2 × (他候補に対する勝利数) + 1 × (引分け数)
 ```mermaid
 flowchart TD
     subgraph "ComEM パイプライン"
-        A[全レコード] --> B[Sparklyブロッキング\nRecall@10: 86.57-99.96%]
-        B --> C[候補10件/レコード抽出]
-        C --> D{フィルタリングLLM\n3Bモデル}
-        D -->|matching| E1[各ペアYes/No判定]
+        A[全レコード] --> B["Sparklyブロッキング\nRecall@10: 86.57-99.96%"]
+        B --> C["候補10件/レコード抽出"]
+        C --> D{"フィルタリングLLM\n3Bモデル"}
+        D -->|matching| E1["各ペアYes/No判定"]
         D -->|comparing| E2[バブルソートランキング]
         E1 --> F[Top-4候補選出]
         E2 --> F
-        F --> G[識別LLM\n大規模モデル]
+        F --> G["識別LLM\n大規模モデル"]
         G --> H[selecting戦略で最終判定]
         H --> I[マッチング結果]
     end

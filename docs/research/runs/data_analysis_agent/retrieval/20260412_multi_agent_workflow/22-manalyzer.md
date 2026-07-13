@@ -188,14 +188,14 @@ graph TD
 ```mermaid
 graph LR
     subgraph "従来: 単一論文評価"
-        A1[スコア収束<br>識別困難<br>狭い分布]
+        A1["スコア収束<br>識別困難<br>狭い分布"]
     end
     subgraph "Manalyzer: ハイブリッドレビュー"
-        B1[分散したスコア<br>明確な識別<br>広い分布]
+        B1["分散したスコア<br>明確な識別<br>広い分布"]
     end
     A1 -->|ハイブリッド化| B1
-    C[個別レビュー<br>s_individual] --> D[統合スコア<br>s_r × (s_1 + s_2)]
-    E[バッチ比較<br>s_batch] --> D
+    C["個別レビュー<br>s_individual"] --> D["統合スコア<br>s_r × (s_1 + s_2)"]
+    E["バッチ比較<br>s_batch"] --> D
 ```
 
 ### Figure 2: 自己証明メカニズム

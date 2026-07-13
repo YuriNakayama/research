@@ -150,31 +150,31 @@ $$
 
 ```mermaid
 flowchart TD
-    X[入力共変量 X] --> S[Shared Representation<br/>共有表現ネットワーク]
+    X[入力共変量 X] --> S["Shared Representation<br/>共有表現ネットワーク"]
 
-    S --> PI[Propensity Head<br/>π = P W=1 | X]
-    S --> M1[Treated Response Head<br/>μ1 = P Y | W=1,X]
-    S --> M0[Control Response Head<br/>μ0 = P Y | W=0,X]
-    S --> TAU[Pseudo Treatment Effect Head<br/>τ']
+    S --> PI["Propensity Head<br/>π = P W=1 | X"]
+    S --> M1["Treated Response Head<br/>μ1 = P Y | W=1,X"]
+    S --> M0["Control Response Head<br/>μ0 = P Y | W=0,X"]
+    S --> TAU["Pseudo Treatment Effect Head<br/>τ'"]
 
     %% ESN: Entire Space
-    PI --> ESTR[ESTR = μ1 · π]
+    PI --> ESTR["ESTR = μ1 · π"]
     M1 --> ESTR
-    PI --> ESCR[ESCR = μ0 · 1-π]
+    PI --> ESCR["ESCR = μ0 · 1-π"]
     M0 --> ESCR
 
     %% X-Network: cross reconstruction (logit空間)
-    M0 --> CTR[μ1' = σ σ⁻¹ μ0 + σ⁻¹ τ']
+    M0 --> CTR["μ1' = σ σ⁻¹ μ0 + σ⁻¹ τ'"]
     TAU --> CTR
-    M1 --> CCR[μ0' = σ σ⁻¹ μ1 − σ⁻¹ τ']
+    M1 --> CCR["μ0' = σ σ⁻¹ μ1 − σ⁻¹ τ'"]
     TAU --> CCR
 
-    ESTR --> L[統合損失 L_DESCN<br/>α Lπ + β1 L_ESTR + β0 L_ESCR<br/>+ γ1 L_CrossTR + γ0 L_CrossCR]
+    ESTR --> L["統合損失 L_DESCN<br/>α Lπ + β1 L_ESTR + β0 L_ESCR<br/>+ γ1 L_CrossTR + γ0 L_CrossCR"]
     ESCR --> L
     CTR --> L
     CCR --> L
 
-    L --> OUT[推論: ITE τ = μ1 − μ0<br/>uplift ランキング]
+    L --> OUT["推論: ITE τ = μ1 − μ0<br/>uplift ランキング"]
 ```
 
 - **ESN 部（Entire Space Network）**: `π`・`μ₁`・`μ₀` を掛け合わせて観測可能な同時確率 ESTR / ESCR を構成し、全サンプルで学習（treatment bias 緩和）。

@@ -21,7 +21,7 @@ resource "aws_amplify_app" "main" {
           phases:
             preBuild:
               commands:
-                - cp -r ../docs ./docs
+                - cp -r ../research ./research
                 - npm ci
             build:
               commands:

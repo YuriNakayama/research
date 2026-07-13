@@ -24,6 +24,7 @@ External:
 - **Frontend**: Next.js (App Router) + TypeScript, AWS Amplify (Auth/Hosting), Playwright (E2E)
 - **Infrastructure**: AWS (Cognito, Amplify Hosting, Secrets Manager, GitHub Actions OIDC), Terraform
 - **CI/CD**: GitHub Actions (ci-frontend.yml, ci-infra.yml)
+- **Package Management**: bun (Node/frontend)
 - **Content**: 手動リサーチ成果物 Markdown（`research/**`, append-only）
 
 ## Folder Structure

@@ -1,7 +1,7 @@
 # ============================================
 # Dev Container（シングルステージ、ツールのみインストール）
 # ============================================
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================
-# 開発ツール (uv, Python, AWS CLI, pnpm, Claude Code)
+# 開発ツール (uv, Python, AWS CLI, bun, Claude Code)
 # ============================================
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
@@ -33,7 +33,10 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws
     && /tmp/aws/install \
     && rm -rf /tmp/awscliv2.zip /tmp/aws
 
-RUN corepack enable pnpm
+# bun をシステム全体にインストール（root / 非 root ユーザー双方が PATH 解決できるよう symlink）
+RUN curl -fsSL https://bun.sh/install | bash \
+    && ln -s /root/.bun/bin/bun /usr/local/bin/bun \
+    && ln -s /root/.bun/bin/bunx /usr/local/bin/bunx
 
 RUN npm config set prefix /usr/local \
     && npm install -g @anthropic-ai/claude-code --silent

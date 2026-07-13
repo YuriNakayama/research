@@ -2,6 +2,14 @@
   "name": "research-viewer",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "bun@1.3.14",
+  "engines": {
+    "node": ">=22",
+    "bun": ">=1.1"
+  },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +18,7 @@
     "type-check": "tsc --noEmit",
     "check:mermaid": "node scripts/check-mermaid.mjs",
     "check:markdown": "markdownlint-cli2 --config ../.markdownlint-cli2.jsonc \"../research/**/*.md\"",
-    "check:docs": "npm run check:markdown && npm run check:mermaid"
+    "check:docs": "bun run check:markdown && bun run check:mermaid"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.2.0",

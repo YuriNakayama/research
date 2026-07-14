@@ -9,18 +9,18 @@
 ## 基本ルール
 
 1. **`runs/` は append-only**: 既存の run ディレクトリを書き換えたり削除したりしないでください。新しい結果は必ず新しい日付ディレクトリを作成して追加します。
-2. **新規出力は必ず `runs/<domain>/<phase>/<date>[_<cluster>]/` に配置**: `domains/` に直接ファイルを作成しないでください（`domains/` は `runs/` への symlink で構成されます）。
+2. **新規出力は必ず日付ディレクトリ配下に配置**: clustering は `runs/<domain>/clustering/<date>/`、gather / retrieval は `runs/<domain>/<phase>/<date>/<cluster>/` に置きます。`domains/` に直接ファイルを作成しないでください（`domains/` は `runs/` への symlink で構成されます）。
 3. **`domains/<domain>/domain.yaml` が存在する場合は最優先で参照**: ここに `output_paths` が定義されていれば、その値を README の既定値より優先します。
 4. **clustering は複数回実行され得る**: 同一ドメインで再クラスタリングを行う場合、過去の `runs/<domain>/clustering/<old_date>/` は残し、新しい `<new_date>/` を追加して `latest` symlink を更新します。
-5. **完了後の latest 更新**: 新規 run を追加したら、`runs/<domain>/<phase>/latest[_<cluster>]` symlink を更新します（skill が実施）。
+5. **完了後の latest 更新**: 新規 run を追加したら、phase ごとに 1 本の `runs/<domain>/<phase>/latest`（最新の日付ディレクトリを指す）と、`domains/` ビュー（`resources/<cluster>` / `reports/<cluster>`）を更新します（skill が実施）。クラスタごとの `latest_<cluster>` は使いません。
 
 ## phase 別の既定出力先
 
 | phase       | 既定出力先                                              |
 |-------------|---------------------------------------------------------|
 | clustering  | `research/runs/<domain>/clustering/<YYYYMMDD>/`         |
-| gather      | `research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/`   |
-| retrieval   | `research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/`|
+| gather      | `research/runs/<domain>/gather/<YYYYMMDD>/<cluster>/`   |
+| retrieval   | `research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/`|
 
 クラスタが特定できない場合は `<cluster>` を `all` とします。
 

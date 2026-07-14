@@ -4,8 +4,15 @@ test.describe("Header", () => {
   test("shows logo and navigation controls", async ({ page }) => {
     await page.goto("/research");
     const header = page.locator("header");
-    await expect(header.getByText("RESEARCH/VIEWER")).toBeVisible();
-    await expect(header.getByText("LOGOUT")).toBeVisible();
+    // The logo shows the full name from `sm` up and a short "R/V" below it, so
+    // the visible text differs by viewport; match the logo link by its href.
+    await expect(
+      header.locator('a[href="/research"]').first(),
+    ).toBeVisible();
+    // LOGOUT label is hidden on mobile (icon-only button with aria-label).
+    await expect(
+      header.getByRole("button", { name: "ログアウト" }),
+    ).toBeVisible();
   });
 
   test("theme toggle button is present", async ({ page }) => {
@@ -24,10 +31,8 @@ test.describe("Header", () => {
 
   test("logo navigates to research root", async ({ page }) => {
     await page.goto("/research/_e2e_fixture");
-    await page
-      .locator("header")
-      .getByRole("link", { name: "RESEARCH/VIEWER" })
-      .click();
+    // Match the logo link by href since its visible text varies by viewport.
+    await page.locator('header a[href="/research"]').first().click();
     await expect(page).toHaveURL("/research");
   });
 });

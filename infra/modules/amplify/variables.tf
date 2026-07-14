@@ -47,3 +47,9 @@ variable "enable_custom_domain" {
   type        = bool
   default     = false
 }
+
+variable "preview_branches" {
+  description = "Additional (non-production) git branches to host on Amplify, e.g. feature branches. Each gets its own Amplify branch + build."
+  type        = list(string)
+  default     = []
+}

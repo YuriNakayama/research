@@ -74,6 +74,16 @@ module "cognito" {
 }
 
 # =============================================================================
+# Notes (DynamoDB personal notes + Amplify SSR compute role)
+# =============================================================================
+module "notes" {
+  source = "./modules/notes"
+
+  environment = var.environment
+  project     = var.project
+}
+
+# =============================================================================
 # Amplify (Next.js hosting)
 # =============================================================================
 module "amplify" {
@@ -89,6 +99,8 @@ module "amplify" {
   subdomain_prefix      = var.subdomain_prefix
   enable_custom_domain  = var.enable_custom_domain
   preview_branches      = var.amplify_preview_branches
+  compute_role_arn      = module.notes.compute_role_arn
+  notes_table_name      = module.notes.table_name
 }
 
 # =============================================================================

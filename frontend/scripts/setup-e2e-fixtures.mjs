@@ -50,6 +50,16 @@ $$
 
 where $TP$ represents true positives and $FP$ represents false positives.
 
+## Results
+
+Benchmark scores across legal NLP tasks (used by the resizable-table E2E test):
+
+| Model | Summarization | Argument Mining | Retrieval |
+|-------|---------------|-----------------|-----------|
+| BERT-Legal | 78.2% | 71.5% | 65.9% |
+| Longformer | 81.4% | 69.8% | 70.1% |
+| GPT-4 | 84.7% | 76.3% | 73.4% |
+
 ## Conclusion
 
 This survey highlights the growing importance of NLP in the legal domain.

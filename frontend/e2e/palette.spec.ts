@@ -6,14 +6,15 @@ test.describe("Palette selector", () => {
     const button = page.getByRole("button", { name: "カラーパレット切替" });
     await expect(button).toBeVisible();
     await button.click();
-    await expect(page.getByText("Dark Teal")).toBeVisible();
-    await expect(page.getByText("Sunset")).toBeVisible();
-    await expect(page.getByText("Coral")).toBeVisible();
-    await expect(page.getByText("Aqua Sky")).toBeVisible();
-    await expect(page.getByText("Vivid Pop")).toBeVisible();
-    await expect(page.getByText("Mono Red")).toBeVisible();
-    await expect(page.getByText("Espresso")).toBeVisible();
-    await expect(page.getByText("Ocean Coral")).toBeVisible();
+    // exact: true so "Coral" does not also match "Ocean Coral".
+    await expect(page.getByText("Dark Teal", { exact: true })).toBeVisible();
+    await expect(page.getByText("Sunset", { exact: true })).toBeVisible();
+    await expect(page.getByText("Coral", { exact: true })).toBeVisible();
+    await expect(page.getByText("Aqua Sky", { exact: true })).toBeVisible();
+    await expect(page.getByText("Vivid Pop", { exact: true })).toBeVisible();
+    await expect(page.getByText("Mono Red", { exact: true })).toBeVisible();
+    await expect(page.getByText("Espresso", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).toBeVisible();
   });
 
   test("switches palette and applies data attribute", async ({ page }) => {
@@ -21,7 +22,7 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Sunset").click();
+    await page.getByText("Sunset", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
       "sunset"
@@ -33,7 +34,7 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Espresso").click();
+    await page.getByText("Espresso", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
       "espresso"
@@ -55,9 +56,9 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await expect(page.getByText("Ocean Coral")).toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByText("Ocean Coral")).not.toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).not.toBeVisible();
   });
 
   test("default palette also sets the data attribute", async ({ page }) => {
@@ -66,7 +67,7 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Coral").click();
+    await page.getByText("Coral", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
       "coral"
@@ -77,7 +78,7 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Dark Teal").click();
+    await page.getByText("Dark Teal", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
       "dark-teal"

@@ -6,12 +6,15 @@ test.describe("Palette selector", () => {
     const button = page.getByRole("button", { name: "カラーパレット切替" });
     await expect(button).toBeVisible();
     await button.click();
-    await expect(page.getByText("Dark Teal")).toBeVisible();
-    await expect(page.getByText("Pastel Mint")).toBeVisible();
-    await expect(page.getByText("Pop Blue")).toBeVisible();
-    await expect(page.getByText("Forest")).toBeVisible();
-    await expect(page.getByText("Sunset")).toBeVisible();
-    await expect(page.getByText("Coral")).toBeVisible();
+    // exact: true so "Coral" does not also match "Ocean Coral".
+    await expect(page.getByText("Dark Teal", { exact: true })).toBeVisible();
+    await expect(page.getByText("Sunset", { exact: true })).toBeVisible();
+    await expect(page.getByText("Coral", { exact: true })).toBeVisible();
+    await expect(page.getByText("Aqua Sky", { exact: true })).toBeVisible();
+    await expect(page.getByText("Vivid Pop", { exact: true })).toBeVisible();
+    await expect(page.getByText("Mono Red", { exact: true })).toBeVisible();
+    await expect(page.getByText("Espresso", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).toBeVisible();
   });
 
   test("switches palette and applies data attribute", async ({ page }) => {
@@ -19,10 +22,10 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Pastel Mint").click();
+    await page.getByText("Sunset", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "pastel-mint"
+      "sunset"
     );
   });
 
@@ -31,10 +34,10 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Forest").click();
+    await page.getByText("Espresso", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "forest"
+      "espresso"
     );
     // Navigate to another page. The root is now a domain dashboard that does
     // not list _e2e_fixture, so go to the deterministic fixture report directly.
@@ -43,7 +46,7 @@ test.describe("Palette selector", () => {
     // Palette should persist
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "forest"
+      "espresso"
     );
   });
 
@@ -53,29 +56,32 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await expect(page.getByText("Dark Teal")).toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByText("Pastel Mint")).not.toBeVisible();
+    await expect(page.getByText("Ocean Coral", { exact: true })).not.toBeVisible();
   });
 
-  test("switching back to default removes data attribute", async ({
-    page,
-  }) => {
+  test("default palette also sets the data attribute", async ({ page }) => {
     await page.goto("/research");
-    // Switch to non-default
+    // Switch to a non-default palette first
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Pop Blue").click();
+    await page.getByText("Coral", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "pop-blue"
+      "coral"
     );
-    // Switch back to default
+    // Switch back to the default (Dark Teal). Every palette — including the
+    // default — now carries its own full scheme via data-palette, so the
+    // attribute must be present (not removed).
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Dark Teal").click();
-    await expect(page.locator("html")).not.toHaveAttribute("data-palette");
+    await page.getByText("Dark Teal", { exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-palette",
+      "dark-teal"
+    );
   });
 });

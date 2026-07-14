@@ -21,34 +21,46 @@
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-display: "JetBrains Mono Variable", "JetBrains Mono", "Noto Sans JP Variable", ui-monospace, monospace;
 
-  /* --- Surface (Light: off-white) --- */
+  /* --- Ink (the single "near-black" role) ---
+     Everything that used to be hardcoded black (#0A0A0A / #09090B /
+     #000000) now derives from --ink. Each palette overrides --ink with
+     its own darkest color so the ENTIRE scheme — borders, text, header,
+     code surface — comes from the palette, not a fixed black. */
+  --ink: #0A0A0A;
+  --ink-soft: #2A2A2A;
+  --ink-muted: #6A6A6A;
+  --on-ink: #FAFAFA;
+
+  /* --- Surface (Light: off-white) ---
+     Palettes override primary/secondary/tertiary; elevated follows
+     primary so it, too, is always a palette color. */
   --surface-primary: #FAFAFA;
   --surface-secondary: #F0F0F0;
   --surface-tertiary: #E4E4E4;
-  --surface-elevated: #FFFFFF;
+  --surface-elevated: var(--surface-primary);
   --surface-overlay: rgba(10, 10, 10, 0.75);
-  --surface-inverse: #0A0A0A;
+  --surface-inverse: var(--ink);
 
   /* --- Header --- */
-  --header-bg: #0A0A0A;
-  --header-text: #FAFAFA;
-  --header-text-secondary: #B8B8B8;
+  --header-bg: var(--ink);
+  --header-text: var(--on-ink);
+  --header-text-secondary: var(--on-ink);
 
   /* --- Border (heavy, mono) --- */
-  --border-primary: #0A0A0A;
-  --border-secondary: #0A0A0A;
-  --border-active: #E6FF3D;
+  --border-primary: var(--ink);
+  --border-secondary: var(--ink);
+  --border-active: var(--accent-bg);
   --border-width: 2px;
   --border-width-strong: 3px;
   --border-width-thin: 1px;
 
   /* --- Text --- */
-  --text-primary: #0A0A0A;
-  --text-secondary: #2A2A2A;
-  --text-tertiary: #6A6A6A;
-  --text-inverse: #FAFAFA;
-  --text-link: #0A0A0A;
-  --text-accent: #0A0A0A;
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-tertiary: var(--ink-muted);
+  --text-inverse: var(--on-ink);
+  --text-link: var(--ink);
+  --text-accent: var(--ink);
 
   /* --- Accent (dark-teal default: matches the palette swatch #00ADB5) --- */
   --accent-bg: #00ADB5;
@@ -74,29 +86,31 @@
   --phase-clustering-fg: #0A0A0A;
 
   /* --- Code ---
-     Brutalist mono + single accent. Dark surface is intentional in
-     both light and dark modes — it keeps brand identity stable and
-     matches Kinetic Brutalism principles (single accent, no glow,
-     no soft blur, hard contrast, hierarchy via weight, not hue).
-     All pairs verified against #09090B base. */
-  --code-bg: #09090B;              /* zinc-950, brand-adjacent */
-  --code-fg: #FAFAFA;              /* ~19.5:1 AAA */
-  --code-dim: #71717A;             /* zinc-500 — comments ~4.6:1 AA */
-  --code-accent: var(--accent-raw);/* single brand accent (yellow) */
-  --code-string: #D4D4D8;          /* zinc-300 — softer white ~12.8:1 */
+     The code surface used to be a fixed near-black (#09090B). It now
+     tracks --ink so each palette recolors the code block with its own
+     darkest color while preserving the single-accent syntax hierarchy. */
+  /* Code block colors are drawn ONLY from the palette roles:
+       bg = --ink (darkest), fg = --on-ink (lightest),
+       accent/string = the palette's accent, dim = the secondary text.
+     No standalone grey/white is introduced. */
+  --code-bg: var(--ink);
+  --code-fg: var(--on-ink);
+  --code-dim: var(--ink-soft);     /* comments — secondary palette color */
+  --code-accent: var(--accent-bg); /* keywords — palette accent */
+  --code-string: var(--on-ink);    /* literals — lightest palette color */
   --code-selection: rgba(230, 255, 61, 0.22);
-  --code-header-bg: #000000;
-  --code-header-text: #FAFAFA;
-  --code-border: #0A0A0A;
+  --code-header-bg: var(--ink);
+  --code-header-text: var(--on-ink);
+  --code-border: var(--ink);
 
   /* --- Sidebar --- */
-  --sidebar-bg: #FAFAFA;
-  --sidebar-text: #0A0A0A;
-  --sidebar-text-secondary: #6A6A6A;
-  --sidebar-active-bg: #E6FF3D;
-  --sidebar-active-text: #0A0A0A;
-  --sidebar-active-indicator: #0A0A0A;
-  --sidebar-hover-bg: #F0F0F0;
+  --sidebar-bg: var(--surface-primary);
+  --sidebar-text: var(--ink);
+  --sidebar-text-secondary: var(--ink-muted);
+  --sidebar-active-bg: var(--accent-bg);
+  --sidebar-active-text: var(--accent-text);
+  --sidebar-active-indicator: var(--ink);
+  --sidebar-hover-bg: var(--surface-secondary);
 
   /* --- Spacing --- */
   --space-xs: 0.25rem;
@@ -127,46 +141,60 @@
 }
 
 .dark {
-  --surface-primary: #0A0A0A;
-  --surface-secondary: #141414;
-  --surface-tertiary: #1E1E1E;
-  --surface-elevated: #141414;
+  /* In dark mode the roles invert: --ink is the light swatch (text /
+     borders) and --on-ink is the dark swatch (the page background).
+     The per-palette [data-palette].dark blocks below supply the actual
+     swatch values; everything here is expressed through those roles so
+     the whole dark shell stays strictly palette-colored. The neutral
+     literals are only the pre-hydration fallback (no data-palette yet). */
+  --ink: #FAFAFA;
+  --ink-soft: #D8D8D8;
+  --ink-muted: #8A8A8A;
+  --on-ink: #0A0A0A;
+
+  --surface-primary: var(--on-ink);
+  --surface-secondary: var(--on-ink);
+  --surface-tertiary: var(--on-ink);
+  --surface-elevated: var(--on-ink);
   --surface-overlay: rgba(250, 250, 250, 0.1);
-  --surface-inverse: #FAFAFA;
+  --surface-inverse: var(--ink);
 
-  --header-bg: #0A0A0A;
-  --header-text: #FAFAFA;
-  --header-text-secondary: #8A8A8A;
+  --header-bg: var(--on-ink);
+  --header-text: var(--ink);
+  --header-text-secondary: var(--ink);
 
-  --border-primary: #FAFAFA;
-  --border-secondary: #FAFAFA;
-  --border-active: #E6FF3D;
+  --border-primary: var(--ink);
+  --border-secondary: var(--ink);
+  --border-active: var(--accent-bg);
 
-  --text-primary: #FAFAFA;
-  --text-secondary: #D8D8D8;
-  --text-tertiary: #8A8A8A;
-  --text-inverse: #0A0A0A;
-  --text-link: #FAFAFA;
-  --text-accent: #FAFAFA;
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-tertiary: var(--ink-muted);
+  --text-inverse: var(--on-ink);
+  --text-link: var(--ink);
+  --text-accent: var(--ink);
 
   --accent-bg: #00ADB5;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #08302F;
   --accent-raw: #00ADB5;
 
-  --code-bg: #09090B;
-  --code-fg: #FAFAFA;
-  --code-header-bg: #FAFAFA;
-  --code-header-text: #0A0A0A;
-  --code-border: #FAFAFA;
+  /* Code surface = the palette's dark swatch, foreground = light swatch. */
+  --code-bg: var(--on-ink);
+  --code-fg: var(--ink);
+  --code-dim: var(--ink-soft);
+  --code-string: var(--ink);
+  --code-header-bg: var(--on-ink);
+  --code-header-text: var(--ink);
+  --code-border: var(--ink);
 
-  --sidebar-bg: #0A0A0A;
-  --sidebar-text: #FAFAFA;
-  --sidebar-text-secondary: #8A8A8A;
-  --sidebar-active-bg: #E6FF3D;
-  --sidebar-active-text: #0A0A0A;
-  --sidebar-active-indicator: #FAFAFA;
-  --sidebar-hover-bg: #1E1E1E;
+  --sidebar-bg: var(--on-ink);
+  --sidebar-text: var(--ink);
+  --sidebar-text-secondary: var(--ink-muted);
+  --sidebar-active-bg: var(--accent-bg);
+  --sidebar-active-text: var(--accent-text);
+  --sidebar-active-indicator: var(--ink);
+  --sidebar-hover-bg: var(--surface-secondary);
 
   --shadow-brutal: 4px 4px 0 0 var(--border-primary);
   --shadow-brutal-sm: 2px 2px 0 0 var(--border-primary);
@@ -175,138 +203,304 @@
 }
 
 /* ============================================================
-   Palettes — each enforces brutalist rules (radius 0, heavy
-   borders) but substitutes its own single accent color.
+   Palettes — STRICT 4-COLOR MODE.
+   Every role below is set to one of the palette's four raw swatches
+   (see palette.ts). No darkening, lightening, tinting or any derived
+   color is used — the scheme is composed *only* from the 4 colors.
+
+   Deterministic role assignment (swatches sorted dark → light):
+     --ink / text / border / header / code-bg = swatch[0]  (darkest)
+     --ink-soft (secondary text)               = swatch[1]
+     --on-ink / --surface-primary              = swatch[3]  (lightest)
+     --surface-secondary / -tertiary           = swatch[2]
+     --accent-bg                               = signature chromatic
+                                                 swatch (see each note)
+     --accent-subtle-bg                        = remaining mid swatch
+
+   NOTE ON CONTRAST: some palettes (e.g. aqua-sky, vivid-pop) are made of
+   pale-only or mid-tone colors, so their darkest-on-lightest contrast can
+   be as low as ~3:1 and body text is intentionally hard to read. This is
+   accepted per the explicit "4 colors only, no adjustment" requirement.
+
+   Both light and dark modes use the SAME four swatches; only
+   --accent-subtle-bg (a background wash) differs so accents stay legible.
    ============================================================ */
 
-/* Pastel Mint → Mint Green accent */
-/* Each accent below is taken from the palette's own swatch (palette.ts
-   colors[]) so the applied accent matches what the palette selector shows.
-   accent-text is black/white chosen for >= 4.5:1 on the accent. */
-
-/* Pastel Mint → swatch pink #F9B2D7 */
-[data-palette="pastel-mint"],
-[data-palette="pastel-mint"].dark {
-  --accent-bg: #F9B2D7;
-  --accent-text: #0A0A0A;
-  --accent-raw: #F9B2D7;
-  --sidebar-active-bg: #F9B2D7;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #F9B2D7;
-  --shadow-brutal-accent: 4px 4px 0 0 #F9B2D7;
-}
-[data-palette="pastel-mint"] {
-  --accent-subtle-bg: #FEE9F4;
-}
-[data-palette="pastel-mint"].dark {
-  --accent-subtle-bg: #2A101F;
+/* Dark Teal (default) — [#222831 #393E46 #00ADB5 #EEEEEE] */
+[data-palette="dark-teal"] {
+  --ink: #222831;
+  --ink-soft: #393E46;
+  --ink-muted: #393E46;
+  --on-ink: #EEEEEE;
+  --surface-primary: #EEEEEE;
+  --surface-secondary: #00ADB5;
+  --surface-tertiary: #00ADB5;
+  --accent-bg: #00ADB5;
+  --accent-text: #222831;
+  --accent-subtle-bg: #00ADB5;
+  --border-active: #00ADB5;
+  --shadow-brutal-accent: 4px 4px 0 0 #00ADB5;
 }
 
-/* Pop Blue → swatch blue #44ACFF */
-[data-palette="pop-blue"],
-[data-palette="pop-blue"].dark {
-  --accent-bg: #44ACFF;
-  --accent-text: #0A0A0A;
-  --accent-raw: #44ACFF;
-  --sidebar-active-bg: #44ACFF;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #44ACFF;
-  --shadow-brutal-accent: 4px 4px 0 0 #44ACFF;
-}
-[data-palette="pop-blue"] {
-  --accent-subtle-bg: #D8ECFF;
-}
-[data-palette="pop-blue"].dark {
-  --accent-subtle-bg: #0A1E30;
-}
-
-/* Forest → swatch green #408A71 */
-[data-palette="forest"],
-[data-palette="forest"].dark {
-  --accent-bg: #408A71;
-  --accent-text: #FAFAFA;
-  --accent-raw: #408A71;
-  --sidebar-active-bg: #408A71;
-  --sidebar-active-text: #FAFAFA;
-  --border-active: #408A71;
-  --shadow-brutal-accent: 4px 4px 0 0 #408A71;
-}
-[data-palette="forest"] {
-  --accent-subtle-bg: #DDF0E8;
-}
-[data-palette="forest"].dark {
-  --accent-subtle-bg: #0C2019;
-}
-
-/* Sunset → swatch orange #F77F00 */
-[data-palette="sunset"],
-[data-palette="sunset"].dark {
-  --accent-bg: #F77F00;
-  --accent-text: #0A0A0A;
-  --accent-raw: #F77F00;
-  --sidebar-active-bg: #F77F00;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #F77F00;
-  --shadow-brutal-accent: 4px 4px 0 0 #F77F00;
-}
+/* Sunset — [#003049 #D62828 #F77F00 #FCBF49] */
 [data-palette="sunset"] {
-  --accent-subtle-bg: #FFE7CC;
-}
-[data-palette="sunset"].dark {
-  --accent-subtle-bg: #2A1600;
+  --ink: #003049;
+  --ink-soft: #D62828;
+  --ink-muted: #D62828;
+  --on-ink: #FCBF49;
+  --surface-primary: #FCBF49;
+  --surface-secondary: #F77F00;
+  --surface-tertiary: #F77F00;
+  --accent-bg: #D62828;
+  --accent-text: #FCBF49;
+  --accent-subtle-bg: #F77F00;
+  --border-active: #D62828;
+  --shadow-brutal-accent: 4px 4px 0 0 #D62828;
 }
 
-/* Coral → swatch red #DB1A1A */
-[data-palette="coral"],
-[data-palette="coral"].dark {
+/* Coral — [#DB1A1A #FFF6F6 #8CC7C4 #2C687B]
+   Sorted dark→light: #2C687B #DB1A1A #8CC7C4 #FFF6F6.
+   Darkest = #2C687B (teal) reads on the near-white #FFF6F6. */
+[data-palette="coral"] {
+  --ink: #2C687B;
+  --ink-soft: #DB1A1A;
+  --ink-muted: #DB1A1A;
+  --on-ink: #FFF6F6;
+  --surface-primary: #FFF6F6;
+  --surface-secondary: #8CC7C4;
+  --surface-tertiary: #8CC7C4;
   --accent-bg: #DB1A1A;
-  --accent-text: #FAFAFA;
-  --accent-raw: #DB1A1A;
-  --sidebar-active-bg: #DB1A1A;
-  --sidebar-active-text: #FAFAFA;
+  --accent-text: #FFF6F6;
+  --accent-subtle-bg: #8CC7C4;
   --border-active: #DB1A1A;
   --shadow-brutal-accent: 4px 4px 0 0 #DB1A1A;
 }
-[data-palette="coral"] {
-  --accent-subtle-bg: #FBDADA;
+
+/* Aqua Sky — [#008DDA #41C9E2 #ACE2E1 #F7EEDD]
+   Sorted dark→light: #008DDA #41C9E2 #ACE2E1 #F7EEDD. Pale set; blue
+   #008DDA is darkest → ink & accent, cream #F7EEDD is surface. */
+[data-palette="aqua-sky"] {
+  --ink: #008DDA;
+  --ink-soft: #41C9E2;
+  --ink-muted: #41C9E2;
+  --on-ink: #F7EEDD;
+  --surface-primary: #F7EEDD;
+  --surface-secondary: #ACE2E1;
+  --surface-tertiary: #ACE2E1;
+  --accent-bg: #008DDA;
+  --accent-text: #F7EEDD;
+  --accent-subtle-bg: #41C9E2;
+  --border-active: #008DDA;
+  --shadow-brutal-accent: 4px 4px 0 0 #008DDA;
 }
-[data-palette="coral"].dark {
-  --accent-subtle-bg: #2A0A0A;
+
+/* Vivid Pop — [#3EC1D3 #F6F7D7 #FF9A00 #FF165D]
+   Sorted dark→light: #FF165D #3EC1D3 #FF9A00 #F6F7D7. Hot pink is the
+   darkest → ink & accent; pale cream #F6F7D7 is surface. */
+[data-palette="vivid-pop"] {
+  --ink: #FF165D;
+  --ink-soft: #3EC1D3;
+  --ink-muted: #3EC1D3;
+  --on-ink: #F6F7D7;
+  --surface-primary: #F6F7D7;
+  --surface-secondary: #FF9A00;
+  --surface-tertiary: #FF9A00;
+  --accent-bg: #FF165D;
+  --accent-text: #F6F7D7;
+  --accent-subtle-bg: #3EC1D3;
+  --border-active: #FF165D;
+  --shadow-brutal-accent: 4px 4px 0 0 #FF165D;
+}
+
+/* Mono Red — [#171717 #444444 #DA0037 #EDEDED]
+   Near-mono: ink #171717 on #EDEDED (15.3:1); red #DA0037 is the accent. */
+[data-palette="mono-red"] {
+  --ink: #171717;
+  --ink-soft: #444444;
+  --ink-muted: #444444;
+  --on-ink: #EDEDED;
+  --surface-primary: #EDEDED;
+  --surface-secondary: #444444;
+  --surface-tertiary: #444444;
+  --accent-bg: #DA0037;
+  --accent-text: #EDEDED;
+  --accent-subtle-bg: #444444;
+  --border-active: #DA0037;
+  --shadow-brutal-accent: 4px 4px 0 0 #DA0037;
+}
+
+/* Espresso — [#000000 #1F150C #412D15 #E1DCC9]
+   Dark browns; ink #000000 on cream #E1DCC9 (15.3:1). Brown #412D15
+   is the mid accent. */
+[data-palette="espresso"] {
+  --ink: #000000;
+  --ink-soft: #1F150C;
+  --ink-muted: #412D15;
+  --on-ink: #E1DCC9;
+  --surface-primary: #E1DCC9;
+  --surface-secondary: #412D15;
+  --surface-tertiary: #412D15;
+  --accent-bg: #412D15;
+  --accent-text: #E1DCC9;
+  --accent-subtle-bg: #1F150C;
+  --border-active: #412D15;
+  --shadow-brutal-accent: 4px 4px 0 0 #412D15;
+}
+
+/* Ocean Coral — [#07689F #A2D5F2 #FAFAFA #FF7E67]
+   Sorted dark→light: #07689F #FF7E67 #A2D5F2 #FAFAFA. Blue is ink & accent;
+   near-white #FAFAFA is surface (ink contrast 5.8:1). */
+[data-palette="ocean-coral"] {
+  --ink: #07689F;
+  --ink-soft: #FF7E67;
+  --ink-muted: #FF7E67;
+  --on-ink: #FAFAFA;
+  --surface-primary: #FAFAFA;
+  --surface-secondary: #A2D5F2;
+  --surface-tertiary: #A2D5F2;
+  --accent-bg: #FF7E67;
+  --accent-text: #07689F;
+  --accent-subtle-bg: #A2D5F2;
+  --border-active: #FF7E67;
+  --shadow-brutal-accent: 4px 4px 0 0 #FF7E67;
 }
 
 /* ------------------------------------------------------------
-   Research phase badge colors, derived per palette
-   Each palette's own swatch colors (palette.ts colors[1..3]) drive the
-   Gather / Retrieval / Clustering badges so the dashboard follows the active
-   palette. fg is picked (black/white) for >= 4.5:1 on each bg. Shared across
-   light and dark since the swatches are fixed per palette.
-   dark-teal (the default) uses the base :root values above.
+   Dark-mode palette variants — same four swatches, roles INVERTED:
+     --ink / text / border = lightest swatch
+     --on-ink / surface    = darkest swatch
+   Still strictly 4-color: nothing is darkened/lightened. Must come
+   after the light blocks so they win when .dark is present. Surfaces
+   are also overridden here so the palette's own dark swatch is used as
+   the background instead of the neutral fallback.
    ------------------------------------------------------------ */
-[data-palette="pastel-mint"],
-[data-palette="pastel-mint"].dark {
-  --phase-gather-bg: #CFECF3;
-  --phase-gather-fg: #0A0A0A;
-  --phase-retrieval-bg: #DAF9DE;
-  --phase-retrieval-fg: #0A0A0A;
-  --phase-clustering-bg: #F6FFDC;
-  --phase-clustering-fg: #0A0A0A;
+[data-palette="dark-teal"].dark {
+  --ink: #EEEEEE;
+  --ink-soft: #00ADB5;
+  --ink-muted: #00ADB5;
+  --on-ink: #222831;
+  --surface-primary: #222831;
+  --surface-secondary: #393E46;
+  --surface-tertiary: #393E46;
+  --accent-bg: #00ADB5;
+  --accent-text: #222831;
+  --accent-subtle-bg: #393E46;
+  --border-active: #00ADB5;
+  --shadow-brutal-accent: 4px 4px 0 0 #00ADB5;
 }
-[data-palette="pop-blue"],
-[data-palette="pop-blue"].dark {
-  --phase-gather-bg: #F9F6C4;
-  --phase-gather-fg: #0A0A0A;
-  --phase-retrieval-bg: #89D4FF;
-  --phase-retrieval-fg: #0A0A0A;
-  --phase-clustering-bg: #44ACFF;
-  --phase-clustering-fg: #0A0A0A;
+[data-palette="sunset"].dark {
+  --ink: #FCBF49;
+  --ink-soft: #F77F00;
+  --ink-muted: #F77F00;
+  --on-ink: #003049;
+  --surface-primary: #003049;
+  --surface-secondary: #D62828;
+  --surface-tertiary: #D62828;
+  --accent-bg: #F77F00;
+  --accent-text: #003049;
+  --accent-subtle-bg: #D62828;
+  --border-active: #F77F00;
+  --shadow-brutal-accent: 4px 4px 0 0 #F77F00;
 }
-[data-palette="forest"],
-[data-palette="forest"].dark {
-  --phase-gather-bg: #285A48;
+[data-palette="coral"].dark {
+  --ink: #FFF6F6;
+  --ink-soft: #8CC7C4;
+  --ink-muted: #8CC7C4;
+  --on-ink: #2C687B;
+  --surface-primary: #2C687B;
+  --surface-secondary: #DB1A1A;
+  --surface-tertiary: #DB1A1A;
+  --accent-bg: #DB1A1A;
+  --accent-text: #FFF6F6;
+  --accent-subtle-bg: #8CC7C4;
+  --border-active: #DB1A1A;
+  --shadow-brutal-accent: 4px 4px 0 0 #DB1A1A;
+}
+[data-palette="aqua-sky"].dark {
+  --ink: #F7EEDD;
+  --ink-soft: #ACE2E1;
+  --ink-muted: #ACE2E1;
+  --on-ink: #008DDA;
+  --surface-primary: #008DDA;
+  --surface-secondary: #41C9E2;
+  --surface-tertiary: #41C9E2;
+  --accent-bg: #F7EEDD;
+  --accent-text: #008DDA;
+  --accent-subtle-bg: #41C9E2;
+  --border-active: #F7EEDD;
+  --shadow-brutal-accent: 4px 4px 0 0 #F7EEDD;
+}
+[data-palette="vivid-pop"].dark {
+  --ink: #F6F7D7;
+  --ink-soft: #3EC1D3;
+  --ink-muted: #3EC1D3;
+  --on-ink: #FF165D;
+  --surface-primary: #FF165D;
+  --surface-secondary: #FF9A00;
+  --surface-tertiary: #FF9A00;
+  --accent-bg: #F6F7D7;
+  --accent-text: #FF165D;
+  --accent-subtle-bg: #3EC1D3;
+  --border-active: #F6F7D7;
+  --shadow-brutal-accent: 4px 4px 0 0 #F6F7D7;
+}
+[data-palette="mono-red"].dark {
+  --ink: #EDEDED;
+  --ink-soft: #444444;
+  --ink-muted: #444444;
+  --on-ink: #171717;
+  --surface-primary: #171717;
+  --surface-secondary: #444444;
+  --surface-tertiary: #444444;
+  --accent-bg: #DA0037;
+  --accent-text: #EDEDED;
+  --accent-subtle-bg: #444444;
+  --border-active: #DA0037;
+  --shadow-brutal-accent: 4px 4px 0 0 #DA0037;
+}
+[data-palette="espresso"].dark {
+  --ink: #E1DCC9;
+  --ink-soft: #412D15;
+  --ink-muted: #412D15;
+  --on-ink: #000000;
+  --surface-primary: #000000;
+  --surface-secondary: #1F150C;
+  --surface-tertiary: #1F150C;
+  --accent-bg: #412D15;
+  --accent-text: #E1DCC9;
+  --accent-subtle-bg: #1F150C;
+  --border-active: #412D15;
+  --shadow-brutal-accent: 4px 4px 0 0 #412D15;
+}
+[data-palette="ocean-coral"].dark {
+  --ink: #FAFAFA;
+  --ink-soft: #A2D5F2;
+  --ink-muted: #A2D5F2;
+  --on-ink: #07689F;
+  --surface-primary: #07689F;
+  --surface-secondary: #FF7E67;
+  --surface-tertiary: #FF7E67;
+  --accent-bg: #FF7E67;
+  --accent-text: #07689F;
+  --accent-subtle-bg: #A2D5F2;
+  --border-active: #FF7E67;
+  --shadow-brutal-accent: 4px 4px 0 0 #FF7E67;
+}
+
+/* ============================================================
+   Research phase badge colors (gather / retrieval / clustering)
+   Each palette maps its three non-darkest swatches to the three
+   phases; the badge foreground is black/white chosen for >=4.5:1 on
+   the swatch. Applied in both light and dark (badges keep the same
+   swatch identity regardless of mode). Consumed by domain-card.tsx.
+   ============================================================ */
+[data-palette="dark-teal"],
+[data-palette="dark-teal"].dark {
+  --phase-gather-bg: #393E46;
   --phase-gather-fg: #FAFAFA;
-  --phase-retrieval-bg: #408A71;
+  --phase-retrieval-bg: #00ADB5;
   --phase-retrieval-fg: #0A0A0A;
-  --phase-clustering-bg: #B0E4CC;
+  --phase-clustering-bg: #EEEEEE;
   --phase-clustering-fg: #0A0A0A;
 }
 [data-palette="sunset"],
@@ -320,12 +514,57 @@
 }
 [data-palette="coral"],
 [data-palette="coral"].dark {
-  --phase-gather-bg: #FFF6F6;
-  --phase-gather-fg: #0A0A0A;
+  --phase-gather-bg: #DB1A1A;
+  --phase-gather-fg: #FAFAFA;
   --phase-retrieval-bg: #8CC7C4;
   --phase-retrieval-fg: #0A0A0A;
-  --phase-clustering-bg: #2C687B;
-  --phase-clustering-fg: #FAFAFA;
+  --phase-clustering-bg: #FFF6F6;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="aqua-sky"],
+[data-palette="aqua-sky"].dark {
+  --phase-gather-bg: #41C9E2;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #ACE2E1;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F7EEDD;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="vivid-pop"],
+[data-palette="vivid-pop"].dark {
+  --phase-gather-bg: #3EC1D3;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #FF9A00;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F6F7D7;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="mono-red"],
+[data-palette="mono-red"].dark {
+  --phase-gather-bg: #444444;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #DA0037;
+  --phase-retrieval-fg: #FAFAFA;
+  --phase-clustering-bg: #EDEDED;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="espresso"],
+[data-palette="espresso"].dark {
+  --phase-gather-bg: #1F150C;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #412D15;
+  --phase-retrieval-fg: #FAFAFA;
+  --phase-clustering-bg: #E1DCC9;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="ocean-coral"],
+[data-palette="ocean-coral"].dark {
+  --phase-gather-bg: #FF7E67;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #A2D5F2;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FAFAFA;
+  --phase-clustering-fg: #0A0A0A;
 }
 
 /* ============================================================

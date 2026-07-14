@@ -15,8 +15,16 @@ export const metadata: Metadata = {
 
 // The sticky header is #0A0A0A in both themes, so the browser UI (mobile
 // address bar) matches it regardless of light/dark.
+// Pinch-to-zoom is explicitly enabled (userScalable + a generous maximumScale)
+// so users on small screens can enlarge text and content. This is also an
+// accessibility requirement (WCAG 1.4.4) — never disable zoom.
 export const viewport: Viewport = {
   themeColor: "#0A0A0A",
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

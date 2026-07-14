@@ -451,10 +451,12 @@ body {
   font-family: var(--font-mono);
 }
 /* Keep scroll momentum inside drawers/sidebars from chaining to the page and
-   triggering pull-to-refresh / rubber-banding on touch devices. */
+   triggering pull-to-refresh / rubber-banding on touch devices.
+   Note: no `touch-action: manipulation` here — it would disable pinch-zoom
+   inside these scroll regions. overscroll-behavior alone stops scroll chaining
+   while leaving the browser's native pinch-to-zoom fully available. */
 .scroll-contain {
   overscroll-behavior: contain;
-  touch-action: manipulation;
 }
 .brutal-invert {
   background: var(--text-primary);

@@ -28,6 +28,16 @@ output "amplify_custom_domain_url" {
   value       = module.amplify.custom_domain_url
 }
 
+output "notes_table_name" {
+  description = "DynamoDB table name for personal notes"
+  value       = module.notes.table_name
+}
+
+output "amplify_compute_role_arn" {
+  description = "IAM role ARN assumed by the Amplify SSR runtime for DynamoDB access"
+  value       = module.notes.compute_role_arn
+}
+
 output "e2e_test_user_secret_arn" {
   description = "ARN of the Secrets Manager entry holding E2E test user credentials (empty when disabled)"
   value       = module.secrets.e2e_test_user_secret_arn

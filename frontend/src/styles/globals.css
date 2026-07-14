@@ -62,14 +62,28 @@
   --text-link: var(--ink);
   --text-accent: var(--ink);
 
-  /* --- Accent (Electric Yellow) --- */
-  --accent-bg: #E6FF3D;
+  /* --- Accent (dark-teal default: matches the palette swatch #00ADB5) --- */
+  --accent-bg: #00ADB5;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #F5FFB8;
+  --accent-subtle-bg: #D6F5F6;
+  --accent-raw: #00ADB5;
 
   /* --- Error --- */
   --error-bg: #FF3D3D;
   --error-text: #FAFAFA;
+
+  /* --- Research phase accents ---
+     Gather / Retrieval / Clustering badge colors. These are DERIVED from the
+     active color palette (see the [data-palette] blocks below), so switching
+     palette recolors the badges. The values here are the default (dark-teal)
+     fallback used before a [data-palette] attribute is applied. All *-fg pairs
+     are verified >= 4.5:1 on their *-bg. */
+  --phase-gather-bg: #393E46;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #00ADB5;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #EEEEEE;
+  --phase-clustering-fg: #0A0A0A;
 
   /* --- Code ---
      The code surface used to be a fixed near-black (#09090B). It now
@@ -160,9 +174,10 @@
   --text-link: var(--ink);
   --text-accent: var(--ink);
 
-  --accent-bg: #E6FF3D;
+  --accent-bg: #00ADB5;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: var(--surface-secondary);
+  --accent-subtle-bg: #08302F;
+  --accent-raw: #00ADB5;
 
   /* Code surface = the palette's dark swatch, foreground = light swatch. */
   --code-bg: var(--on-ink);
@@ -473,6 +488,86 @@
 }
 
 /* ============================================================
+   Research phase badge colors (gather / retrieval / clustering)
+   Each palette maps its three non-darkest swatches to the three
+   phases; the badge foreground is black/white chosen for >=4.5:1 on
+   the swatch. Applied in both light and dark (badges keep the same
+   swatch identity regardless of mode). Consumed by domain-card.tsx.
+   ============================================================ */
+[data-palette="dark-teal"],
+[data-palette="dark-teal"].dark {
+  --phase-gather-bg: #393E46;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #00ADB5;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #EEEEEE;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="sunset"],
+[data-palette="sunset"].dark {
+  --phase-gather-bg: #D62828;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #F77F00;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FCBF49;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="coral"],
+[data-palette="coral"].dark {
+  --phase-gather-bg: #DB1A1A;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #8CC7C4;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FFF6F6;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="aqua-sky"],
+[data-palette="aqua-sky"].dark {
+  --phase-gather-bg: #41C9E2;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #ACE2E1;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F7EEDD;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="vivid-pop"],
+[data-palette="vivid-pop"].dark {
+  --phase-gather-bg: #3EC1D3;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #FF9A00;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F6F7D7;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="mono-red"],
+[data-palette="mono-red"].dark {
+  --phase-gather-bg: #444444;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #DA0037;
+  --phase-retrieval-fg: #FAFAFA;
+  --phase-clustering-bg: #EDEDED;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="espresso"],
+[data-palette="espresso"].dark {
+  --phase-gather-bg: #1F150C;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #412D15;
+  --phase-retrieval-fg: #FAFAFA;
+  --phase-clustering-bg: #E1DCC9;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="ocean-coral"],
+[data-palette="ocean-coral"].dark {
+  --phase-gather-bg: #FF7E67;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #A2D5F2;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FAFAFA;
+  --phase-clustering-fg: #0A0A0A;
+}
+
+/* ============================================================
    Base Typography
    ============================================================ */
 html {
@@ -492,6 +587,21 @@ body {
   letter-spacing: 0;
   color: var(--text-primary);
   background: var(--surface-primary);
+}
+
+/* Prevent horizontal page scroll. Without this, any element wider than the
+   viewport (a long URL, a wide table escaping its wrapper) makes the whole page
+   scrollable sideways; the sticky header only spans the viewport, so scrolling
+   right exposes background to its side and the header appears to "shift".
+   The clamp is on <html> (the viewport scroll container) so <body> keeps
+   overflow:visible and the sticky header is not turned into a scroll context.
+   overscroll-behavior-x:none also kills the horizontal rubber-band on touch. */
+html {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+body {
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -580,10 +690,12 @@ body {
   font-family: var(--font-mono);
 }
 /* Keep scroll momentum inside drawers/sidebars from chaining to the page and
-   triggering pull-to-refresh / rubber-banding on touch devices. */
+   triggering pull-to-refresh / rubber-banding on touch devices.
+   Note: no `touch-action: manipulation` here — it would disable pinch-zoom
+   inside these scroll regions. overscroll-behavior alone stops scroll chaining
+   while leaving the browser's native pinch-to-zoom fully available. */
 .scroll-contain {
   overscroll-behavior: contain;
-  touch-action: manipulation;
 }
 .brutal-invert {
   background: var(--text-primary);
@@ -603,6 +715,9 @@ body {
      the left with a large empty gutter on the right; the sidebar + ToC columns
      already frame the content, so let prose fill the remaining space. */
   max-width: none;
+  /* Wrap long unbreakable strings (URLs, IDs, code spans) instead of letting
+     them push the content wider than the viewport on mobile. */
+  overflow-wrap: break-word;
   --tw-prose-body: var(--text-primary);
   --tw-prose-headings: var(--text-primary);
   --tw-prose-links: var(--text-primary);

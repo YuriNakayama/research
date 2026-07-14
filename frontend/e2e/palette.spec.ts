@@ -7,11 +7,13 @@ test.describe("Palette selector", () => {
     await expect(button).toBeVisible();
     await button.click();
     await expect(page.getByText("Dark Teal")).toBeVisible();
-    await expect(page.getByText("Pastel Mint")).toBeVisible();
-    await expect(page.getByText("Pop Blue")).toBeVisible();
-    await expect(page.getByText("Forest")).toBeVisible();
     await expect(page.getByText("Sunset")).toBeVisible();
     await expect(page.getByText("Coral")).toBeVisible();
+    await expect(page.getByText("Aqua Sky")).toBeVisible();
+    await expect(page.getByText("Vivid Pop")).toBeVisible();
+    await expect(page.getByText("Mono Red")).toBeVisible();
+    await expect(page.getByText("Espresso")).toBeVisible();
+    await expect(page.getByText("Ocean Coral")).toBeVisible();
   });
 
   test("switches palette and applies data attribute", async ({ page }) => {
@@ -19,10 +21,10 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Pastel Mint").click();
+    await page.getByText("Sunset").click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "pastel-mint"
+      "sunset"
     );
   });
 
@@ -31,18 +33,19 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Forest").click();
+    await page.getByText("Espresso").click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "forest"
+      "espresso"
     );
-    // Navigate to another page (match by href since cards include extra labels)
-    await page.locator('main a[href="/research/_e2e_fixture"]').first().click();
+    // Navigate to another page. The root is now a domain dashboard that does
+    // not list _e2e_fixture, so go to the deterministic fixture report directly.
+    await page.goto("/research/_e2e_fixture");
     await expect(page).toHaveURL("/research/_e2e_fixture");
     // Palette should persist
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "forest"
+      "espresso"
     );
   });
 
@@ -52,29 +55,32 @@ test.describe("Palette selector", () => {
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await expect(page.getByText("Dark Teal")).toBeVisible();
+    await expect(page.getByText("Ocean Coral")).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByText("Pastel Mint")).not.toBeVisible();
+    await expect(page.getByText("Ocean Coral")).not.toBeVisible();
   });
 
-  test("switching back to default removes data attribute", async ({
-    page,
-  }) => {
+  test("default palette also sets the data attribute", async ({ page }) => {
     await page.goto("/research");
-    // Switch to non-default
+    // Switch to a non-default palette first
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
-    await page.getByText("Pop Blue").click();
+    await page.getByText("Coral").click();
     await expect(page.locator("html")).toHaveAttribute(
       "data-palette",
-      "pop-blue"
+      "coral"
     );
-    // Switch back to default
+    // Switch back to the default (Dark Teal). Every palette — including the
+    // default — now carries its own full scheme via data-palette, so the
+    // attribute must be present (not removed).
     await page
       .getByRole("button", { name: "カラーパレット切替" })
       .click();
     await page.getByText("Dark Teal").click();
-    await expect(page.locator("html")).not.toHaveAttribute("data-palette");
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-palette",
+      "dark-teal"
+    );
   });
 });

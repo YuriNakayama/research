@@ -13,6 +13,10 @@ resource "aws_amplify_app" "main" {
 
   iam_service_role_arn = aws_iam_role.amplify.arn
 
+  # IAM role assumed by the SSR (WEB_COMPUTE) runtime for DynamoDB access.
+  # Distinct from iam_service_role_arn (build/deploy). Empty => unset.
+  compute_role_arn = var.compute_role_arn != "" ? var.compute_role_arn : null
+
   build_spec = <<-YAML
     version: 1
     applications:
@@ -45,6 +49,7 @@ resource "aws_amplify_app" "main" {
     NEXT_PUBLIC_COGNITO_USER_POOL_ID  = var.cognito_user_pool_id
     NEXT_PUBLIC_COGNITO_APP_CLIENT_ID = var.cognito_app_client_id
     AMPLIFY_MONOREPO_APP_ROOT         = "frontend"
+    NOTES_TABLE_NAME                  = var.notes_table_name
   }
 
   tags = {

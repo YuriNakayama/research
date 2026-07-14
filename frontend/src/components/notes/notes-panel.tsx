@@ -146,27 +146,31 @@ export function NotesPanel({ slug }: NotesPanelProps) {
           }}
           className="fixed z-40 flex flex-col overflow-hidden brutal-border-strong brutal-shadow bg-[var(--surface-elevated)]"
         >
-          {/* Header doubles as the drag handle. */}
-          <div
-            {...handleProps}
-            className={cn(
-              "flex touch-none items-center justify-between brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)] px-3 py-2",
-              dragging ? "cursor-grabbing" : "cursor-grab",
-            )}
-          >
-            <span className="brutal-label flex items-center gap-1.5 text-[var(--text-inverse)]">
-              <GripVertical
-                className="h-3.5 w-3.5 opacity-70"
-                aria-hidden
-              />
-              <StickyNote className="h-3.5 w-3.5" aria-hidden />
-              個人メモ
-            </span>
+          {/* Header: the title area is the drag handle; the close button is a
+              sibling OUTSIDE the drag zone so its pointer events are never
+              swallowed by the drag-start handler. */}
+          <div className="flex items-stretch justify-between brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)]">
+            <div
+              {...handleProps}
+              className={cn(
+                "flex min-w-0 flex-1 touch-none items-center gap-1.5 px-3 py-2",
+                dragging ? "cursor-grabbing" : "cursor-grab",
+              )}
+            >
+              <span className="brutal-label flex items-center gap-1.5 text-[var(--text-inverse)]">
+                <GripVertical
+                  className="h-3.5 w-3.5 opacity-70"
+                  aria-hidden
+                />
+                <StickyNote className="h-3.5 w-3.5" aria-hidden />
+                個人メモ
+              </span>
+            </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="個人メモを閉じる"
-              className="flex h-6 w-6 items-center justify-center text-[var(--text-inverse)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
+              className="flex w-10 shrink-0 items-center justify-center text-[var(--text-inverse)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
             >
               <X className="h-4 w-4" strokeWidth={2.5} aria-hidden />
             </button>

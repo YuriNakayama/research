@@ -11,6 +11,7 @@ import { CodeBlock } from "./code-block";
 import { MermaidBlock } from "./mermaid-block";
 import { ImageWithCaption } from "./image-with-caption";
 import { ResizableTable } from "./resizable-table";
+import { createSlugger } from "@/lib/toc";
 
 type MarkdownRendererProps = {
   content: string;
@@ -136,7 +137,34 @@ export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
   // rendered tables).
   const components = useMemo(() => {
     const tableKeyPrefix = basePath ?? "doc";
+    // One slugger per rendered document so heading ids match the TOC's ids
+    // (both derive from lib/toc's slugify) and repeated headings disambiguate
+    // identically. Enables the `href="#id"` anchor jumps from the TOC.
+    const slugger = createSlugger();
+
+    const makeHeading = (Tag: "h2" | "h3" | "h4" | "h5" | "h6") => {
+      const Heading = ({
+        children,
+        ...props
+      }: ComponentPropsWithoutRef<"h2">) => {
+        const id = slugger(extractTextFromChildren(children));
+        // scroll-mt keeps the target clear of the sticky header when jumped to.
+        return (
+          <Tag id={id} className="scroll-mt-24" {...props}>
+            {children}
+          </Tag>
+        );
+      };
+      Heading.displayName = `Heading(${Tag})`;
+      return Heading;
+    };
+
     return {
+      h2: makeHeading("h2"),
+      h3: makeHeading("h3"),
+      h4: makeHeading("h4"),
+      h5: makeHeading("h5"),
+      h6: makeHeading("h6"),
       pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => {
           // Check if this is a mermaid code block
           const mermaidCode = isMermaidCodeBlock(children);

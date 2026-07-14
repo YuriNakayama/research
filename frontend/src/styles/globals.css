@@ -50,15 +50,28 @@
   --text-link: #0A0A0A;
   --text-accent: #0A0A0A;
 
-  /* --- Accent (Electric Yellow) --- */
-  --accent-bg: #E6FF3D;
+  /* --- Accent (dark-teal default: matches the palette swatch #00ADB5) --- */
+  --accent-bg: #00ADB5;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #F5FFB8;
-  --accent-raw: #E6FF3D;
+  --accent-subtle-bg: #D6F5F6;
+  --accent-raw: #00ADB5;
 
   /* --- Error --- */
   --error-bg: #FF3D3D;
   --error-text: #FAFAFA;
+
+  /* --- Research phase accents ---
+     Gather / Retrieval / Clustering badge colors. These are DERIVED from the
+     active color palette (see the [data-palette] blocks below), so switching
+     palette recolors the badges. The values here are the default (dark-teal)
+     fallback used before a [data-palette] attribute is applied. All *-fg pairs
+     are verified >= 4.5:1 on their *-bg. */
+  --phase-gather-bg: #393E46;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #00ADB5;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #EEEEEE;
+  --phase-clustering-fg: #0A0A0A;
 
   /* --- Code ---
      Brutalist mono + single accent. Dark surface is intentional in
@@ -136,9 +149,10 @@
   --text-link: #FAFAFA;
   --text-accent: #FAFAFA;
 
-  --accent-bg: #E6FF3D;
+  --accent-bg: #00ADB5;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #2A3000;
+  --accent-subtle-bg: #08302F;
+  --accent-raw: #00ADB5;
 
   --code-bg: #09090B;
   --code-fg: #FAFAFA;
@@ -166,96 +180,152 @@
    ============================================================ */
 
 /* Pastel Mint → Mint Green accent */
-[data-palette="pastel-mint"] {
-  --accent-bg: #3CFFB0;
+/* Each accent below is taken from the palette's own swatch (palette.ts
+   colors[]) so the applied accent matches what the palette selector shows.
+   accent-text is black/white chosen for >= 4.5:1 on the accent. */
+
+/* Pastel Mint → swatch pink #F9B2D7 */
+[data-palette="pastel-mint"],
+[data-palette="pastel-mint"].dark {
+  --accent-bg: #F9B2D7;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #D8FFEC;
-  --sidebar-active-bg: #3CFFB0;
-  --border-active: #3CFFB0;
-  --shadow-brutal-accent: 4px 4px 0 0 #3CFFB0;
+  --accent-raw: #F9B2D7;
+  --sidebar-active-bg: #F9B2D7;
+  --sidebar-active-text: #0A0A0A;
+  --border-active: #F9B2D7;
+  --shadow-brutal-accent: 4px 4px 0 0 #F9B2D7;
+}
+[data-palette="pastel-mint"] {
+  --accent-subtle-bg: #FEE9F4;
 }
 [data-palette="pastel-mint"].dark {
-  --accent-bg: #3CFFB0;
-  --accent-text: #0A0A0A;
-  --accent-subtle-bg: #0A2A1C;
-  --sidebar-active-bg: #3CFFB0;
-  --border-active: #3CFFB0;
+  --accent-subtle-bg: #2A101F;
 }
 
-/* Pop Blue → Electric Blue accent */
+/* Pop Blue → swatch blue #44ACFF */
+[data-palette="pop-blue"],
+[data-palette="pop-blue"].dark {
+  --accent-bg: #44ACFF;
+  --accent-text: #0A0A0A;
+  --accent-raw: #44ACFF;
+  --sidebar-active-bg: #44ACFF;
+  --sidebar-active-text: #0A0A0A;
+  --border-active: #44ACFF;
+  --shadow-brutal-accent: 4px 4px 0 0 #44ACFF;
+}
 [data-palette="pop-blue"] {
-  --accent-bg: #2E5BFF;
-  --accent-text: #FAFAFA;
-  --accent-subtle-bg: #D8E2FF;
-  --sidebar-active-bg: #2E5BFF;
-  --sidebar-active-text: #FAFAFA;
-  --border-active: #2E5BFF;
-  --shadow-brutal-accent: 4px 4px 0 0 #2E5BFF;
+  --accent-subtle-bg: #D8ECFF;
 }
 [data-palette="pop-blue"].dark {
-  --accent-bg: #2E5BFF;
-  --accent-text: #FAFAFA;
-  --accent-subtle-bg: #0A1230;
-  --sidebar-active-bg: #2E5BFF;
-  --sidebar-active-text: #FAFAFA;
-  --border-active: #2E5BFF;
+  --accent-subtle-bg: #0A1E30;
 }
 
-/* Forest → Deep Green accent */
-[data-palette="forest"] {
-  --accent-bg: #00B84D;
+/* Forest → swatch green #408A71 */
+[data-palette="forest"],
+[data-palette="forest"].dark {
+  --accent-bg: #408A71;
   --accent-text: #FAFAFA;
-  --accent-subtle-bg: #D0F5DC;
-  --sidebar-active-bg: #00B84D;
+  --accent-raw: #408A71;
+  --sidebar-active-bg: #408A71;
   --sidebar-active-text: #FAFAFA;
-  --border-active: #00B84D;
-  --shadow-brutal-accent: 4px 4px 0 0 #00B84D;
+  --border-active: #408A71;
+  --shadow-brutal-accent: 4px 4px 0 0 #408A71;
+}
+[data-palette="forest"] {
+  --accent-subtle-bg: #DDF0E8;
 }
 [data-palette="forest"].dark {
-  --accent-bg: #00E860;
-  --accent-text: #0A0A0A;
-  --accent-subtle-bg: #002A12;
-  --sidebar-active-bg: #00E860;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #00E860;
+  --accent-subtle-bg: #0C2019;
 }
 
-/* Sunset → Orange accent */
+/* Sunset → swatch orange #F77F00 */
+[data-palette="sunset"],
+[data-palette="sunset"].dark {
+  --accent-bg: #F77F00;
+  --accent-text: #0A0A0A;
+  --accent-raw: #F77F00;
+  --sidebar-active-bg: #F77F00;
+  --sidebar-active-text: #0A0A0A;
+  --border-active: #F77F00;
+  --shadow-brutal-accent: 4px 4px 0 0 #F77F00;
+}
 [data-palette="sunset"] {
-  --accent-bg: #FF6B00;
-  --accent-text: #FAFAFA;
-  --accent-subtle-bg: #FFE0C8;
-  --sidebar-active-bg: #FF6B00;
-  --sidebar-active-text: #FAFAFA;
-  --border-active: #FF6B00;
-  --shadow-brutal-accent: 4px 4px 0 0 #FF6B00;
+  --accent-subtle-bg: #FFE7CC;
 }
 [data-palette="sunset"].dark {
-  --accent-bg: #FF8C1A;
-  --accent-text: #0A0A0A;
-  --accent-subtle-bg: #2A1400;
-  --sidebar-active-bg: #FF8C1A;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #FF8C1A;
+  --accent-subtle-bg: #2A1600;
 }
 
-/* Coral → Hot Pink accent */
-[data-palette="coral"] {
-  --accent-bg: #FF006E;
+/* Coral → swatch red #DB1A1A */
+[data-palette="coral"],
+[data-palette="coral"].dark {
+  --accent-bg: #DB1A1A;
   --accent-text: #FAFAFA;
-  --accent-subtle-bg: #FFD8E8;
-  --sidebar-active-bg: #FF006E;
+  --accent-raw: #DB1A1A;
+  --sidebar-active-bg: #DB1A1A;
   --sidebar-active-text: #FAFAFA;
-  --border-active: #FF006E;
-  --shadow-brutal-accent: 4px 4px 0 0 #FF006E;
+  --border-active: #DB1A1A;
+  --shadow-brutal-accent: 4px 4px 0 0 #DB1A1A;
+}
+[data-palette="coral"] {
+  --accent-subtle-bg: #FBDADA;
 }
 [data-palette="coral"].dark {
-  --accent-bg: #FF3D8A;
-  --accent-text: #FAFAFA;
-  --accent-subtle-bg: #2A001A;
-  --sidebar-active-bg: #FF3D8A;
-  --sidebar-active-text: #FAFAFA;
-  --border-active: #FF3D8A;
+  --accent-subtle-bg: #2A0A0A;
+}
+
+/* ------------------------------------------------------------
+   Research phase badge colors, derived per palette
+   Each palette's own swatch colors (palette.ts colors[1..3]) drive the
+   Gather / Retrieval / Clustering badges so the dashboard follows the active
+   palette. fg is picked (black/white) for >= 4.5:1 on each bg. Shared across
+   light and dark since the swatches are fixed per palette.
+   dark-teal (the default) uses the base :root values above.
+   ------------------------------------------------------------ */
+[data-palette="pastel-mint"],
+[data-palette="pastel-mint"].dark {
+  --phase-gather-bg: #CFECF3;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #DAF9DE;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F6FFDC;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="pop-blue"],
+[data-palette="pop-blue"].dark {
+  --phase-gather-bg: #F9F6C4;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #89D4FF;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #44ACFF;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="forest"],
+[data-palette="forest"].dark {
+  --phase-gather-bg: #285A48;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #408A71;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #B0E4CC;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="sunset"],
+[data-palette="sunset"].dark {
+  --phase-gather-bg: #D62828;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #F77F00;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FCBF49;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="coral"],
+[data-palette="coral"].dark {
+  --phase-gather-bg: #FFF6F6;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #8CC7C4;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #2C687B;
+  --phase-clustering-fg: #FAFAFA;
 }
 
 /* ============================================================
@@ -278,6 +348,21 @@ body {
   letter-spacing: 0;
   color: var(--text-primary);
   background: var(--surface-primary);
+}
+
+/* Prevent horizontal page scroll. Without this, any element wider than the
+   viewport (a long URL, a wide table escaping its wrapper) makes the whole page
+   scrollable sideways; the sticky header only spans the viewport, so scrolling
+   right exposes background to its side and the header appears to "shift".
+   The clamp is on <html> (the viewport scroll container) so <body> keeps
+   overflow:visible and the sticky header is not turned into a scroll context.
+   overscroll-behavior-x:none also kills the horizontal rubber-band on touch. */
+html {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+body {
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -366,10 +451,12 @@ body {
   font-family: var(--font-mono);
 }
 /* Keep scroll momentum inside drawers/sidebars from chaining to the page and
-   triggering pull-to-refresh / rubber-banding on touch devices. */
+   triggering pull-to-refresh / rubber-banding on touch devices.
+   Note: no `touch-action: manipulation` here — it would disable pinch-zoom
+   inside these scroll regions. overscroll-behavior alone stops scroll chaining
+   while leaving the browser's native pinch-to-zoom fully available. */
 .scroll-contain {
   overscroll-behavior: contain;
-  touch-action: manipulation;
 }
 .brutal-invert {
   background: var(--text-primary);
@@ -389,6 +476,9 @@ body {
      the left with a large empty gutter on the right; the sidebar + ToC columns
      already frame the content, so let prose fill the remaining space. */
   max-width: none;
+  /* Wrap long unbreakable strings (URLs, IDs, code spans) instead of letting
+     them push the content wider than the viewport on mobile. */
+  overflow-wrap: break-word;
   --tw-prose-body: var(--text-primary);
   --tw-prose-headings: var(--text-primary);
   --tw-prose-links: var(--text-primary);

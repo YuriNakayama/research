@@ -36,8 +36,9 @@ test.describe("Palette selector", () => {
       "data-palette",
       "forest"
     );
-    // Navigate to another page (match by href since cards include extra labels)
-    await page.locator('main a[href="/research/_e2e_fixture"]').first().click();
+    // Navigate to another page. The root is now a domain dashboard that does
+    // not list _e2e_fixture, so go to the deterministic fixture report directly.
+    await page.goto("/research/_e2e_fixture");
     await expect(page).toHaveURL("/research/_e2e_fixture");
     // Palette should persist
     await expect(page.locator("html")).toHaveAttribute(

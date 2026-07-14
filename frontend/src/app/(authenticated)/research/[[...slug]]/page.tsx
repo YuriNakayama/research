@@ -6,11 +6,12 @@ import {
   getDirectoryEntries,
   getDocsTree,
   getBreadcrumbs,
-  getRootEntries,
 } from "@/lib/docs-content";
 import { extractTocItems } from "@/lib/toc";
+import { getDomainSummaries } from "@/lib/content-index";
 import { DocsLayout } from "@/components/docs/docs-layout";
 import { DirectoryIndex } from "@/components/docs/directory-index";
+import { DomainDashboard } from "@/components/dashboard/domain-dashboard";
 import { MarkdownRenderer } from "@/components/markdown/markdown-renderer";
 import { ReportHeader } from "@/components/report/report-header";
 import { Toc } from "@/components/report/toc";
@@ -56,14 +57,14 @@ export default async function DocsPage({ params }: PageProps) {
   const breadcrumbs = getBreadcrumbs(currentSlug);
   const currentPath = currentSlug.length > 0 ? `/research/${currentSlug.join("/")}` : "/research";
 
-  // Top page: show root directories
+  // Top page: show the domain dashboard instead of a raw directory listing.
   if (currentSlug.length === 0) {
-    const entries = getRootEntries();
+    const summaries = getDomainSummaries();
 
     return (
       <DocsLayout tree={tree} currentPath={currentPath}>
         <Breadcrumbs items={breadcrumbs} />
-        <DirectoryIndex entries={entries} parentSlug={currentSlug} />
+        <DomainDashboard summaries={summaries} />
       </DocsLayout>
     );
   }

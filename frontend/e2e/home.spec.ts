@@ -1,24 +1,29 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Home page (research root)", () => {
-  test("redirects to /research and displays document listing", async ({ page }) => {
+  test("redirects to /research and displays the dashboard", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveURL("/research");
     await expect(page.getByRole("heading", { name: "RESEARCH" })).toBeVisible();
   });
 
-  test("displays root directory entries", async ({ page }) => {
+  test("displays domain cards", async ({ page }) => {
     await page.goto("/research");
     const main = page.locator("main");
-    // Directory cards include a label like "01 / DIR" alongside the name,
-    // so match the link by href instead of accessible name.
-    await expect(main.locator('a[href="/research/runs"]')).toBeVisible();
-    await expect(main.locator('a[href="/research/_e2e_fixture"]')).toBeVisible();
+    // The root now shows a domain dashboard: each card links to
+    // /research/domains/<domain>. Assert at least one such card is present.
+    await expect(
+      main.locator('a[href^="/research/domains/"]').first(),
+    ).toBeVisible();
   });
 
-  test("navigates to directory on folder card click", async ({ page }) => {
+  test("navigates to a domain on card click", async ({ page }) => {
     await page.goto("/research");
-    await page.locator('main a[href="/research/_e2e_fixture"]').click();
-    await expect(page).toHaveURL("/research/_e2e_fixture");
+    const firstCard = page
+      .locator('main a[href^="/research/domains/"]')
+      .first();
+    const href = await firstCard.getAttribute("href");
+    await firstCard.click();
+    await expect(page).toHaveURL(href!);
   });
 });

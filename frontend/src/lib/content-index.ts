@@ -303,7 +303,14 @@ export function getDomainSummaries(): DomainSummary[] {
     });
   }
 
-  return summaries.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  // Most-recently-updated domains first so active work surfaces at the top of
+  // the dashboard; fall back to name for stable ordering when dates tie.
+  return summaries.sort((a, b) => {
+    const dateA = a.latestRunDate ?? "";
+    const dateB = b.latestRunDate ?? "";
+    if (dateA !== dateB) return dateB.localeCompare(dateA);
+    return a.displayName.localeCompare(b.displayName);
+  });
 }
 
 // List domain directories from `runs/` and `domains/` (union), so domains

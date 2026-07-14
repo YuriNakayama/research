@@ -60,6 +60,17 @@
   --error-bg: #FF3D3D;
   --error-text: #FAFAFA;
 
+  /* --- Research phase accents (Light) ---
+     Used to color-code Gather / Retrieval / Clustering badges on the
+     dashboard. All *-fg pairs verified >= 4.5:1 on their *-bg tint so the
+     count text stays AA-legible. */
+  --phase-gather-bg: #E0EDFF;
+  --phase-gather-fg: #14448C;
+  --phase-retrieval-bg: #DBF5E4;
+  --phase-retrieval-fg: #15683C;
+  --phase-clustering-bg: #F3E4FF;
+  --phase-clustering-fg: #6B21A8;
+
   /* --- Code ---
      Brutalist mono + single accent. Dark surface is intentional in
      both light and dark modes — it keeps brand identity stable and
@@ -139,6 +150,15 @@
   --accent-bg: #E6FF3D;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #2A3000;
+
+  /* --- Research phase accents (Dark) ---
+     Muted-dark tints with light fg, contrast-checked separately from Light. */
+  --phase-gather-bg: #10233F;
+  --phase-gather-fg: #8FBEFF;
+  --phase-retrieval-bg: #0E2E1E;
+  --phase-retrieval-fg: #7BE0A6;
+  --phase-clustering-bg: #2A1440;
+  --phase-clustering-fg: #D6A8FF;
 
   --code-bg: #09090B;
   --code-fg: #FAFAFA;

@@ -5,7 +5,11 @@ applications:
       phases:
         preBuild:
           commands:
-            - rm -rf ./docs && cp -r ../docs ./docs
+            # Stage the display content into frontend/research so the standalone
+            # server can read it at request time (docs-content.ts reads
+            # process.cwd()/research, and next.config.ts traces ./research/**).
+            # Without this the SSR runtime hits ENOENT on /tmp/app/research → 500.
+            - rm -rf ./research && cp -r ../research ./research
             - curl -fsSL https://bun.sh/install | bash
             - export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH"
             - bun install --frozen-lockfile

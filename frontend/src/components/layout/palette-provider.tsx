@@ -34,6 +34,8 @@ export function PaletteProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     const html = document.documentElement;
+    // The default palette uses the base :root/.dark tokens (no attribute);
+    // other palettes override via the [data-palette="..."] attribute.
     if (palette === DEFAULT_PALETTE) {
       html.removeAttribute("data-palette");
     } else {

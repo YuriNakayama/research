@@ -63,6 +63,21 @@ resource "aws_amplify_branch" "main" {
   }
 }
 
+# Non-production preview branches (feature branches). Inherit the app-level
+# environment variables (Cognito config etc.); only NODE_ENV differs.
+resource "aws_amplify_branch" "preview" {
+  for_each = toset(var.preview_branches)
+
+  app_id      = aws_amplify_app.main.id
+  branch_name = each.value
+  stage       = "DEVELOPMENT"
+  framework   = "Next.js - SSR"
+
+  environment_variables = {
+    NODE_ENV = "production"
+  }
+}
+
 # =============================================================================
 # IAM Role for Amplify
 # =============================================================================

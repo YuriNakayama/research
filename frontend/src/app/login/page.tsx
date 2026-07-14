@@ -5,6 +5,7 @@ import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { Loader } from "@/components/layout/loader";
 
 function PostLogin() {
   const router = useRouter();
@@ -12,9 +13,9 @@ function PostLogin() {
     router.replace("/");
   }, [router]);
   return (
-    <p className="brutal-label text-center text-[var(--text-tertiary)]">
-      REDIRECTING...
-    </p>
+    <div className="flex justify-center">
+      <Loader label="リダイレクト中" inline />
+    </div>
   );
 }
 
@@ -40,7 +41,10 @@ export default function LoginPage() {
         <div className="pointer-events-none absolute right-6 top-6 brutal-label text-[var(--text-tertiary)]">
           AUTH / SECURE
         </div>
-        <div className="pointer-events-none absolute bottom-6 left-6 brutal-label text-[var(--text-tertiary)]">
+        <div
+          className="pointer-events-none absolute bottom-6 left-6 brutal-label text-[var(--text-tertiary)]"
+          suppressHydrationWarning
+        >
           © {new Date().getFullYear()}
         </div>
         <div className="pointer-events-none absolute bottom-6 right-6 brutal-label text-[var(--text-tertiary)]">

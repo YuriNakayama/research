@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useId } from "react";
 import { useTheme } from "next-themes";
+import { Loader } from "@/components/layout/loader";
 
 type MermaidBlockProps = {
   code: string;
@@ -62,7 +63,11 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
 
   return (
     <div className="mermaid-container">
-      {loading && <div className="mermaid-loading">Loading diagram...</div>}
+      {loading && (
+        <div className="mermaid-loading">
+          <Loader label="ダイアグラム生成中" inline />
+        </div>
+      )}
       <div ref={containerRef} style={{ display: loading ? "none" : "block" }} />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
+import { Loader } from "@/components/layout/loader";
 
 type MermaidDiagramProps = {
   chart: string;
@@ -68,7 +69,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   if (!svg) {
     return (
       <div className="flex h-32 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-primary)] bg-[var(--surface-secondary)]">
-        <p className="text-sm text-[var(--text-tertiary)]">Loading diagram...</p>
+        <Loader label="ダイアグラム生成中" inline />
       </div>
     );
   }

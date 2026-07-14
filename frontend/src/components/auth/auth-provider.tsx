@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { configureAmplify } from "@/lib/amplify";
+import { Loader } from "@/components/layout/loader";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -12,11 +13,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-[var(--text-tertiary)]">読み込み中...</p>
-      </div>
-    );
+    return <Loader fullscreen />;
   }
 
   return <>{children}</>;

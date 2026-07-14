@@ -46,6 +46,7 @@ test.describe("Palette selector", () => {
     );
   });
 
+
   test("closes dropdown on escape key", async ({ page }) => {
     await page.goto("/research");
     await page

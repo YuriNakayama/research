@@ -23,7 +23,7 @@ export function DocsLayout({
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)]">
       {/* Sidebar - desktop */}
-      <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto brutal-border-r border-[var(--border-primary)] bg-[var(--sidebar-bg)] lg:block">
+      <aside className="scroll-contain sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto brutal-border-r border-[var(--border-primary)] bg-[var(--sidebar-bg)] lg:block">
         <div className="brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)] px-4 py-3">
           <p className="brutal-label text-[var(--text-inverse)]">
             [002] / INDEX
@@ -42,7 +42,7 @@ export function DocsLayout({
 
         {/* ToC - desktop */}
         {toc && (
-          <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto brutal-border-l border-[var(--border-primary)] bg-[var(--surface-primary)] xl:block">
+          <aside className="scroll-contain sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto brutal-border-l border-[var(--border-primary)] bg-[var(--surface-primary)] xl:block">
             <div className="brutal-border-b border-[var(--border-primary)] bg-[var(--text-primary)] px-4 py-3">
               <p className="brutal-label text-[var(--text-inverse)]">
                 [003] / TOC

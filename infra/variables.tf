@@ -47,6 +47,12 @@ variable "enable_custom_domain" {
   default     = true
 }
 
+variable "amplify_preview_branches" {
+  description = "Additional git branches to host on Amplify (feature/preview branches)"
+  type        = list(string)
+  default     = []
+}
+
 variable "create_e2e_test_user" {
   description = "Whether to create a Cognito user + Secrets Manager entry for E2E login tests"
   type        = bool

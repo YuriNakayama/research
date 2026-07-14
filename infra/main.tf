@@ -88,6 +88,7 @@ module "amplify" {
   domain_name           = var.domain_name
   subdomain_prefix      = var.subdomain_prefix
   enable_custom_domain  = var.enable_custom_domain
+  preview_branches      = var.amplify_preview_branches
 }
 
 # =============================================================================

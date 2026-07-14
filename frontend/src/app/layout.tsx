@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import "@fontsource-variable/noto-sans-jp";
 import "@fontsource-variable/jetbrains-mono";
@@ -11,6 +11,12 @@ import { PaletteProvider } from "@/components/layout/palette-provider";
 export const metadata: Metadata = {
   title: "Research Viewer",
   description: "リサーチレポート閲覧サービス",
+};
+
+// The sticky header is #0A0A0A in both themes, so the browser UI (mobile
+// address bar) matches it regardless of light/dark.
+export const viewport: Viewport = {
+  themeColor: "#0A0A0A",
 };
 
 export default function RootLayout({

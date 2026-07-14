@@ -17,3 +17,11 @@ output "custom_domain_url" {
   description = "Custom domain URL for Amplify app"
   value       = var.enable_custom_domain ? "https://${var.subdomain_prefix}.${var.domain_name}" : null
 }
+
+output "preview_branch_urls" {
+  description = "Default Amplify URLs for each preview branch"
+  value = {
+    for name, branch in aws_amplify_branch.preview :
+    name => "https://${branch.branch_name}.${aws_amplify_app.main.default_domain}"
+  }
+}

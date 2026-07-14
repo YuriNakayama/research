@@ -6,14 +6,25 @@ import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import type { ComponentPropsWithoutRef } from "react";
-import { isValidElement } from "react";
+import { isValidElement, useMemo } from "react";
 import { CodeBlock } from "./code-block";
 import { MermaidBlock } from "./mermaid-block";
 import { ImageWithCaption } from "./image-with-caption";
+import { ResizableTable } from "./resizable-table";
 
 type MarkdownRendererProps = {
   content: string;
   basePath?: string;
+};
+
+// react-markdown passes the source hast node (with position info) as `node`.
+// We only need the start line to derive a stable per-table storage key.
+type HastNode = {
+  position?: { start?: { line?: number } };
+};
+
+type TableRendererProps = ComponentPropsWithoutRef<"table"> & {
+  node?: HastNode;
 };
 
 function preprocessMathBlocks(content: string): string {
@@ -118,16 +129,15 @@ function resolveDocHref(href: string | undefined, basePath: string | undefined):
 }
 
 export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
-  return (
-    <ReactMarkdown
-      className="prose prose-sm md:prose-base lg:prose-lg dark:prose-invert max-w-none"
-      remarkPlugins={[remarkMath, remarkGfm]}
-      rehypePlugins={[
-        rehypeKatex,
-        rehypeHighlight,
-      ]}
-      components={{
-        pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => {
+  // Deterministic per-table storage keys: docs slug (basePath) + the table's
+  // source line. The source line comes from the mdast/hast node position, so it
+  // is stable across re-renders and React StrictMode's double-invocation — a
+  // render-time counter is NOT safe here (it double-counts and desyncs from the
+  // rendered tables).
+  const components = useMemo(() => {
+    const tableKeyPrefix = basePath ?? "doc";
+    return {
+      pre: ({ children, ...props }: ComponentPropsWithoutRef<"pre">) => {
           // Check if this is a mermaid code block
           const mermaidCode = isMermaidCodeBlock(children);
           if (mermaidCode) {
@@ -148,11 +158,15 @@ export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
             </CodeBlock>
           );
         },
-        table: ({ children, ...props }: ComponentPropsWithoutRef<"table">) => (
-          <div className="overflow-x-auto">
-            <table {...props}>{children}</table>
-          </div>
-        ),
+        table: ({ children, node, ...props }: TableRendererProps) => {
+          // node.position.start.line uniquely identifies this table on the page.
+          const line = node?.position?.start?.line ?? 0;
+          return (
+            <ResizableTable storageKey={`${tableKeyPrefix}@${line}`} {...props}>
+              {children}
+            </ResizableTable>
+          );
+        },
         img: ({ src, ...props }: ComponentPropsWithoutRef<"img">) => (
           <ImageWithCaption src={resolveImageSrc(typeof src === "string" ? src : undefined, basePath)} {...props} />
         ),
@@ -172,7 +186,15 @@ export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
             </code>
           );
         },
-      }}
+    };
+  }, [basePath]);
+
+  return (
+    <ReactMarkdown
+      className="prose prose-sm md:prose-base lg:prose-lg dark:prose-invert max-w-none"
+      remarkPlugins={[remarkMath, remarkGfm]}
+      rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      components={components}
     >
       {preprocessMathBlocks(content)}
     </ReactMarkdown>

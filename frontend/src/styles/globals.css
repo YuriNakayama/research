@@ -60,16 +60,18 @@
   --error-bg: #FF3D3D;
   --error-text: #FAFAFA;
 
-  /* --- Research phase accents (Light) ---
-     Used to color-code Gather / Retrieval / Clustering badges on the
-     dashboard. All *-fg pairs verified >= 4.5:1 on their *-bg tint so the
-     count text stays AA-legible. */
-  --phase-gather-bg: #E0EDFF;
-  --phase-gather-fg: #14448C;
-  --phase-retrieval-bg: #DBF5E4;
-  --phase-retrieval-fg: #15683C;
-  --phase-clustering-bg: #F3E4FF;
-  --phase-clustering-fg: #6B21A8;
+  /* --- Research phase accents ---
+     Gather / Retrieval / Clustering badge colors. These are DERIVED from the
+     active color palette (see the [data-palette] blocks below), so switching
+     palette recolors the badges. The values here are the default (dark-teal)
+     fallback used before a [data-palette] attribute is applied. All *-fg pairs
+     are verified >= 4.5:1 on their *-bg. */
+  --phase-gather-bg: #393E46;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #00ADB5;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #EEEEEE;
+  --phase-clustering-fg: #0A0A0A;
 
   /* --- Code ---
      Brutalist mono + single accent. Dark surface is intentional in
@@ -150,15 +152,6 @@
   --accent-bg: #E6FF3D;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #2A3000;
-
-  /* --- Research phase accents (Dark) ---
-     Muted-dark tints with light fg, contrast-checked separately from Light. */
-  --phase-gather-bg: #10233F;
-  --phase-gather-fg: #8FBEFF;
-  --phase-retrieval-bg: #0E2E1E;
-  --phase-retrieval-fg: #7BE0A6;
-  --phase-clustering-bg: #2A1440;
-  --phase-clustering-fg: #D6A8FF;
 
   --code-bg: #09090B;
   --code-fg: #FAFAFA;
@@ -278,6 +271,60 @@
   --border-active: #FF3D8A;
 }
 
+/* ------------------------------------------------------------
+   Research phase badge colors, derived per palette
+   Each palette's own swatch colors (palette.ts colors[1..3]) drive the
+   Gather / Retrieval / Clustering badges so the dashboard follows the active
+   palette. fg is picked (black/white) for >= 4.5:1 on each bg. Shared across
+   light and dark since the swatches are fixed per palette.
+   dark-teal (the default) uses the base :root values above.
+   ------------------------------------------------------------ */
+[data-palette="pastel-mint"],
+[data-palette="pastel-mint"].dark {
+  --phase-gather-bg: #CFECF3;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #DAF9DE;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #F6FFDC;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="pop-blue"],
+[data-palette="pop-blue"].dark {
+  --phase-gather-bg: #F9F6C4;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #89D4FF;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #44ACFF;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="forest"],
+[data-palette="forest"].dark {
+  --phase-gather-bg: #285A48;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #408A71;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #B0E4CC;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="sunset"],
+[data-palette="sunset"].dark {
+  --phase-gather-bg: #D62828;
+  --phase-gather-fg: #FAFAFA;
+  --phase-retrieval-bg: #F77F00;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #FCBF49;
+  --phase-clustering-fg: #0A0A0A;
+}
+[data-palette="coral"],
+[data-palette="coral"].dark {
+  --phase-gather-bg: #FFF6F6;
+  --phase-gather-fg: #0A0A0A;
+  --phase-retrieval-bg: #8CC7C4;
+  --phase-retrieval-fg: #0A0A0A;
+  --phase-clustering-bg: #2C687B;
+  --phase-clustering-fg: #FAFAFA;
+}
+
 /* ============================================================
    Base Typography
    ============================================================ */
@@ -298,6 +345,21 @@ body {
   letter-spacing: 0;
   color: var(--text-primary);
   background: var(--surface-primary);
+}
+
+/* Prevent horizontal page scroll. Without this, any element wider than the
+   viewport (a long URL, a wide table escaping its wrapper) makes the whole page
+   scrollable sideways; the sticky header only spans the viewport, so scrolling
+   right exposes background to its side and the header appears to "shift".
+   The clamp is on <html> (the viewport scroll container) so <body> keeps
+   overflow:visible and the sticky header is not turned into a scroll context.
+   overscroll-behavior-x:none also kills the horizontal rubber-band on touch. */
+html {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+body {
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -409,6 +471,9 @@ body {
      the left with a large empty gutter on the right; the sidebar + ToC columns
      already frame the content, so let prose fill the remaining space. */
   max-width: none;
+  /* Wrap long unbreakable strings (URLs, IDs, code spans) instead of letting
+     them push the content wider than the viewport on mobile. */
+  overflow-wrap: break-word;
   --tw-prose-body: var(--text-primary);
   --tw-prose-headings: var(--text-primary);
   --tw-prose-links: var(--text-primary);

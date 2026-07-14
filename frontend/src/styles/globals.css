@@ -37,7 +37,7 @@
   /* --- Border (heavy, mono) --- */
   --border-primary: #0A0A0A;
   --border-secondary: #0A0A0A;
-  --border-active: #00ADB5;
+  --border-active: #E6FF3D;
   --border-width: 2px;
   --border-width-strong: 3px;
   --border-width-thin: 1px;
@@ -50,19 +50,11 @@
   --text-link: #0A0A0A;
   --text-accent: #0A0A0A;
 
-  /* --- Accent (default: Dark Teal palette) ---
-     Role-token model: every palette drives 3–5 colors, not one accent.
-     - accent    : primary action / hover / active swatch  (c2 in palette.ts)
-     - accent-2  : secondary accent for ToC/blockquote/table-header rails (c0/c1)
-     - surface-tint : subtle section fill (light swatch c3 in light mode)
-     All pairings AA-verified — see palette.ts. */
-  --accent-bg: #00ADB5;            /* dark-teal c2 — 7.21:1 on black */
+  /* --- Accent (Electric Yellow) --- */
+  --accent-bg: #E6FF3D;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #D6F5F6;     /* teal tint — text-primary AA */
-  --accent-raw: #00ADB5;
-  --accent-2-bg: #222831;          /* dark-teal c0 — 14.21:1 vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #EEEEEE;         /* dark-teal c3 — 17.06:1 vs black */
+  --accent-subtle-bg: #F5FFB8;
+  --accent-raw: #E6FF3D;
 
   /* --- Error --- */
   --error-bg: #FF3D3D;
@@ -79,7 +71,7 @@
   --code-dim: #71717A;             /* zinc-500 — comments ~4.6:1 AA */
   --code-accent: var(--accent-raw);/* single brand accent (yellow) */
   --code-string: #D4D4D8;          /* zinc-300 — softer white ~12.8:1 */
-  --code-selection: rgba(0, 173, 181, 0.22);
+  --code-selection: rgba(230, 255, 61, 0.22);
   --code-header-bg: #000000;
   --code-header-text: #FAFAFA;
   --code-border: #0A0A0A;
@@ -88,7 +80,7 @@
   --sidebar-bg: #FAFAFA;
   --sidebar-text: #0A0A0A;
   --sidebar-text-secondary: #6A6A6A;
-  --sidebar-active-bg: #00ADB5;
+  --sidebar-active-bg: #E6FF3D;
   --sidebar-active-text: #0A0A0A;
   --sidebar-active-indicator: #0A0A0A;
   --sidebar-hover-bg: #F0F0F0;
@@ -135,7 +127,7 @@
 
   --border-primary: #FAFAFA;
   --border-secondary: #FAFAFA;
-  --border-active: #00C2CB;
+  --border-active: #E6FF3D;
 
   --text-primary: #FAFAFA;
   --text-secondary: #D8D8D8;
@@ -144,14 +136,9 @@
   --text-link: #FAFAFA;
   --text-accent: #FAFAFA;
 
-  /* Dark-teal defaults (dark mode). surface-tint is a DARK tint here so it
-     stays AA against white body text. */
-  --accent-bg: #00C2CB;            /* brighter teal for dark bg — AA on black */
+  --accent-bg: #E6FF3D;
   --accent-text: #0A0A0A;
-  --accent-subtle-bg: #06312E;
-  --accent-2-bg: #00ADB5;
-  --accent-2-text: #0A0A0A;
-  --surface-tint: #16232A;         /* dark teal-tinted surface, 14+:1 vs white */
+  --accent-subtle-bg: #2A3000;
 
   --code-bg: #09090B;
   --code-fg: #FAFAFA;
@@ -162,7 +149,7 @@
   --sidebar-bg: #0A0A0A;
   --sidebar-text: #FAFAFA;
   --sidebar-text-secondary: #8A8A8A;
-  --sidebar-active-bg: #00C2CB;
+  --sidebar-active-bg: #E6FF3D;
   --sidebar-active-text: #0A0A0A;
   --sidebar-active-indicator: #FAFAFA;
   --sidebar-hover-bg: #1E1E1E;
@@ -175,45 +162,14 @@
 
 /* ============================================================
    Palettes — each enforces brutalist rules (radius 0, heavy
-   borders) but drives a 3–5 color ROLE-TOKEN set derived from
-   its 4 swatches in palette.ts:
-     accent (c2-ish) · accent-2 (c0/c1) · surface-tint (light swatch)
-   surface-tint flips to a dark tint in .dark so body text stays AA.
-   All bg/text pairs verified ≥4.5:1 (AA) — see palette.ts header.
+   borders) but substitutes its own single accent color.
    ============================================================ */
 
-/* Dark Teal (DEFAULT) — mirrors :root/.dark so an explicit
-   data-palette="dark-teal" renders identically to the no-attribute base. */
-[data-palette="dark-teal"] {
-  --accent-bg: #00ADB5;
-  --accent-text: #0A0A0A;
-  --accent-subtle-bg: #D6F5F6;
-  --accent-2-bg: #222831;
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #EEEEEE;
-  --sidebar-active-bg: #00ADB5;
-  --sidebar-active-text: #0A0A0A;
-  --border-active: #00ADB5;
-  --shadow-brutal-accent: 4px 4px 0 0 #00ADB5;
-}
-[data-palette="dark-teal"].dark {
-  --accent-bg: #00C2CB;
-  --accent-subtle-bg: #06312E;
-  --accent-2-bg: #00ADB5;
-  --accent-2-text: #0A0A0A;
-  --surface-tint: #16232A;
-  --sidebar-active-bg: #00C2CB;
-  --border-active: #00C2CB;
-}
-
-/* Pastel Mint — accent c2 mint · accent-2 c0 pink · tint c1 sky */
+/* Pastel Mint → Mint Green accent */
 [data-palette="pastel-mint"] {
   --accent-bg: #3CFFB0;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #D8FFEC;
-  --accent-2-bg: #F9B2D7;      /* c0 — 11.67:1 vs black */
-  --accent-2-text: #0A0A0A;
-  --surface-tint: #CFECF3;     /* c1 — 15.98:1 vs black */
   --sidebar-active-bg: #3CFFB0;
   --border-active: #3CFFB0;
   --shadow-brutal-accent: 4px 4px 0 0 #3CFFB0;
@@ -222,21 +178,15 @@
   --accent-bg: #3CFFB0;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #0A2A1C;
-  --accent-2-bg: #7A3A5C;      /* muted pink, AA vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #0A2A1C;
   --sidebar-active-bg: #3CFFB0;
   --border-active: #3CFFB0;
 }
 
-/* Pop Blue — accent c3 blue · accent-2 c0 pink · tint c1 lemon */
+/* Pop Blue → Electric Blue accent */
 [data-palette="pop-blue"] {
   --accent-bg: #2E5BFF;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #D8E2FF;
-  --accent-2-bg: #FE9EC7;      /* c0 — 10.3:1 vs black */
-  --accent-2-text: #0A0A0A;
-  --surface-tint: #F9F6C4;     /* c1 — 17.92:1 vs black */
   --sidebar-active-bg: #2E5BFF;
   --sidebar-active-text: #FAFAFA;
   --border-active: #2E5BFF;
@@ -246,22 +196,16 @@
   --accent-bg: #2E5BFF;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #0A1230;
-  --accent-2-bg: #7A2E52;      /* muted pink, AA vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #0A1230;
   --sidebar-active-bg: #2E5BFF;
   --sidebar-active-text: #FAFAFA;
   --border-active: #2E5BFF;
 }
 
-/* Forest — accent green · accent-2 c1 deep green · tint c3 pale green */
+/* Forest → Deep Green accent */
 [data-palette="forest"] {
   --accent-bg: #00B84D;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #D0F5DC;
-  --accent-2-bg: #285A48;      /* c1 — 7.6:1 vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #B0E4CC;     /* c3 — 13.97:1 vs black */
   --sidebar-active-bg: #00B84D;
   --sidebar-active-text: #FAFAFA;
   --border-active: #00B84D;
@@ -271,22 +215,16 @@
   --accent-bg: #00E860;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #002A12;
-  --accent-2-bg: #285A48;
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #002A12;
   --sidebar-active-bg: #00E860;
   --sidebar-active-text: #0A0A0A;
   --border-active: #00E860;
 }
 
-/* Sunset — accent orange · accent-2 c0 navy · tint c3 amber */
+/* Sunset → Orange accent */
 [data-palette="sunset"] {
   --accent-bg: #FF6B00;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #FFE0C8;
-  --accent-2-bg: #003049;      /* c0 — 13.25:1 vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #FCBF49;     /* c3 — 11.96:1 vs black */
   --sidebar-active-bg: #FF6B00;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF6B00;
@@ -296,22 +234,16 @@
   --accent-bg: #FF8C1A;
   --accent-text: #0A0A0A;
   --accent-subtle-bg: #2A1400;
-  --accent-2-bg: #0A4E73;      /* lightened navy, AA vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #2A1400;
   --sidebar-active-bg: #FF8C1A;
   --sidebar-active-text: #0A0A0A;
   --border-active: #FF8C1A;
 }
 
-/* Coral — accent pink · accent-2 c3 teal-blue · tint c2 aqua */
+/* Coral → Hot Pink accent */
 [data-palette="coral"] {
   --accent-bg: #FF006E;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #FFD8E8;
-  --accent-2-bg: #2C687B;      /* c3 — 5.96:1 vs white */
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #8CC7C4;     /* c2 — 10.45:1 vs black */
   --sidebar-active-bg: #FF006E;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF006E;
@@ -321,9 +253,6 @@
   --accent-bg: #FF3D8A;
   --accent-text: #FAFAFA;
   --accent-subtle-bg: #2A001A;
-  --accent-2-bg: #2C687B;
-  --accent-2-text: #FAFAFA;
-  --surface-tint: #2A001A;
   --sidebar-active-bg: #FF3D8A;
   --sidebar-active-text: #FAFAFA;
   --border-active: #FF3D8A;
@@ -510,9 +439,8 @@ body {
 
 .prose blockquote {
   border-left-width: var(--border-width-strong);
-  border-left-color: var(--accent-2-bg);
   font-style: normal;
-  background: var(--surface-tint);
+  background: var(--surface-secondary);
   padding: var(--space-md) var(--space-lg);
   quotes: none;
 }
@@ -577,7 +505,7 @@ body {
 }
 .resizable-table-handle:hover::after,
 .resizable-table-handle:focus-visible::after {
-  background: var(--accent-2-bg);
+  background: var(--accent-bg);
 }
 .resizable-table-handle:focus-visible {
   outline: 2px solid var(--accent-bg);
@@ -585,22 +513,16 @@ body {
 }
 
 .prose thead {
-  background: var(--accent-2-bg);
-  color: var(--accent-2-text);
+  background: var(--text-primary);
+  color: var(--text-inverse);
 }
 .prose thead th {
-  color: var(--accent-2-text);
+  color: var(--text-inverse);
   font-family: var(--font-mono);
   text-transform: uppercase;
   font-size: 0.8em;
   letter-spacing: 0.05em;
 }
-/* Zebra rows use the subtle surface tint so the palette's light swatch
-   appears in body content, not just accents. */
-.prose tbody tr:nth-child(even) {
-  background: var(--surface-tint);
-}
-
 /* Align digits in data tables so columns of numbers line up. */
 .prose td,
 .prose th {
@@ -804,6 +726,43 @@ body {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   Unified loader (Loader component)
+   Brutalist scanning bar: a hard-edged fill sweeps across a bordered
+   track. No blur, no soft spinner. Under prefers-reduced-motion the
+   fill holds static at partial width instead of animating.
+   ============================================================ */
+.loader-bar {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 12px;
+  border: var(--border-width) solid var(--border-primary);
+  background: var(--surface-secondary);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.loader-bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: var(--accent-bg);
+  animation: loader-scan 1.1s steps(6, end) infinite;
+}
+@keyframes loader-scan {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-bar-fill {
+    animation: none;
+    left: 0;
+    width: 45%;
+  }
 }
 
 /* ============================================================

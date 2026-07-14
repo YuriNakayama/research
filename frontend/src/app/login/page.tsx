@@ -5,6 +5,7 @@ import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { Loader } from "@/components/layout/loader";
 
 function PostLogin() {
   const router = useRouter();
@@ -12,9 +13,9 @@ function PostLogin() {
     router.replace("/");
   }, [router]);
   return (
-    <p className="brutal-label text-center text-[var(--text-tertiary)]">
-      REDIRECTING...
-    </p>
+    <div className="flex justify-center">
+      <Loader label="リダイレクト中" inline />
+    </div>
   );
 }
 

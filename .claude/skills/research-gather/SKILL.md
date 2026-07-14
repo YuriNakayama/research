@@ -19,7 +19,7 @@ When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively
 | Domain Selection | すべてのクラスタ |
 | Next Action (Step 6) | 完了（自動終了） |
 
-In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path or keywords). For example: `/research-gather --auto docs/research/clustering-result.md` → input is the clustering result file.
+In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path or keywords). For example: `/research-gather --auto research/runs/<domain>/clustering/latest/index.md` → input is the clustering result file.
 
 If `$ARGUMENTS` does NOT contain `--auto`, proceed with the normal interactive workflow below.
 
@@ -387,35 +387,41 @@ AskUserQuestion:
 
 ## Output Location
 
-**MUST READ FIRST**: Before deciding the output path, read `docs/research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
+**MUST READ FIRST**: Before deciding the output path, read `research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
 
 ### Path resolution
 
 1. Identify the **domain** (`<domain>`, `snake_case`):
-   - If the input is a clustering file under `docs/research/runs/<domain>/clustering/...`, use that `<domain>`.
+   - If the input is a clustering file under `research/runs/<domain>/clustering/...`, use that `<domain>`.
    - Otherwise infer from the research theme or ask the user.
 2. Identify the **cluster** (`<cluster>`):
    - From the clustering result section being processed (cluster ID like `metalearner` / `nl2sql-nl2code`).
    - If gathering across all clusters / no cluster context, use `all`.
-3. If `docs/research/domains/<domain>/domain.yaml` defines `output_paths.gather`, use it.
-4. Otherwise use the default path:
+3. If `research/domains/<domain>/domain.yaml` defines `output_paths.gather`, use it.
+4. Otherwise use the default path — a **date directory** with a **cluster subdirectory**:
 
    ```
-   docs/research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/
+   research/runs/<domain>/gather/<YYYYMMDD>/<cluster>/
    ```
 
    - Filename: `resources-<topic-slug>.md` inside this directory.
-5. **Never write directly under `docs/research/domains/<domain>/resources/`** — that layer is symlinks.
+   - Multiple clusters gathered on the same day share one `<YYYYMMDD>/` directory, each in its own `<cluster>/` subdirectory.
+5. **Never write directly under `research/domains/<domain>/resources/`** — that layer is symlinks.
 6. **Never overwrite previous gather runs** — append-only.
 
 ### After writing
 
-Update the latest pointer:
+Update the phase-level `latest` pointer (one per phase, pointing at the newest date directory) and the `domains/` view symlink for this cluster:
 
 ```bash
-ln -snf <YYYYMMDD>_<cluster> docs/research/runs/<domain>/gather/latest_<cluster>
-ln -snf ../../../runs/<domain>/gather/latest_<cluster> docs/research/domains/<domain>/resources/<cluster>
+# phase-level latest -> newest date directory
+ln -snf <YYYYMMDD> research/runs/<domain>/gather/latest
+
+# domains/ view: point this cluster at its newest date directory
+ln -snf ../../../runs/<domain>/gather/<YYYYMMDD>/<cluster> research/domains/<domain>/resources/<cluster>
 ```
+
+There is no per-cluster `latest_<cluster>` pointer — clusters are represented as subdirectories under the date directory.
 
 ## Parallel Processing
 

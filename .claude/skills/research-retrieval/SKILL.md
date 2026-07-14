@@ -18,7 +18,7 @@ When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively
 | Additional Elements | None |
 | Next Action (Step 7) | Done (自動終了) |
 
-In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path, URLs, or keywords). For example: `/research-retrieval --auto docs/research/resources-llm.md` → input is the gather result file.
+In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path, URLs, or keywords). For example: `/research-retrieval --auto research/runs/<domain>/gather/latest/<cluster>/resources-llm.md` → input is the gather result file.
 
 If `$ARGUMENTS` does NOT contain `--auto`, proceed with the normal interactive workflow below.
 
@@ -740,35 +740,41 @@ If "Revise specific reports" is selected, present a follow-up AskUserQuestion wi
 
 ## Output Location
 
-**MUST READ FIRST**: Before deciding the output path, read `docs/research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
+**MUST READ FIRST**: Before deciding the output path, read `research/README.md` (the single source of truth for the research directory layout) and `.claude/rules/research.md`.
 
 ### Path resolution
 
 1. Identify the **domain** (`<domain>`, `snake_case`):
-   - If the input is a gather/clustering file under `docs/research/runs/<domain>/...`, use that `<domain>`.
+   - If the input is a gather/clustering file under `research/runs/<domain>/...`, use that `<domain>`.
    - Otherwise infer from context or ask the user.
 2. Identify the **cluster** (`<cluster>`):
    - From the gather file's cluster context (e.g., `metalearner`, `nl2sql-nl2code`).
    - If retrieving for a free-form URL/PDF list with no cluster context, use `all`.
-3. If `docs/research/domains/<domain>/domain.yaml` defines `output_paths.retrieval`, use it.
-4. Otherwise use the default path:
+3. If `research/domains/<domain>/domain.yaml` defines `output_paths.retrieval`, use it.
+4. Otherwise use the default path — a **date directory** with a **cluster subdirectory**:
 
    ```
-   docs/research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/
+   research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/
    ```
 
    - Place `index.md` and per-resource files (`NN-kebab-case-name.md`) inside this directory.
-5. **Never write directly under `docs/research/domains/<domain>/reports/`** — that layer is symlinks.
+   - Multiple clusters retrieved on the same day share one `<YYYYMMDD>/` directory, each in its own `<cluster>/` subdirectory.
+5. **Never write directly under `research/domains/<domain>/reports/`** — that layer is symlinks.
 6. **Never overwrite previous retrieval runs** — append-only.
 
 ### After writing
 
-Update the latest pointer:
+Update the phase-level `latest` pointer (one per phase, pointing at the newest date directory) and the `domains/` view symlink for this cluster:
 
 ```bash
-ln -snf <YYYYMMDD>_<cluster> docs/research/runs/<domain>/retrieval/latest_<cluster>
-ln -snf ../../../runs/<domain>/retrieval/latest_<cluster> docs/research/domains/<domain>/reports/<cluster>
+# phase-level latest -> newest date directory
+ln -snf <YYYYMMDD> research/runs/<domain>/retrieval/latest
+
+# domains/ view: point this cluster at its newest date directory
+ln -snf ../../../runs/<domain>/retrieval/<YYYYMMDD>/<cluster> research/domains/<domain>/reports/<cluster>
 ```
+
+There is no per-cluster `latest_<cluster>` pointer — clusters are represented as subdirectories under the date directory.
 
 ### Filename conventions
 

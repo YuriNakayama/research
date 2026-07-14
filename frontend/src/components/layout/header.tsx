@@ -7,6 +7,7 @@ import { signOut } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
 import { Sun, Moon, LogOut, Menu, X } from "lucide-react";
 import { PaletteSelector } from "./palette-selector";
+import { SearchTrigger } from "@/components/search/search-trigger";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -53,6 +54,7 @@ export function Header() {
         </div>
 
         <div className="flex h-14 items-center">
+          <SearchTrigger />
           {mounted && <PaletteSelector />}
           {mounted && (
             <button

@@ -74,6 +74,15 @@ function shouldInclude(name: string): boolean {
   return !IGNORED_NAMES.has(name) && !name.startsWith(".");
 }
 
+// `latest[_<cluster>]` run directories are symlink aliases of a dated run
+// (per research directory rules). The build-time `cp -r` dereferences those
+// symlinks into real directory copies, so realpath dedup alone can't collapse
+// them. Skipping the alias by name keeps the dated run as the canonical URL and
+// prevents every report from being indexed twice.
+function isLatestAlias(name: string): boolean {
+  return name === "latest" || name.startsWith("latest_");
+}
+
 function isMarkdownFile(name: string): boolean {
   return name.endsWith(".md");
 }
@@ -167,6 +176,7 @@ function collectMarkdownFiles(
   const files: string[] = [];
   for (const dirent of dirents) {
     if (!shouldInclude(dirent.name)) continue;
+    if (isLatestAlias(dirent.name)) continue;
     const full = path.join(dir, dirent.name);
 
     // Resolve so symlinked directories are traversed and dedup is by real path.

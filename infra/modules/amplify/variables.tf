@@ -53,3 +53,15 @@ variable "preview_branches" {
   type        = list(string)
   default     = []
 }
+
+variable "compute_role_arn" {
+  description = "IAM role ARN assumed by the Next.js SSR (WEB_COMPUTE) runtime for DynamoDB access. Empty disables the runtime role."
+  type        = string
+  default     = ""
+}
+
+variable "notes_table_name" {
+  description = "DynamoDB table name for personal notes, exposed to the SSR runtime as NOTES_TABLE_NAME."
+  type        = string
+  default     = ""
+}

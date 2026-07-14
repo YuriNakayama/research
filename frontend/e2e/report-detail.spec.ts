@@ -12,10 +12,12 @@ test.describe("Report detail page", () => {
         })
         .first()
     ).toBeVisible();
+    // Authors render as chips; venue renders next to a "VENUE" label, so use
+    // substring matches rather than exact text.
     await expect(
-      page.getByText("Ferraro et al.", { exact: true })
+      page.getByText("Ferraro et al.").first()
     ).toBeVisible();
-    await expect(page.getByText("arXiv", { exact: true })).toBeVisible();
+    await expect(page.getByText("arXiv").first()).toBeVisible();
   });
 
   test("renders markdown content with headings", async ({ page }) => {

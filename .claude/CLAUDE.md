@@ -31,7 +31,8 @@ External:
 
 ```
 research/                    表示用リサーチ成果物（append-only）
-  runs/<domain>/<phase>/<date>[_<cluster>]/   実体の出力
+  runs/<domain>/clustering/<date>/            clustering の出力
+  runs/<domain>/{gather,retrieval}/<date>/<cluster>/   gather / retrieval の出力
   domains/<domain>/          runs への symlink 構成
   _schema/                   スキーマ定義
 frontend/                    Next.js (App Router, TypeScript) レポート閲覧 UI
@@ -76,7 +77,7 @@ dev/create-worktree  # Create git worktree with .env copy
 ## 表示用コンテンツと viewer の境界
 
 - **`research/**` が唯一の表示用領域**。ビルド時に `frontend/research` へコピーされ、`/research` 配下で描画される。
-- `research/**` は append-only。既存 run の中身は改変せず、新規は `runs/<domain>/<phase>/<date>[_<cluster>]/` に追加する（詳細は `.claude/rules/research.md`）。
+- `research/**` は append-only。既存 run の中身は改変せず、新規は clustering は `runs/<domain>/clustering/<date>/`、gather / retrieval は `runs/<domain>/<phase>/<date>/<cluster>/` に追加する（詳細は `.claude/rules/research.md`）。
 - `docs/**` は開発用。viewer の表示対象ではない。
 - viewer のアセット参照は `/api/research-assets/<path>`、内部 Markdown リンクは `/research/<slug>` に解決される。
 

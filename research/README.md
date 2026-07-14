@@ -11,6 +11,11 @@
 
 ## ディレクトリ構成
 
+すべての phase (`clustering` / `gather` / `retrieval`) で、run ディレクトリは
+**日付単位 (`<YYYYMMDD>/`)** に統一します。`gather` / `retrieval` はその日付ディレクトリの
+直下に **クラスタごとのサブディレクトリ (`<cluster>/`)** を置きます。`latest` は
+phase ごとに **1本** で、最新の日付ディレクトリを指します。
+
 ```
 research/
 ├── README.md                                # このファイル（構成の単一情報源）
@@ -20,9 +25,9 @@ research/
 │       ├── domain.yaml                      # ドメインメタ（任意・存在すれば skill が読む）
 │       ├── clustering -> ../../runs/<domain>/clustering/latest
 │       ├── resources/                       # 各クラスタの最新リソース一覧
-│       │   └── <cluster>/
+│       │   └── <cluster> -> ../../../runs/<domain>/gather/<YYYYMMDD>/<cluster>
 │       └── reports/                         # 各クラスタの最新詳細レポート
-│           └── <cluster>/
+│           └── <cluster> -> ../../../runs/<domain>/retrieval/<YYYYMMDD>/<cluster>
 │
 └── runs/                                    # 【実行履歴】append-only
     └── <domain>/
@@ -33,16 +38,20 @@ research/
         │   │   └── ...
         │   └── latest -> <YYYYMMDD>         # 最新版へのシンボリックリンク
         ├── gather/
-        │   ├── <YYYYMMDD>_<cluster>/        # cluster 単位 or domain 全体 (`_all`)
-        │   │   └── resources-*.md
-        │   └── latest_<cluster> -> ...
+        │   ├── <YYYYMMDD>/                  # 実行日ごとの gather 結果
+        │   │   └── <cluster>/               # cluster 単位 or domain 全体 (`all`)
+        │   │       └── resources-*.md
+        │   └── latest -> <YYYYMMDD>         # 最新の日付ディレクトリへのリンク
         └── retrieval/
-            ├── <YYYYMMDD>_<cluster>/        # 詳細レポート群
-            │   ├── index.md
-            │   ├── 01-*.md
-            │   └── ...
-            └── latest_<cluster> -> ...
+            ├── <YYYYMMDD>/                  # 実行日ごとの retrieval 結果
+            │   └── <cluster>/               # 詳細レポート群
+            │       ├── index.md
+            │       ├── 01-*.md
+            │       └── ...
+            └── latest -> <YYYYMMDD>         # 最新の日付ディレクトリへのリンク
 ```
+
+> **クラスタを区別しない場合** は `<cluster>` を `all` とし、`<YYYYMMDD>/all/` に出力します。
 
 ## 出力先決定フロー（skill 用）
 
@@ -54,30 +63,41 @@ skill は次の手順で出力先を決定します。
 2. **`research/domains/<domain>/domain.yaml` が存在すれば読む** — `output_paths` テンプレが定義されていればそれに従う
 3. **存在しない場合は下表の既定パスを使用**
 4. **`<date>` は実行日 (`YYYYMMDD`)、`<cluster>` は対象クラスタ ID (`snake_case` or `kebab-case`)**
-5. **完了後、`domains/<domain>/<phase>` 配下の `latest` ポインタを更新**（skill / 人手）
+5. **完了後、phase ごとの `latest` ポインタと `domains/` ビューを更新**（skill / 人手）
 
 ### phase 別の既定出力先
 
 | phase       | skill                | 既定出力先                                                   |
 |-------------|----------------------|--------------------------------------------------------------|
-| clustering  | `research-clustering`| `research/runs/<domain>/clustering/<YYYYMMDD>/`         |
-| gather      | `research-gather`    | `research/runs/<domain>/gather/<YYYYMMDD>_<cluster>/`   |
-| retrieval   | `research-retrieval` | `research/runs/<domain>/retrieval/<YYYYMMDD>_<cluster>/`|
+| clustering  | `research-clustering`| `research/runs/<domain>/clustering/<YYYYMMDD>/`              |
+| gather      | `research-gather`    | `research/runs/<domain>/gather/<YYYYMMDD>/<cluster>/`        |
+| retrieval   | `research-retrieval` | `research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/`     |
 
 クラスタ単位ではなくドメイン全体を対象にする場合は `<cluster>` を `all` とします。
 
 ### latest ポインタの規約
 
-- `runs/<domain>/clustering/latest` → 最新の clustering run
-- `runs/<domain>/gather/latest_<cluster>` → cluster ごとの最新 gather run
-- `runs/<domain>/retrieval/latest_<cluster>` → cluster ごとの最新 retrieval run
-- `domains/<domain>/clustering` / `resources/<cluster>` / `reports/<cluster>` は上記 latest を指すシンボリックリンク
+`latest` は phase ごとに **1本** で、最新の**日付ディレクトリ**を指します。クラスタごとの
+`latest_<cluster>` は廃止しました（クラスタは日付ディレクトリ配下のサブディレクトリで表現します）。
+
+- `runs/<domain>/clustering/latest` → 最新の clustering run（`<YYYYMMDD>`）
+- `runs/<domain>/gather/latest` → 最新の gather 日付ディレクトリ（`<YYYYMMDD>`）
+- `runs/<domain>/retrieval/latest` → 最新の retrieval 日付ディレクトリ（`<YYYYMMDD>`）
+- `domains/<domain>/clustering` は `clustering/latest` を指すシンボリックリンク
+- `domains/<domain>/resources/<cluster>` / `reports/<cluster>` は、そのクラスタを含む
+  **最新の日付ディレクトリ**配下の該当クラスタ (`.../<YYYYMMDD>/<cluster>`) を指す
+  シンボリックリンク。あるクラスタが最新日付に存在しない場合は、そのクラスタを含む直近の
+  日付ディレクトリを指す（クラスタ単位の最新ビューを維持するため）
 
 シンボリックリンク作成例:
 
 ```bash
+# clustering: phase 単位の latest を指す
 ln -snf ../../runs/cate/clustering/latest research/domains/cate/clustering
-ln -snf ../../../runs/cate/retrieval/latest_metalearner research/domains/cate/reports/metalearner
+
+# gather/retrieval: 日付ディレクトリ配下のクラスタを直接指す
+ln -snf ../../../runs/cate/retrieval/20260322/metalearner research/domains/cate/reports/metalearner
+ln -snf ../../../runs/cate/gather/20260602/uplift_ranking  research/domains/cate/resources/uplift_ranking
 ```
 
 ## ドメインメタファイル `domain.yaml`（任意）
@@ -96,8 +116,8 @@ clusters:
     keywords: [TARNet, Dragonnet, BCAUSS]
 output_paths:
   clustering: runs/{domain}/clustering/{date}/
-  gather:     runs/{domain}/gather/{date}_{cluster}/
-  retrieval:  runs/{domain}/retrieval/{date}_{cluster}/
+  gather:     runs/{domain}/gather/{date}/{cluster}/
+  retrieval:  runs/{domain}/retrieval/{date}/{cluster}/
 ```
 
 ## 命名規約
@@ -106,7 +126,8 @@ output_paths:
 |---------------|------------------------------------------------------------|-----------------------------|
 | ドメイン名    | `snake_case`                                               | `data_analysis_agent`       |
 | クラスタ ID   | `snake_case` または `kebab-case`（ドメイン内で統一）       | `metalearner`, `nl2sql-nl2code` |
-| run ディレクトリ | `YYYYMMDD` / `YYYYMMDD_<cluster>`                       | `20260330_metalearner`      |
+| 日付ディレクトリ | `YYYYMMDD`                                             | `20260330`                  |
+| クラスタディレクトリ | `<YYYYMMDD>/<cluster>`（gather / retrieval）        | `20260330/metalearner`      |
 | レポートファイル | `NN-kebab-case.md`（NN = 0埋め連番）                     | `01-causal-forest.md`       |
 | index ファイル | `index.md`                                                | -                           |
 

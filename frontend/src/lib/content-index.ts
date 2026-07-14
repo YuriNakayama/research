@@ -134,8 +134,11 @@ function extractHeadings(lines: string[]): string[] {
   return headings;
 }
 
-// Parse `runs/<domain>/<phase>/<date>[_<cluster>]/...` from a slug relative to
-// `research/`. Returns best-effort fields; unknown positions stay undefined.
+// Parse run context from a slug relative to `research/`. Supports both layouts:
+//   - current: `runs/<domain>/<phase>/<date>/<cluster>/...`
+//              (clustering has no <cluster> segment: `.../<date>/...`)
+//   - legacy:  `runs/<domain>/<phase>/<date>[_<cluster>]/...`
+// Returns best-effort fields; unknown positions stay undefined.
 function parseRunContext(slug: string[]): {
   domain: string;
   phase?: Phase;
@@ -148,12 +151,22 @@ function parseRunContext(slug: string[]): {
 
   let runDate: string | undefined;
   let cluster: string | undefined;
+
   const runSegment = slug[3];
   if (runSegment) {
-    const dateMatch = runSegment.match(/^(\d{8})(?:_(.+))?$/);
-    if (dateMatch) {
-      runDate = dateMatch[1];
-      cluster = dateMatch[2];
+    // Legacy combined form `<date>_<cluster>`.
+    const combined = runSegment.match(/^(\d{8})_(.+)$/);
+    if (combined) {
+      runDate = combined[1];
+      cluster = combined[2];
+    } else if (/^\d{8}$/.test(runSegment)) {
+      // Current form: `<date>` with the cluster (if any) as the next segment.
+      runDate = runSegment;
+      // clustering has no cluster dir; gather/retrieval do (slug[4]).
+      const next = slug[4];
+      // Only treat it as a cluster when there is a further path segment after
+      // it (i.e. slug[4] is a directory, not the file itself).
+      if (next && slug.length > 5) cluster = next;
     }
   }
   return { domain, phase, runDate, cluster };

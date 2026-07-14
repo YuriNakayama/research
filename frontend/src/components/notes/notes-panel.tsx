@@ -90,13 +90,22 @@ export function NotesPanel({ slug }: NotesPanelProps) {
     return null;
   }
 
-  // Keep the expanded card within the viewport horizontally: if the anchor is
-  // near the right edge, the card grows leftward.
-  const panelLeft =
-    typeof window !== "undefined" &&
-    position.x + PANEL_WIDTH > window.innerWidth - 8
-      ? Math.max(8, window.innerWidth - PANEL_WIDTH - 8)
-      : position.x;
+  // Anchor the expanded card at the FAB position, then keep the whole card on
+  // screen: grow leftward when near the right edge and upward when near the
+  // bottom, so the header and actions are never clipped by the viewport.
+  const margin = 8;
+  const vw = typeof window !== "undefined" ? window.innerWidth : PANEL_WIDTH;
+  const vh = typeof window !== "undefined" ? window.innerHeight : PANEL_MAX_HEIGHT;
+  const cardWidth = Math.min(PANEL_WIDTH, vw - margin * 2);
+  const cardHeight = Math.min(PANEL_MAX_HEIGHT, vh - margin * 2);
+  const panelLeft = Math.min(
+    Math.max(margin, position.x),
+    Math.max(margin, vw - cardWidth - margin),
+  );
+  const panelTop = Math.min(
+    Math.max(margin, position.y),
+    Math.max(margin, vh - cardHeight - margin),
+  );
 
   return (
     <>
@@ -131,9 +140,9 @@ export function NotesPanel({ slug }: NotesPanelProps) {
           aria-label="個人メモ"
           style={{
             left: panelLeft,
-            top: Math.max(8, Math.min(position.y, viewportBottom())),
-            width: `min(${PANEL_WIDTH}px, calc(100vw - 16px))`,
-            maxHeight: `min(${PANEL_MAX_HEIGHT}px, calc(100dvh - 16px))`,
+            top: panelTop,
+            width: cardWidth,
+            maxHeight: cardHeight,
           }}
           className="fixed z-40 flex flex-col overflow-hidden brutal-border-strong brutal-shadow bg-[var(--surface-elevated)]"
         >
@@ -178,12 +187,4 @@ export function NotesPanel({ slug }: NotesPanelProps) {
       )}
     </>
   );
-}
-
-// Lowest top offset that keeps the card header on-screen.
-function viewportBottom(): number {
-  if (typeof window === "undefined") {
-    return 0;
-  }
-  return Math.max(8, window.innerHeight - 80);
 }

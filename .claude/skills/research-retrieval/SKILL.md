@@ -30,36 +30,42 @@ research-clustering → research-gather → research-retrieval
 
 This skill also works standalone — users can provide URLs, PDFs, or keywords directly without upstream skills.
 
-## Report Quality Principles — Visual Richness
+## Report Quality Principles — Exhaustive Structural Coverage
 
 Reports must be dense with visual and structural elements. A report without figures, tables, and diagrams is an incomplete report. The reader should be able to skim the report and grasp the key ideas purely from the visual elements alone.
 
-### Figures and Tables — The Most Important Part
+### The Inclusion Rule
 
-Every report MUST contain a dedicated `## Figures & Tables` section. This section is NOT optional and must appear even if you have to construct the figures yourself from the text content. A report missing this section is considered a failure.
+**If the source expresses something as a figure, table, formula, chart/visualization, or a structured list, that element MUST appear in the report.** This is the single governing rule of this section.
 
-**What to include in Figures & Tables:**
+Do not filter by importance, do not sample, and do not decide an element is "minor" or "redundant" and drop it. Presence in the source is the only criterion for inclusion — if it is in the source, it is in the report. Judgment applies to *how* you represent an element, never to *whether* you include it.
 
-1. **Reproduce every key table from the source** — If the paper has experimental results tables, reproduce them as Markdown tables with the exact numbers. If the source has 3 results tables, include all 3, not just 1.
-2. **Recreate architecture/system diagrams** — Use Mermaid diagram syntax (`\`\`\`mermaid ... \`\`\``) or ASCII art to recreate figures from the source. For papers: the model architecture, the training pipeline, the data flow. For patents: the system diagram, the process flow.
-3. **Create comparison tables even when the source doesn't have one** — If the source discusses related work or compares to baselines, synthesize this into a structured comparison table.
-4. **Performance charts as tables** — When the source has line charts or bar charts showing performance, convert them to Markdown tables with the data points.
+There is no upper bound on the number of elements. If a paper contains 12 tables and 9 figures, the report contains all 12 tables and all 9 figures. Never stop because the report already has "enough" visuals or is getting long.
 
-**Minimum requirements per resource type:**
-- Academic Paper: at least 4 visual elements (main results table, architecture diagram, comparison table, ablation/analysis table)
-- Patent: at least 3 visual elements (process flow diagram, claims structure table, prior art comparison table)
-- Technical Article: at least 3 visual elements (architecture diagram, performance table, comparison table)
-- Business Case: at least 2 visual elements (results before/after table, solution architecture diagram)
+### Elements Covered by the Inclusion Rule
 
-### Other Structural Elements
+Every one of the following, whenever present in the source:
 
-- **Step-by-step decomposition** — Break down methods, algorithms, processes, and patent claims into numbered step sequences. When a paper proposes a 3-phase training procedure, list each phase with its inputs, operations, and outputs. When a patent describes a process, decompose it into steps.
-- **Mathematical formulas** — Include key equations using LaTeX notation (`$...$` for inline, `$$...$$` for display). For papers: the loss function, the core estimator, the objective function. For patents: any mathematical relationships in the claims. Don't skip formulas just because they're complex — they're often the most precise description of the method.
-- **Pseudocode** — Always include pseudocode for algorithmic methods. If the source describes a procedure, convert it to pseudocode even if the original doesn't present it that way.
-- **Comparison tables** — Whenever the source compares its approach to alternatives (which most papers and patents do), create a comparison table with columns for method name, key properties, strengths, and weaknesses.
-- **Timeline/flow diagrams** — For multi-stage processes, create Mermaid diagrams or ASCII flow diagrams showing the data flow or process stages.
+- **Tables** — Reproduce every table as a Markdown table with the exact numbers, preserving all rows and columns. If the source has 3 results tables, include all 3, not just 1. Do not abbreviate a table by dropping rows, columns, or precision.
+- **Figures & diagrams** — Every architecture diagram, system diagram, data flow, and training pipeline. Reproduce via the Figure Acquisition Strategy in Step 4 (extracted/linked image where available), and additionally recreate as Mermaid or ASCII art.
+- **Mathematical formulas** — Every equation, using LaTeX notation (`$...$` inline, `$$...$$` display). Loss functions, estimators, objectives, and any mathematical relationships in patent claims. Never skip a formula because it is complex — formulas are often the most precise description of the method. Define each variable.
+- **Charts & visualizations** — Line charts, bar charts, scatter plots, heatmaps, and any other plot. Include the image where available AND convert the underlying data points to a Markdown table, so the values are text-searchable.
+- **Structured lists / enumerations** — Any content the source organizes as an ordered or bulleted structure: contribution lists, assumptions, limitations, requirements, design principles, experimental conditions, claim elements. Preserve the structure as a list rather than flattening it into prose. The organization itself carries information.
+- **Step sequences** — Methods, algorithms, processes, and patent claims decomposed into numbered steps with inputs, operations, and outputs per step.
 
-Think of each report as a "cheat sheet" someone could use to quickly understand and potentially reimplement the approach. If a reader has to go back to the original source to see a table or figure, the report has failed its purpose.
+### Elements to Add Even When Absent from the Source
+
+The Inclusion Rule sets a floor, not a ceiling. Construct these regardless of whether the source presents them:
+
+- **Comparison tables** — Whenever the source discusses related work or compares against baselines, synthesize a structured comparison table (method name, key properties, strengths, weaknesses).
+- **Pseudocode** — For any algorithmic method, even when the original does not present it as pseudocode.
+- **Flow diagrams** — For multi-stage processes, a Mermaid or ASCII diagram of the stages and data flow.
+
+### Placement
+
+Every report MUST contain a dedicated `## Figures & Tables` section, and a report missing it is considered a failure. That section is the home for the source's primary figures, tables, and charts. Formulas, step sequences, and structured lists belong in the body sections where they are discussed (Proposed Method, Key Claims, etc.) — the Inclusion Rule is about the report as a whole, so an element placed in the right body section satisfies it and does not also need duplicating into `## Figures & Tables`.
+
+Think of each report as a "cheat sheet" someone could use to quickly understand and potentially reimplement the approach. If a reader has to go back to the original source to see a table, figure, formula, or list, the report has failed its purpose.
 
 ## Workflow
 
@@ -105,7 +111,7 @@ Every report covers the problem & motivation, the core method/technology in full
 
 **Detail level — always maximum:**
 
-Aim for 400+ lines per report. Length is a consequence of completeness, not a target in itself: include everything the source supports, and never truncate, summarize away, or drop a detail because the report is getting long. If the source contains a number, a formula, or a table, it belongs in the report. The goal is that a reader never needs to open the original.
+Aim for 400+ lines per report. Length is a consequence of completeness, not a target in itself: include everything the source supports, and never truncate, summarize away, or drop a detail because the report is getting long. Per the Inclusion Rule (see "Report Quality Principles" above), every figure, table, formula, chart, and structured list in the source must appear in the report. The goal is that a reader never needs to open the original.
 
 **Additional elements — all always included:**
 
@@ -205,7 +211,7 @@ The report quality depends heavily on the information retrieved. Do not skip Web
 - Core problem and motivation
 - Proposed method/approach with key details, including specific formulas and algorithm steps
 - Experimental results with **specific numbers** (accuracy, win rates, scores, etc.) — never use vague qualitative descriptions when the source contains quantitative data
-- Notable figures/tables content (recreate as Markdown tables or ASCII diagrams)
+- **Every** figure, table, chart, formula, and structured list in the source — take an inventory as you fetch (e.g. "Table 1–5, Figure 1–3, Eq. 1–7, contribution list, limitations list") and carry it into report generation. The Inclusion Rule requires all of them, so extraction must not filter by importance — a detail dropped here cannot be recovered later.
 
 #### 4b: Patents
 
@@ -345,10 +351,9 @@ Input Data → [Preprocessing] → [Module A] → [Module B] → Output
 
 ## Figures & Tables
 
-{THIS SECTION IS MANDATORY AND MUST NOT BE SKIPPED. Include at minimum 4 visual elements.
+{THIS SECTION IS MANDATORY AND MUST NOT BE SKIPPED. Per the Inclusion Rule, include EVERY table, figure, and chart present in the source — there is no minimum and no maximum. If the paper has 12 tables, include all 12. Never sample or filter by importance.
 
-Reproduce every significant table and figure from the source. If the paper has 5 tables, include all 5.
-If the source has architecture diagrams, recreate them. The reader should never need to open the original.
+The items below are the typical elements, not a checklist to stop at. The reader should never need to open the original.
 
 1. **Main results table** — reproduce the primary experimental results with exact numbers:
 
@@ -483,7 +488,7 @@ $$\text{formula from patent}$$
 
 ## Figures & Tables
 
-{Mandatory. Include at minimum 2 visual elements:
+{Mandatory. Per the Inclusion Rule, include EVERY drawing, table, and chart present in the patent — no minimum, no maximum. The items below are the typical elements, not a checklist to stop at.
 
 1. **Claims structure table**:
 
@@ -556,7 +561,7 @@ Decompose into structured subsections:}
 
 ## Figures & Tables
 
-{Mandatory. Include at minimum 2 visual elements:
+{Mandatory. Per the Inclusion Rule, include EVERY figure, table, and chart present in the article — no minimum, no maximum. The items below are the typical elements, not a checklist to stop at.
 - Architecture diagram (ASCII/Mermaid)
 - Performance or comparison table
 - Timeline or process flow diagram}
@@ -611,7 +616,7 @@ Decompose into structured subsections:}
 
 ## Figures & Tables
 
-{Mandatory. Visualize key results, architecture, or timeline.}
+{Mandatory. Per the Inclusion Rule, include EVERY figure, table, and chart present in the source — no minimum, no maximum. Typically: results/metrics table, solution architecture diagram, adoption timeline.}
 
 ## Lessons Learned
 

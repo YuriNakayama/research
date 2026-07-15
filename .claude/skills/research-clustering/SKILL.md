@@ -134,6 +134,33 @@ Output depth is NOT a user choice. Every run produces the most detailed output a
 
 Never ask the user to trade depth for speed, and never skip a section because the output is "long enough". If a section's content is available, include it.
 
+## Report Quality Principles — Visual and Structural Expression
+
+Use figures, tables, formulas, structured lists, Mermaid diagrams, and ASCII art aggressively throughout the output. Prose is the fallback, not the default: whenever information has structure — a relationship, a comparison, a hierarchy, a sequence, a set of parallel items — express that structure visually rather than describing it in sentences.
+
+**Default representation by information shape:**
+
+| Information shape | Representation |
+|-------------------|----------------|
+| Relationships between clusters, hierarchy, adjacency | Mermaid `graph` diagram (ASCII art acceptable for simple cases) |
+| Parallel items compared on shared axes | Markdown table |
+| Enumerations (keywords, strategies, criteria) | Structured list — never a comma-separated sentence |
+| Sequence or reading order | Numbered list or Mermaid `flowchart` |
+| Taxonomy from a survey paper | Mermaid tree or nested list mirroring the source structure |
+| Quantitative relationship or scoring criterion | LaTeX formula (`$...$` inline, `$$...$$` display) |
+
+**Specific requirements for this skill:**
+
+- **Domain map (mandatory)** — Every output includes a Mermaid diagram of inter-cluster relationships. This is not optional and not satisfied by a prose description.
+- **Cluster summary table (mandatory)** — All clusters compared in one table.
+- **Per-cluster keyword lists** — Always a structured list, never prose.
+- **Survey paper taxonomy** — When a survey paper's taxonomy informs the partitioning, reproduce that taxonomy as a diagram or nested list and show how it maps to the clusters.
+- **Timeline diagram** — When clusters have a temporal dimension (classical → recent → emerging), add a timeline.
+
+The reader should be able to grasp the field's structure from the diagrams and tables alone, without reading the prose.
+
+**Mermaid syntax constraint**: output under `research/**` is rendered by the viewer and validated by `npm run check:docs` (mermaid parse check). Keep node labels free of unescaped `(`, `)`, `:`, and `,` — wrap such labels in quotes (`A["label (with parens)"]`). A diagram that fails to parse breaks CI.
+
 ### Step 3: Domain Identification (Web Search)
 
 Based on input keywords and confirmed parameters, use WebSearch to investigate related academic/technical domains.
@@ -230,7 +257,16 @@ Consolidate everything into one Markdown file.
 
 ## Domain Map
 
-{Conceptual diagram showing inter-cluster relationships. Use ASCII art or Mermaid notation}
+{MANDATORY. Mermaid diagram showing inter-cluster relationships — adjacency, dependency, hierarchy, and overlap. Prefer Mermaid (`graph TD` / `graph LR`); ASCII art is acceptable only for trivially simple structures. A prose description does NOT satisfy this section.
+
+```mermaid
+graph TD
+    ROOT[{Research Theme}] --> C1[Cluster 1: {name}]
+    ROOT --> C2[Cluster 2: {name}]
+    C1 -.shares methods.-> C2
+```
+
+Add a timeline diagram as well when the clusters have a temporal dimension.}
 
 ## Cluster Summary
 

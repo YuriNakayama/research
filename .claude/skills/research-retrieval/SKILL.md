@@ -55,11 +55,19 @@ Every one of the following, whenever present in the source:
 
 ### Elements to Add Even When Absent from the Source
 
-The Inclusion Rule sets a floor, not a ceiling. Construct these regardless of whether the source presents them:
+The Inclusion Rule sets a floor, not a ceiling. Use figures, tables, formulas, structured lists, Mermaid diagrams, and ASCII art aggressively — prose is the fallback, not the default. Whenever information has structure, express that structure visually rather than describing it in sentences.
+
+Construct these regardless of whether the source presents them:
 
 - **Comparison tables** — Whenever the source discusses related work or compares against baselines, synthesize a structured comparison table (method name, key properties, strengths, weaknesses).
 - **Pseudocode** — For any algorithmic method, even when the original does not present it as pseudocode.
 - **Flow diagrams** — For multi-stage processes, a Mermaid or ASCII diagram of the stages and data flow.
+- **Architecture diagrams** — Recreate the system/model structure as Mermaid even when the source only describes it in prose.
+- **Timelines** — For work with a temporal dimension (method lineage, patent family history), a Mermaid timeline or ASCII chart.
+
+**Mermaid vs ASCII**: prefer Mermaid for anything with nodes and edges (architecture, flow, lineage, hierarchy) since the viewer renders it. Use ASCII art for simple linear flows, bar charts of quantitative data, and cases where a Mermaid diagram would be more complex than the thing it depicts.
+
+**Mermaid syntax constraint**: output under `research/**` is rendered by the viewer and validated by `npm run check:docs` (mermaid parse check). Keep node labels free of unescaped `(`, `)`, `:`, and `,` — wrap such labels in quotes (`A["label (with parens)"]`). A diagram that fails to parse breaks CI.
 
 ### Placement
 

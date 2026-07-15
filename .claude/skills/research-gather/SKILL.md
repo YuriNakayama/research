@@ -101,6 +101,43 @@ Note the interaction with Step 4's verification: the floor applies to resources 
 
 Never offer the user a faster, shallower option, and never stop early because the result set "looks like enough".
 
+## Report Quality Principles — Visual and Structural Expression
+
+Use figures, tables, formulas, structured lists, Mermaid diagrams, and ASCII art aggressively throughout the output. Prose is the fallback, not the default: whenever information has structure — a distribution, a trend, a relationship, a comparison — express that structure visually rather than describing it in sentences.
+
+The resource tables are the backbone of this skill's output, but a wall of tables is not a report. The analytical sections around them must be visual too.
+
+**Default representation by information shape:**
+
+| Information shape | Representation |
+|-------------------|----------------|
+| Resource lists | Markdown table (see the output template) |
+| Counts per domain / type / year | Table **and** an ASCII bar chart for the distribution |
+| Publication trend over time | ASCII bar chart or Mermaid `xychart-beta` |
+| Relationships between resources (citation, lineage, same group) | Mermaid `graph` diagram |
+| Domain coverage and gaps | Table with an explicit gap column, or a Mermaid diagram |
+| Enumerations (trends, observations, next steps) | Structured list — never a comma-separated sentence |
+| Ratios or coverage metrics | LaTeX formula (`$...$`) when a definition clarifies the number |
+
+**Specific requirements for this skill:**
+
+- **収集サマリ table (mandatory)** — Counts per domain × resource type, already in the template.
+- **Year distribution (mandatory)** — Show how resources spread across the target period, as an ASCII bar chart. A reader should see at a glance whether the field is accelerating.
+- **全体の傾向 section** — Lead with a visual (chart or diagram), then the prose. Never a bare paragraph.
+- **Resource relationship diagram** — When collected resources have visible relationships (a survey and the papers it covers, a patent family, papers from one group), show them as a Mermaid diagram.
+- **Coverage gaps** — When a domain yields notably fewer resources, make this visible in a table or chart rather than burying it in prose.
+
+Example of the year distribution chart:
+
+```
+2026 |████████████ 12
+2025 |████████████████████ 20
+2024 |███████████ 11
+2023 |█████ 5
+```
+
+**Mermaid syntax constraint**: output under `research/**` is rendered by the viewer and validated by `npm run check:docs` (mermaid parse check). Keep node labels free of unescaped `(`, `)`, `:`, and `,` — wrap such labels in quotes (`A["label (with parens)"]`). A diagram that fails to parse breaks CI.
+
 ### Step 3: Resource Collection
 
 For each target domain, search for resources in parallel using the Agent tool to spawn subagents.
@@ -286,9 +323,29 @@ Generate a **single Markdown file** containing all collected resources in table 
 
 {Below table includes only verified entries. All URLs have been confirmed via WebFetch.}
 
+## 年次分布
+
+{MANDATORY. ASCII bar chart of resource counts per year across the target period. Add a per-resource-type breakdown when multiple types were collected.}
+
+```
+2026 |████████████ 12
+2025 |████████████████████ 20
+2024 |███████████ 11
+2023 |█████ 5
+```
+
+## リソース関係図
+
+{Include when the collected resources have visible relationships — a survey and the papers it covers, a patent family, papers from the same group. Mermaid `graph` diagram. Omit only when no meaningful relationship exists across the collected set.}
+
 ## 全体の傾向
 
-{3–5 sentences: 収集結果から見える全体的な傾向、注目すべきポイント}
+{Lead with a visual, then the prose. Structure the observations as a list, not a paragraph:}
+
+- **{観点}**: {具体的な観察と裏付けとなる件数}
+- **{観点}**: {具体的な観察と裏付けとなる件数}
+
+{3–5 sentences of synthesis after the list — 収集結果から見える全体的な傾向、注目すべきポイント}
 
 ---
 

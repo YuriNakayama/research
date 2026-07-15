@@ -13,10 +13,9 @@ When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively
 
 | Parameter | Default Value |
 |-----------|--------------|
-| Priority Sections | All sections equally (Core method + Results + Problem + Practical applications) |
-| Detail Level | Overview level (100-200 lines per report) |
-| Additional Elements | None |
 | Next Action (Step 7) | Done (自動終了) |
+
+Priority sections, detail level, and additional elements are not parameters — every report is generated at maximum depth with all sections and all additional elements (see "Report Depth" below). `--auto` changes nothing about report content; it only skips the Step 7 confirmation.
 
 In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path, URLs, or keywords). For example: `/research-retrieval --auto research/runs/<domain>/gather/latest/<cluster>/resources-llm.md` → input is the gather result file.
 
@@ -56,7 +55,7 @@ Every report MUST contain a dedicated `## Figures & Tables` section. This sectio
 
 - **Step-by-step decomposition** — Break down methods, algorithms, processes, and patent claims into numbered step sequences. When a paper proposes a 3-phase training procedure, list each phase with its inputs, operations, and outputs. When a patent describes a process, decompose it into steps.
 - **Mathematical formulas** — Include key equations using LaTeX notation (`$...$` for inline, `$$...$$` for display). For papers: the loss function, the core estimator, the objective function. For patents: any mathematical relationships in the claims. Don't skip formulas just because they're complex — they're often the most precise description of the method.
-- **Pseudocode** — Always include pseudocode for algorithmic methods, not just when the user selects it in the hearing. If the source describes a procedure, convert it to pseudocode even if the original doesn't present it that way.
+- **Pseudocode** — Always include pseudocode for algorithmic methods. If the source describes a procedure, convert it to pseudocode even if the original doesn't present it that way.
 - **Comparison tables** — Whenever the source compares its approach to alternatives (which most papers and patents do), create a comparison table with columns for method name, key properties, strengths, and weaknesses.
 - **Timeline/flow diagrams** — For multi-stage processes, create Mermaid diagrams or ASCII flow diagrams showing the data flow or process stages.
 
@@ -96,63 +95,25 @@ Classify each resource into one of four types. This determines which report temp
 
 If the type is ambiguous, infer from context or ask the user via AskUserQuestion.
 
-### Step 3: User Hearing
+### Step 3: Report Depth (fixed — no hearing)
 
-> **`--auto` mode**: Skip this entire step. Use the default values from the Auto Mode table above.
+There is no hearing in this skill. Report depth, section coverage, and additional elements are NOT user choices — every report is generated at maximum depth. Do not ask the user to choose a detail level, and do not offer a faster/shorter option.
 
-Confirm report parameters via AskUserQuestion. Skip hearings for parameters already specified.
+**Sections — all are mandatory, none are prioritized over others:**
 
-#### Hearing 1: Priority Sections
+Every report covers the problem & motivation, the core method/technology in full technical detail (formulas, algorithm steps, architecture), the results & evaluation with specific numbers, and the practical applications. Emphasizing one section never justifies thinning another.
 
-```
-AskUserQuestion:
-  question: "Which sections should be emphasized in each report? (multiple selection)"
-  header: "Priority Sections"
-  multiSelect: true
-  options:
-    - label: "Core method/technology details"
-      description: "Algorithm steps, technical architecture, formulas, key innovations in detail"
-    - label: "Results & evaluation"
-      description: "Experimental results, performance metrics, comparison with alternatives"
-    - label: "Problem & motivation"
-      description: "What problem is being solved, why it matters, background context"
-    - label: "Practical applications"
-      description: "Real-world use cases, implementation considerations, applicability conditions"
-```
+**Detail level — always maximum:**
 
-#### Hearing 2: Detail Level
+Aim for 400+ lines per report. Length is a consequence of completeness, not a target in itself: include everything the source supports, and never truncate, summarize away, or drop a detail because the report is getting long. If the source contains a number, a formula, or a table, it belongs in the report. The goal is that a reader never needs to open the original.
 
-```
-AskUserQuestion:
-  question: "What detail level should each report have?"
-  header: "Detail Level"
-  multiSelect: false
-  options:
-    - label: "Overview level (recommended)"
-      description: "100-200 lines per report. Concise summary of key points"
-    - label: "Detailed level"
-      description: "200-400 lines per report. In-depth analysis with formulas/architecture"
-    - label: "Brief level"
-      description: "50-100 lines per report. Minimal: summary, key points, and links only"
-```
+**Additional elements — all always included:**
 
-#### Hearing 3: Additional Elements
+- **Cross-resource relationship map** in `index.md` (relationships, citations, evolution between resources)
+- **Comparison table** in `index.md` (feature/method comparison across resources)
+- **Further investigation candidates** — related resources found in references/citations
 
-```
-AskUserQuestion:
-  question: "Would you like to include any additional elements? (multiple selection)"
-  header: "Additional Elements"
-  multiSelect: true
-  options:
-    - label: "Cross-resource relationship map"
-      description: "Show relationships, citations, or evolution between resources in index.md"
-    - label: "Comparison table"
-      description: "Add a feature/method comparison table to index.md"
-    - label: "Further investigation candidates"
-      description: "List related resources worth investigating from references/citations"
-    - label: "None"
-      description: "Basic structure only"
-```
+When only one resource is being analyzed, the cross-resource map and comparison table have nothing to compare across — in that case relate the resource to the prior art and baselines discussed within it, rather than omitting the sections.
 
 ### Step 4: Information Retrieval
 
@@ -705,15 +666,15 @@ Create `index.md` in the output directory with links and summaries for all repor
 
 ## Cross-Resource Insights
 
-{If "Cross-resource relationship map" was selected: show relationships, common themes, or evolution across resources.}
+{Mandatory. Show relationships, common themes, and evolution across resources.}
 
 ## Comparison Table
 
-{If "Comparison table" was selected: comparative table of methods, approaches, or solutions.}
+{Mandatory. Comparative table of methods, approaches, or solutions across the analyzed resources.}
 
 ## Further Investigation Candidates
 
-{If selected: list of related resources worth investigating, discovered during retrieval.}
+{Mandatory. List related resources worth investigating, discovered during retrieval.}
 ```
 
 ### Step 7: Output Confirmation
@@ -730,8 +691,8 @@ AskUserQuestion:
       description: "Finalize the current output"
     - label: "Revise specific reports"
       description: "Revise or enhance specific report files"
-    - label: "Change structure/detail level"
-      description: "Adjust section structure or detail level and regenerate"
+    - label: "Change section structure"
+      description: "Adjust or reorder the section structure and regenerate (depth stays at maximum)"
     - label: "Investigate additional resources"
       description: "Find and analyze additional related resources"
 ```

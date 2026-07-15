@@ -16,8 +16,9 @@ When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively
 | Research Type | Academic Paper Survey |
 | Time Range | Last 4 years |
 | Search Languages | English + Japanese |
-| Output Granularity | Standard |
 | Next Action (Step 7) | Done (自動終了) |
+
+Output granularity is not a parameter — every run produces the most detailed output (see "Output Depth" below).
 
 In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the research theme input. For example: `/research-clustering --auto LLM agent orchestration` → theme is "LLM agent orchestration".
 
@@ -122,21 +123,16 @@ AskUserQuestion:
 
 If "Other" is selected, ask a follow-up AskUserQuestion for the specific languages. Pre-select defaults based on the input: if the input contains Japanese text, default to English + Japanese; otherwise default to English only.
 
-#### Hearing 4: Output Granularity
+### Step 2.5: Output Depth (fixed — no hearing)
 
-```
-AskUserQuestion:
-  question: "What level of detail do you want in the output?"
-  header: "Output Granularity"
-  multiSelect: false
-  options:
-    - label: "Standard (recommended)"
-      description: "Domain partitioning + overview, keywords, and research strategy per cluster"
-    - label: "Detailed"
-      description: "Standard + representative papers/patents/cases per cluster"
-    - label: "Overview only"
-      description: "Domain partitioning and keywords only — quick big-picture view"
-```
+Output depth is NOT a user choice. Every run produces the most detailed output available:
+
+- Domain partitioning + per-cluster overview, keywords, and research strategy
+- **Representative resources for every cluster** (survey papers, key papers/patents/cases) — always included, never gated
+- Reference survey/review paper table in the index
+- Domain map diagram showing inter-cluster relationships
+
+Never ask the user to trade depth for speed, and never skip a section because the output is "long enough". If a section's content is available, include it.
 
 ### Step 3: Domain Identification (Web Search)
 
@@ -186,7 +182,7 @@ For each cluster, produce:
 - **Overview**: 2–5 sentences explaining the scope of the cluster
 - **Keywords**: Technical terms and concepts belonging to the cluster (5–15 items)
 - **Research strategy**: Recommended approach for deeper investigation of this cluster
-- **Representative resources** (only for "Detailed" granularity): A few survey papers, key papers/patents/cases
+- **Representative resources**: Survey papers and key papers/patents/cases for the cluster — always include this; list every representative resource found rather than a token few
 
 For academic paper surveys, list the survey/review papers found in Step 3 as "seed resources" for the relevant cluster. Also show how the survey paper's taxonomy maps to the cluster structure.
 
@@ -256,7 +252,7 @@ Consolidate everything into one Markdown file.
 - {Notable research groups or companies}
 - {Recommended reading order from survey papers}
 
-**Representative Resources** (detailed granularity only):
+**Representative Resources** (always included):
 | Title | Type | Year | Summary |
 |-------|------|------|---------|
 | {title} | Paper/Patent/Case | {year} | {summary} |

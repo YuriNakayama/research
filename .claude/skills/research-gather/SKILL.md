@@ -15,9 +15,9 @@ When `$ARGUMENTS` contains `--auto`, run the entire workflow **non-interactively
 |-----------|--------------|
 | Resource Types | 学術論文 + 特許 |
 | Time Range | 直近4年 |
-| Collection Depth | 標準（各5〜10件） |
-| Domain Selection | すべてのクラスタ |
 | Next Action (Step 6) | 完了（自動終了） |
+
+Collection depth and domain selection are not parameters — every run collects the maximum number of resources across all clusters (see "Collection Scope" below).
 
 In `--auto` mode, the remaining text in `$ARGUMENTS` (after removing `--auto`) is used as the input (file path or keywords). For example: `/research-gather --auto research/runs/<domain>/clustering/latest/index.md` → input is the clustering result file.
 
@@ -90,34 +90,16 @@ AskUserQuestion:
 
 If "カスタム" is selected, ask a follow-up for the specific year range.
 
-#### Hearing 3: Collection Depth
+### Step 2.5: Collection Scope (fixed — no hearing)
 
-```
-AskUserQuestion:
-  question: "各領域あたりの収集件数はどの程度にしますか？"
-  header: "収集件数"
-  multiSelect: false
-  options:
-    - label: "標準（各5〜10件）（推奨）"
-      description: "主要なリソースを網羅。バランスの良い量"
-    - label: "広範（各10〜20件）"
-      description: "できるだけ多くのリソースを収集。時間がかかる場合あり"
-    - label: "簡潔（各3〜5件）"
-      description: "代表的なリソースのみ。素早く概観を得たい場合"
-```
+Collection depth and cluster selection are NOT user choices. Every run uses the maximum scope:
 
-#### Hearing 4: Domain Selection (clustering input only)
+- **Depth**: at least 20 verified resources per domain × resource type. Treat 20 as a floor, not a target — if high-quality resources remain after 20, keep going. Stop only when additional searching stops surfacing new relevant resources, not when a count is reached.
+- **Clusters**: always collect for **every** cluster in the input. Never ask which clusters to target and never sample a subset.
 
-If the input is from clustering and contains multiple clusters, ask which domains to investigate:
+Note the interaction with Step 4's verification: the floor applies to resources that survive URL verification. If verification drops entries below 20 for a domain, search again to replace them.
 
-```
-AskUserQuestion:
-  question: "どのクラスタのリソースを収集しますか？"
-  header: "対象クラスタ"
-  multiSelect: true
-  options:
-    (dynamically generated from cluster names — show up to 4; if more than 4 clusters, group or offer "すべて" as the first option)
-```
+Never offer the user a faster, shallower option, and never stop early because the result set "looks like enough".
 
 ### Step 3: Resource Collection
 
@@ -265,7 +247,7 @@ After verification, log the results:
 
 **Important**: It is better to have fewer verified entries than many unverified ones. Never include an entry in the output unless its URL has been verified. This prevents hallucinated or mismatched URL/title pairs from propagating to downstream tools (CSV lists, daily research pipeline).
 
-If verification reduces the result set below the requested collection depth, run additional searches to find replacement resources, then verify those as well.
+If verification reduces the result set for any domain below the Step 2.5 floor (20 verified resources per domain × resource type), run additional searches to find replacement resources, then verify those as well. Repeat until the floor is met or searching stops surfacing new relevant resources.
 
 ### Step 5: Output File Generation
 

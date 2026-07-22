@@ -48,6 +48,17 @@ export function NotesContent({
         このメモはあなただけに表示されます。
       </p>
 
+      {/* Kept above the form: below it the message can fall outside the
+          card's scroll viewport, so a failed save looks like silence. */}
+      {error && (
+        <p
+          role="alert"
+          className="mb-3 brutal-border border-[var(--accent-bg)] px-3 py-2 text-xs text-[var(--text-primary)]"
+        >
+          {error}
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} className="mb-4">
         <label htmlFor="note-input" className="sr-only">
           メモを追加
@@ -79,15 +90,6 @@ export function NotesContent({
           </button>
         </div>
       </form>
-
-      {error && (
-        <p
-          role="alert"
-          className="mb-3 brutal-border border-[var(--accent-bg)] px-3 py-2 text-xs text-[var(--text-primary)]"
-        >
-          {error}
-        </p>
-      )}
 
       {loading ? (
         <p className="text-sm text-[var(--text-secondary)]">読み込み中…</p>

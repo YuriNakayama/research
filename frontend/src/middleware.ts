@@ -33,6 +33,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // API routes are called with `fetch`, which follows redirects by default: a
+  // redirect to /login would hand the caller a 200 HTML page, so `response.ok`
+  // stays true and the failure surfaces as an opaque JSON/Zod parse error.
+  // Answer with a 401 in the same envelope the route handlers use instead.
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 },
+    );
+  }
+
   const loginUrl = new URL(LOGIN_PATH, request.url);
   return NextResponse.redirect(loginUrl);
 }

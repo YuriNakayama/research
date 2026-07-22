@@ -17,33 +17,6 @@ resource "aws_amplify_app" "main" {
   # Distinct from iam_service_role_arn (build/deploy). Empty => unset.
   compute_role_arn = var.compute_role_arn != "" ? var.compute_role_arn : null
 
-  build_spec = <<-YAML
-    version: 1
-    applications:
-      - appRoot: frontend
-        frontend:
-          phases:
-            preBuild:
-              commands:
-                - cp -r ../research ./research
-                - curl -fsSL https://bun.sh/install | bash
-                - export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH"
-                - bun install --frozen-lockfile
-            build:
-              commands:
-                - export PATH="$HOME/.bun/bin:$PATH"
-                - bunx next build
-          artifacts:
-            baseDirectory: .next
-            files:
-              - '**/*'
-          cache:
-            paths:
-              - node_modules/**/*
-              - .next/cache/**/*
-              - $HOME/.bun/install/cache/**/*
-  YAML
-
   environment_variables = {
     NEXT_PUBLIC_AWS_REGION            = data.aws_region.current.name
     NEXT_PUBLIC_COGNITO_USER_POOL_ID  = var.cognito_user_pool_id
@@ -54,6 +27,19 @@ resource "aws_amplify_app" "main" {
 
   tags = {
     Name = "${var.project}_${var.environment}_amplify_app"
+  }
+
+  # build_spec is deliberately unmanaged so Amplify uses amplify.yml from the
+  # repository. An inline build spec stored on the app takes precedence over
+  # the file, so keeping a copy here silently pins builds to whatever Terraform
+  # last applied — that is how the repo's amplify.yml fixes (research/ staging,
+  # symlink handling) ended up never running.
+  #
+  # The provider rejects "" (min length 1), so the stored spec cannot be
+  # cleared declaratively; it is removed once via the API. Ignoring it here
+  # keeps Terraform from reintroducing the drift.
+  lifecycle {
+    ignore_changes = [build_spec]
   }
 }
 

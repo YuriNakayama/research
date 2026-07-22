@@ -27,6 +27,15 @@ applications:
         build:
           commands:
             - export PATH="$HOME/.bun/bin:$PATH"
+            # Amplify injects branch environment variables into the BUILD shell
+            # only; the WEB_COMPUTE runtime does not inherit them. NEXT_PUBLIC_*
+            # survive because Next.js inlines them into the bundle, but a
+            # server-side process.env lookup (NOTES_TABLE_NAME in
+            # lib/notes/dynamo.ts) resolves to undefined at request time and
+            # every notes call fails with "NOTES_TABLE_NAME is not configured".
+            # Writing the value into .env.production before the build makes
+            # Next.js bundle it into the standalone server output.
+            - echo "NOTES_TABLE_NAME=$NOTES_TABLE_NAME" >> .env.production
             - bunx next build
       artifacts:
         baseDirectory: .next

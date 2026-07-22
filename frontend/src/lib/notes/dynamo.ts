@@ -6,7 +6,8 @@ import {
   UpdateCommand,
   DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
-import type { Note } from "@/lib/notes/schema";
+import type { Note, NoteAnchor } from "@/lib/notes/schema";
+import { noteAnchorSchema } from "@/lib/notes/schema";
 
 // Table + region are injected by the Amplify runtime (see infra/modules/*).
 const TABLE_NAME = process.env.NOTES_TABLE_NAME ?? "";
@@ -41,15 +42,34 @@ type NoteItem = {
   noteId: string;
   slug: string;
   body: string;
+  // Absent on notes created before anchoring existed — those are page-level.
+  anchor?: unknown;
   createdAt: string;
   updatedAt: string;
 };
 
+/**
+ * Re-validate a stored anchor on the way out.
+ *
+ * Items written by an older or newer revision of this code may carry an anchor
+ * shape this build does not understand. Dropping it degrades the note to
+ * page-level rather than failing the whole list request.
+ */
+function parseAnchor(raw: unknown): NoteAnchor | undefined {
+  if (raw === undefined || raw === null) {
+    return undefined;
+  }
+  const parsed = noteAnchorSchema.safeParse(raw);
+  return parsed.success ? parsed.data : undefined;
+}
+
 function toNote(item: NoteItem): Note {
+  const anchor = parseAnchor(item.anchor);
   return {
     noteId: item.noteId,
     slug: item.slug,
     body: item.body,
+    ...(anchor ? { anchor } : {}),
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   };
@@ -76,7 +96,13 @@ export async function listNotes(sub: string, slug: string): Promise<Note[]> {
 /** Create a note owned by `sub`. `noteId`/timestamps are caller-supplied to keep this layer deterministic. */
 export async function createNote(
   sub: string,
-  input: { noteId: string; slug: string; body: string; now: string },
+  input: {
+    noteId: string;
+    slug: string;
+    body: string;
+    anchor?: NoteAnchor;
+    now: string;
+  },
 ): Promise<Note> {
   const item: NoteItem = {
     pk: userPk(sub),
@@ -84,6 +110,9 @@ export async function createNote(
     noteId: input.noteId,
     slug: input.slug,
     body: input.body,
+    // Omitted entirely when absent — page-level notes carry no anchor
+    // attribute, matching what pre-anchoring items look like.
+    ...(input.anchor ? { anchor: input.anchor } : {}),
     createdAt: input.now,
     updatedAt: input.now,
   };

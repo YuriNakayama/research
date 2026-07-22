@@ -127,3 +127,79 @@ test.describe("Personal notes floating widget", () => {
     ).toHaveValue("テストメモ");
   });
 });
+
+test.describe("Anchored notes", () => {
+  test("a heading exposes a note affordance that stages the anchor", async ({
+    page,
+  }) => {
+    await page.goto(REPORT_URL);
+
+    // Heading buttons are quiet until hovered; hovering the heading reveals it.
+    const heading = page.locator("h2[id]").first();
+    await expect(heading).toBeVisible();
+    const headingText = (await heading.innerText()).trim();
+    await heading.hover();
+
+    const noteButton = heading.getByRole("button", { name: /にメモを追加$/ });
+    await expect(noteButton).toBeVisible();
+    await noteButton.click();
+
+    // The panel opens with the heading staged as the attach target.
+    const dialog = page.getByRole("dialog", { name: "個人メモ" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("添付先:")).toBeVisible();
+    // The heading's own text is shown as the target (button label suffix
+    // stripped, so compare against the heading text itself).
+    await expect(dialog).toContainText(headingText.replace(/\s+$/, ""));
+  });
+
+  test("staged anchor can be cleared back to page-level", async ({ page }) => {
+    await page.goto(REPORT_URL);
+    const heading = page.locator("h2[id]").first();
+    await heading.hover();
+    await heading.getByRole("button", { name: /にメモを追加$/ }).click();
+
+    const dialog = page.getByRole("dialog", { name: "個人メモ" });
+    await dialog.getByRole("button", { name: "解除" }).click();
+    await expect(dialog.getByText("添付先: ページ全体")).toBeVisible();
+  });
+
+  test("selecting body text offers to attach a note to it", async ({
+    page,
+  }) => {
+    await page.goto(REPORT_URL);
+
+    // Select a paragraph's text programmatically — Playwright's drag emulation
+    // is unreliable for text ranges across browsers.
+    await page.evaluate(() => {
+      // Pick a paragraph with enough text that the selection ends mid-line,
+      // which is where a reader would realistically stop.
+      const paragraph = Array.from(
+        document.querySelectorAll("article p, .prose p"),
+      ).find((p) => (p.firstChild as Text | null)?.data?.length ?? 0 > 40);
+      if (!paragraph?.firstChild) return;
+      const range = document.createRange();
+      const text = paragraph.firstChild as Text;
+      range.setStart(text, 0);
+      range.setEnd(text, Math.min(30, text.data.length));
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+
+    // Exact match: the heading affordances are labelled "「…」にメモを追加",
+    // which a substring match would also resolve to.
+    const addFromSelection = page.getByRole("button", {
+      name: "メモを追加",
+      exact: true,
+    });
+    await expect(addFromSelection).toBeVisible();
+    await addFromSelection.click();
+
+    // The panel opens showing the quoted passage as the attach target.
+    const dialog = page.getByRole("dialog", { name: "個人メモ" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("選択箇所")).toBeVisible();
+  });
+});

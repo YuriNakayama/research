@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Note } from "@/lib/notes/schema";
+import type { Note, NoteAnchor } from "@/lib/notes/schema";
 import {
   fetchNotes,
   createNote as createNoteRequest,
@@ -13,7 +13,7 @@ type UseNotesResult = {
   loading: boolean;
   error: string | null;
   submitting: boolean;
-  addNote: (body: string) => Promise<boolean>;
+  addNote: (body: string, anchor?: NoteAnchor) => Promise<boolean>;
   removeNote: (noteId: string) => Promise<void>;
 };
 
@@ -47,11 +47,11 @@ export function useNotes(slug: string): UseNotesResult {
   }, [load]);
 
   const addNote = useCallback(
-    async (body: string): Promise<boolean> => {
+    async (body: string, anchor?: NoteAnchor): Promise<boolean> => {
       setSubmitting(true);
       setError(null);
       try {
-        const created = await createNoteRequest(slug, body);
+        const created = await createNoteRequest(slug, body, anchor);
         setNotes((prev) => [created, ...prev]);
         return true;
       } catch (err) {

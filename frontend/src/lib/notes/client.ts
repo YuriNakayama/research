@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { noteSchema, type Note } from "@/lib/notes/schema";
+import { noteSchema, type Note, type NoteAnchor } from "@/lib/notes/schema";
 
 // Client-side API for the notes endpoints. Every response is validated with
 // Zod at the boundary (see .claude/rules/frontend.md "API Communication").
@@ -55,11 +55,15 @@ export async function fetchNotes(slug: string): Promise<Note[]> {
   return notesResponseSchema.parse(await readJson(response)).data;
 }
 
-export async function createNote(slug: string, body: string): Promise<Note> {
+export async function createNote(
+  slug: string,
+  body: string,
+  anchor?: NoteAnchor,
+): Promise<Note> {
   const response = await fetch("/api/notes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ slug, body }),
+    body: JSON.stringify(anchor ? { slug, body, anchor } : { slug, body }),
   });
   if (!response.ok) {
     throw new Error(await readError(response));

@@ -18,6 +18,8 @@ import { Toc } from "@/components/report/toc";
 import { MobileToc } from "@/components/report/mobile-toc";
 import { Breadcrumbs } from "@/components/docs/breadcrumbs";
 import { NotesPanel } from "@/components/notes/notes-panel";
+import { NotesProvider } from "@/components/notes/notes-provider";
+import { AnnotatedArticle } from "@/components/notes/annotated-article";
 
 // Render docs pages on demand instead of statically pre-generating every one.
 // The number of Markdown docs grows without bound, and pre-rendering all of
@@ -100,8 +102,15 @@ export default async function DocsPage({ params }: PageProps) {
     >
       <Breadcrumbs items={breadcrumbs} />
       {hasMetadata && <ReportHeader title={doc.title} metadata={doc.metadata} />}
-      <MarkdownRenderer content={doc.content} basePath={currentSlug.slice(0, -1).join("/")} />
-      <NotesPanel slug={currentSlug.join("/")} />
+      <NotesProvider slug={currentSlug.join("/")}>
+        <AnnotatedArticle>
+          <MarkdownRenderer
+            content={doc.content}
+            basePath={currentSlug.slice(0, -1).join("/")}
+          />
+        </AnnotatedArticle>
+        <NotesPanel />
+      </NotesProvider>
     </DocsLayout>
   );
 }

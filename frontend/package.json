@@ -16,6 +16,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "test:unit": "vitest run",
     "check:mermaid": "node scripts/check-mermaid.mjs",
     "check:markdown": "markdownlint-cli2 --config ../.markdownlint-cli2.jsonc \"../research/**/*.md\"",
     "check:docs": "bun run check:markdown && bun run check:mermaid"
@@ -62,6 +63,7 @@
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.10"
   }
 }

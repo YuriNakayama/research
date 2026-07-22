@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
       noteId: randomUUID(),
       slug: parsed.data.slug,
       body: parsed.data.body,
+      anchor: parsed.data.anchor,
       now,
     });
     return ok(note, 201);

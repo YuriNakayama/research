@@ -12,6 +12,7 @@ import { MermaidBlock } from "./mermaid-block";
 import { ImageWithCaption } from "./image-with-caption";
 import { ResizableTable } from "./resizable-table";
 import { createSlugger } from "@/lib/toc";
+import { HeadingNoteButton } from "@/components/notes/heading-note-button";
 
 type MarkdownRendererProps = {
   content: string;
@@ -147,11 +148,14 @@ export function MarkdownRenderer({ content, basePath }: MarkdownRendererProps) {
         children,
         ...props
       }: ComponentPropsWithoutRef<"h2">) => {
-        const id = slugger(extractTextFromChildren(children));
+        const text = extractTextFromChildren(children);
+        const id = slugger(text);
         // scroll-mt keeps the target clear of the sticky header when jumped to.
+        // `group` scopes the note button's hover-reveal to this heading.
         return (
-          <Tag id={id} className="scroll-mt-24" {...props}>
+          <Tag id={id} className="group scroll-mt-24" {...props}>
             {children}
+            <HeadingNoteButton headingId={id} headingText={text} />
           </Tag>
         );
       };

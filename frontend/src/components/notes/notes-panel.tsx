@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { StickyNote, X } from "lucide-react";
-import { useNotes } from "@/hooks/use-notes";
+import { useNotesContext } from "@/components/notes/notes-provider";
 import { NotesContent } from "@/components/notes/notes-content";
-
-type NotesPanelProps = {
-  // Document slug the notes are attached to (e.g. "runs/foo/gather/...").
-  slug: string;
-};
 
 /**
  * Floating personal-notes widget.
@@ -20,15 +15,18 @@ type NotesPanelProps = {
  *   viewport resize and could be left stranded off its anchor.
  * - Expands into a card pinned to the same corner, capped to the viewport so
  *   the header and actions are never clipped.
+ *
+ * Open state lives in the provider so in-body affordances (heading buttons,
+ * selection popovers) can open the panel with an anchor already staged.
  */
-export function NotesPanel({ slug }: NotesPanelProps) {
-  const { notes, loading, error, submitting, addNote, removeNote } =
-    useNotes(slug);
-  const [open, setOpen] = useState<boolean>(false);
+export function NotesPanel() {
+  const ctx = useNotesContext();
+  const open = ctx?.open ?? false;
+  const setOpen = ctx?.setOpen;
 
   // Close on Escape for keyboard users.
   useEffect(() => {
-    if (!open) {
+    if (!open || !setOpen) {
       return;
     }
     const onKey = (event: KeyboardEvent) => {
@@ -38,7 +36,13 @@ export function NotesPanel({ slug }: NotesPanelProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, setOpen]);
+
+  if (!ctx) {
+    return null;
+  }
+
+  const { notes } = ctx;
 
   return (
     <>
@@ -46,7 +50,7 @@ export function NotesPanel({ slug }: NotesPanelProps) {
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => ctx.setOpen(true)}
           aria-label={`個人メモを開く（${notes.length} 件）`}
           className="fixed bottom-36 right-5 z-40 flex h-14 w-14 items-center justify-center brutal-border-strong brutal-shadow bg-[var(--accent-bg)] text-[var(--accent-text)] transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
         >
@@ -78,7 +82,7 @@ export function NotesPanel({ slug }: NotesPanelProps) {
             </div>
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => ctx.setOpen(false)}
               aria-label="個人メモを閉じる"
               className="flex w-10 shrink-0 items-center justify-center text-[var(--text-inverse)] transition-colors hover:bg-[var(--accent-bg)] hover:text-[var(--accent-text)] cursor-pointer"
             >
@@ -88,14 +92,7 @@ export function NotesPanel({ slug }: NotesPanelProps) {
 
           {/* Scrollable body. */}
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <NotesContent
-              notes={notes}
-              loading={loading}
-              error={error}
-              submitting={submitting}
-              onAdd={addNote}
-              onRemove={removeNote}
-            />
+            <NotesContent />
           </div>
         </div>
       )}

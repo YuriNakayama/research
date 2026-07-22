@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""Regenerate the `research/domains/**` browsing symlinks from `research/runs/**`.
+
+`domains/` is a convenience view: it lets a human browse each domain's newest
+output in git or a file manager. The viewer does NOT read it — pages are
+rendered by deriving the same view from `runs/` (frontend/src/lib/domain-view.ts).
+So a stale or missing link here never affects the published site; it only makes
+local browsing out of date. Run this after adding a run to bring it back in sync.
+
+Rules (identical to the viewer's resolver):
+  domains/<d>/clustering        -> runs/<d>/clustering/latest
+  domains/<d>/resources/<c>     -> runs/<d>/gather/<newest date containing c>/<c>
+  domains/<d>/reports/<c>       -> runs/<d>/retrieval/<newest date containing c>/<c>
+
+Clusters are resolved individually because a run does not necessarily re-run
+every cluster: the newest run directory is not the newest version of each
+cluster.
+
+Usage:
+  dev/sync-domain-links           # apply
+  dev/sync-domain-links --check   # exit 1 if anything would change (CI)
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+RESEARCH = REPO_ROOT / "research"
+RUNS = RESEARCH / "runs"
+DOMAINS = RESEARCH / "domains"
+
+DATE_DIR = re.compile(r"^\d{8}$")
+
+# View directory name -> backing run phase.
+VIEWS = {"resources": "gather", "reports": "retrieval"}
+
+
+def run_dates(domain: str, phase: str) -> list[str]:
+    """Dated run directories for a phase, newest first (`latest` excluded)."""
+    phase_dir = RUNS / domain / phase
+    if not phase_dir.is_dir():
+        return []
+    dates = [
+        d.name
+        for d in phase_dir.iterdir()
+        if DATE_DIR.match(d.name) and d.is_dir()
+    ]
+    return sorted(dates, reverse=True)
+
+
+def cluster_dates(domain: str, phase: str) -> dict[str, str]:
+    """Map each cluster to the newest run date that contains it."""
+    latest: dict[str, str] = {}
+    for date in run_dates(domain, phase):
+        for entry in sorted((RUNS / domain / phase / date).iterdir()):
+            if entry.name.startswith("."):
+                continue
+            if entry.is_dir() and entry.name not in latest:
+                latest[entry.name] = date
+    return latest
+
+
+def desired_links() -> dict[Path, str]:
+    """Every symlink that should exist, mapped to its target."""
+    links: dict[Path, str] = {}
+    if not RUNS.is_dir():
+        return links
+
+    for domain_dir in sorted(RUNS.iterdir()):
+        if not domain_dir.is_dir() or domain_dir.name.startswith("."):
+            continue
+        domain = domain_dir.name
+
+        # clustering: whole run directory, addressed through the phase pointer.
+        if (RUNS / domain / "clustering" / "latest").is_dir():
+            links[DOMAINS / domain / "clustering"] = (
+                f"../../runs/{domain}/clustering/latest"
+            )
+
+        for view, phase in VIEWS.items():
+            for cluster, date in cluster_dates(domain, phase).items():
+                links[DOMAINS / domain / view / cluster] = (
+                    f"../../../runs/{domain}/{phase}/{date}/{cluster}"
+                )
+
+    return links
+
+
+def current_links() -> dict[Path, str]:
+    """Every symlink that exists under `domains/` today."""
+    found: dict[Path, str] = {}
+    if not DOMAINS.is_dir():
+        return found
+    for dirpath, dirnames, filenames in os.walk(DOMAINS):
+        for name in list(dirnames) + filenames:
+            p = Path(dirpath) / name
+            if p.is_symlink():
+                found[p] = os.readlink(p)
+        # Do not descend into symlinked directories.
+        dirnames[:] = [d for d in dirnames if not (Path(dirpath) / d).is_symlink()]
+    return found
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="report drift without writing; exit 1 if out of sync",
+    )
+    args = parser.parse_args()
+
+    desired = desired_links()
+    current = current_links()
+
+    to_create = {p: t for p, t in desired.items() if current.get(p) != t}
+    to_remove = [p for p in current if p not in desired]
+
+    if not to_create and not to_remove:
+        print(f"domains/ is in sync ({len(desired)} links)")
+        return 0
+
+    for path in sorted(to_remove):
+        print(f"  stale   {path.relative_to(REPO_ROOT)}")
+    for path, target in sorted(to_create.items()):
+        old = current.get(path)
+        verb = "update " if old else "create "
+        print(f"  {verb} {path.relative_to(REPO_ROOT)} -> {target}")
+
+    if args.check:
+        print(
+            f"\nout of sync: {len(to_create)} to write, {len(to_remove)} stale.\n"
+            "Run dev/sync-domain-links to fix."
+        )
+        return 1
+
+    for path in to_remove:
+        path.unlink()
+    for path, target in to_create.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if path.is_symlink() or path.exists():
+            path.unlink()
+        path.symlink_to(target)
+
+    # Drop view directories left empty after pruning.
+    for domain_dir in sorted(DOMAINS.iterdir()) if DOMAINS.is_dir() else []:
+        for view in VIEWS:
+            view_dir = domain_dir / view
+            if view_dir.is_dir() and not any(view_dir.iterdir()):
+                view_dir.rmdir()
+
+    print(f"\nsynced: {len(to_create)} written, {len(to_remove)} removed")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

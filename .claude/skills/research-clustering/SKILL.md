@@ -350,10 +350,15 @@ After the new clustering run is written, update (or instruct the pipeline/user t
 
 ```bash
 ln -snf <YYYYMMDD> research/runs/<domain>/clustering/latest
-ln -snf ../../runs/<domain>/clustering/latest research/domains/<domain>/clustering
+
+# domains/ browsing view: rebuilt from runs/ for every domain (idempotent)
+dev/sync-domain-links
 ```
 
-If the `domains/<domain>/` directory does not yet exist, create it (it is just a view layer).
+`dev/sync-domain-links` creates the `domains/<domain>/` view layer as needed, so there is
+nothing to set up by hand. Note the viewer does not read those links at all — it derives
+the same view from `runs/` at request time — so they are a browsing convenience and a
+stale link never breaks the site.
 
 ## Parallel Processing
 

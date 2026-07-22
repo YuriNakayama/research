@@ -9,7 +9,18 @@ applications:
             # server can read it at request time (docs-content.ts reads
             # process.cwd()/research, and next.config.ts traces ./research/**).
             # Without this the SSR runtime hits ENOENT on /tmp/app/research → 500.
-            - rm -rf ./research && cp -r ../research ./research
+            #
+            # `-a` preserves symlinks instead of dereferencing them: plain `cp -r`
+            # expands every `runs/**/latest` pointer into a full duplicate copy of
+            # the run it targets, inflating the artifact and defeating the
+            # realpath-based dedup in lib/content-index.ts.
+            #
+            # `domains/**` symlinks are excluded because they are a browsing aid
+            # only — the viewer derives that view from `runs/` at request time
+            # (lib/domain-view.ts). The real files under `domains/` (domain.yaml,
+            # README.md) are still read, so they are copied back afterwards.
+            - rm -rf ./research && cp -a ../research ./research
+            - find ./research/domains -type l -delete
             - curl -fsSL https://bun.sh/install | bash
             - export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH"
             - bun install --frozen-lockfile

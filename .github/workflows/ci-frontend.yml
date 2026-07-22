@@ -41,8 +41,19 @@ jobs:
         with:
           bun-version: latest
 
+      # `domains/**` symlinks are a browsing aid only: the viewer derives that
+      # view from `runs/` at request time. Verify they still match `runs/` so a
+      # stale link does not mislead someone reading the repo.
+      - name: Check domains/ view is in sync
+        run: dev/sync-domain-links --check
+
+      # Mirror amplify.yml: `-a` keeps symlinks (plain `cp -r` expands every
+      # `latest` pointer into a duplicate copy), and the `domains/` links are
+      # dropped because the viewer never reads them.
       - name: Copy research content into frontend
-        run: cp -r research frontend/research
+        run: |
+          cp -a research frontend/research
+          find frontend/research/domains -type l -delete
 
       - name: Install dependencies
         working-directory: frontend

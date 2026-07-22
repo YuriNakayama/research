@@ -49,7 +49,12 @@ export async function POST(request: NextRequest) {
 
   const parsed = createNoteSchema.safeParse(payload);
   if (!parsed.success) {
-    return fail("Invalid request body", 400);
+    // Include which field failed — a bare "Invalid request body" makes a
+    // rejected slug or over-long body impossible to diagnose from the UI.
+    const detail = parsed.error.issues
+      .map((issue) => `${issue.path.join(".") || "body"}: ${issue.message}`)
+      .join(", ");
+    return fail(`Invalid request body (${detail})`, 400);
   }
 
   try {

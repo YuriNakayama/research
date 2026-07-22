@@ -14,6 +14,13 @@ import {
 import type { Note } from "@/lib/notes/schema";
 import { cn } from "@/lib/utils";
 
+// The selection button is right-aligned to the selection end via
+// -translate-x-full, so its left coordinate must stay at least its own width
+// from the viewport edge to remain fully visible.
+const BUTTON_MIN_LEFT = 120;
+const BUTTON_MARGIN = 8;
+const BUTTON_HEIGHT = 40;
+
 type Marker = {
   note: Note;
   // Viewport-independent position, relative to the article container.
@@ -189,7 +196,16 @@ export function NoteHighlightLayer({
       {selection && (
         <div
           data-notes-ignore
-          style={{ top: selection.y + 8, left: selection.x }}
+          // Anchored to the end of the selection, but kept inside the
+          // viewport: near the left edge the button's own width would
+          // otherwise push it off-screen and out of reach.
+          style={{
+            top: Math.min(selection.y + 8, window.innerHeight - BUTTON_HEIGHT),
+            left: Math.min(
+              Math.max(selection.x, BUTTON_MIN_LEFT),
+              window.innerWidth - BUTTON_MARGIN,
+            ),
+          }}
           className="fixed z-50 -translate-x-full"
         >
           <button

@@ -172,12 +172,16 @@ test.describe("Anchored notes", () => {
     // Select a paragraph's text programmatically — Playwright's drag emulation
     // is unreliable for text ranges across browsers.
     await page.evaluate(() => {
-      const paragraph = document.querySelector("article p, .prose p");
+      // Pick a paragraph with enough text that the selection ends mid-line,
+      // which is where a reader would realistically stop.
+      const paragraph = Array.from(
+        document.querySelectorAll("article p, .prose p"),
+      ).find((p) => (p.firstChild as Text | null)?.data?.length ?? 0 > 40);
       if (!paragraph?.firstChild) return;
       const range = document.createRange();
       const text = paragraph.firstChild as Text;
       range.setStart(text, 0);
-      range.setEnd(text, Math.min(20, text.data.length));
+      range.setEnd(text, Math.min(30, text.data.length));
       const sel = window.getSelection();
       sel?.removeAllRanges();
       sel?.addRange(range);

@@ -57,19 +57,31 @@ resource "aws_amplify_app" "main" {
   }
 }
 
+# Variables the SSR (WEB_COMPUTE) runtime reads from process.env at request
+# time. App-level environment_variables are supplied to the BUILD only —
+# NEXT_PUBLIC_* survive because Next.js inlines them into the bundle at build
+# time, but a plain server-side lookup like process.env.NOTES_TABLE_NAME finds
+# nothing unless the variable is also set on the branch. Without this the notes
+# API fails every write with "NOTES_TABLE_NAME is not configured".
+locals {
+  runtime_environment_variables = {
+    NODE_ENV         = "production"
+    NOTES_TABLE_NAME = var.notes_table_name
+  }
+}
+
 resource "aws_amplify_branch" "main" {
   app_id      = aws_amplify_app.main.id
   branch_name = "main"
   stage       = "PRODUCTION"
   framework   = "Next.js - SSR"
 
-  environment_variables = {
-    NODE_ENV = "production"
-  }
+  environment_variables = local.runtime_environment_variables
 }
 
 # Non-production preview branches (feature branches). Inherit the app-level
-# environment variables (Cognito config etc.); only NODE_ENV differs.
+# environment variables (Cognito config etc.) for the build; runtime values
+# must be repeated here for the same reason as above.
 resource "aws_amplify_branch" "preview" {
   for_each = toset(var.preview_branches)
 
@@ -78,9 +90,7 @@ resource "aws_amplify_branch" "preview" {
   stage       = "DEVELOPMENT"
   framework   = "Next.js - SSR"
 
-  environment_variables = {
-    NODE_ENV = "production"
-  }
+  environment_variables = local.runtime_environment_variables
 }
 
 # =============================================================================

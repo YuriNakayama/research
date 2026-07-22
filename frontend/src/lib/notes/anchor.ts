@@ -26,11 +26,6 @@ export type ResolvedRange = {
   exact: boolean;
 };
 
-/** Normalize whitespace so re-flowed markdown still matches. */
-export function normalizeText(text: string): string {
-  return text.replace(/\s+/g, " ");
-}
-
 /**
  * Build the anchor payload for a selection.
  *
@@ -51,12 +46,16 @@ export function buildSelectionAnchor(input: {
   if (quote.trim().length === 0) {
     return null;
   }
+  // The quote may have been truncated, so the suffix must start where the
+  // stored quote actually ends — not at the original selection end, which
+  // would capture text that never follows the quote and can never re-match.
+  const quoteEnd = start + quote.length;
   return {
     kind: "selection",
     ...(headingId ? { headingId } : {}),
     quote,
     prefix: documentText.slice(Math.max(0, start - ANCHOR_CONTEXT_MAX), start),
-    suffix: documentText.slice(end, end + ANCHOR_CONTEXT_MAX),
+    suffix: documentText.slice(quoteEnd, quoteEnd + ANCHOR_CONTEXT_MAX),
   };
 }
 
@@ -120,19 +119,58 @@ function fuzzyMatch(
   prefix: string,
   suffix: string,
 ): ResolvedRange | null {
-  const MIN_MATCH = Math.max(12, Math.ceil(quote.length * 0.4));
+  // Proportional only: a fixed character floor is too permissive for CJK text,
+  // where a dozen characters can be a whole meaningful phrase and would match
+  // unrelated passages. A wrong underline is more confusing than an orphan.
+  const MIN_MATCH = Math.max(
+    MIN_FUZZY_CHARS,
+    Math.ceil(quote.length * FUZZY_RATIO),
+  );
   for (let length = quote.length - 1; length >= MIN_MATCH; length -= 1) {
     const candidates = allIndexesOf(documentText, quote.slice(0, length));
     if (candidates.length === 0) continue;
-    const best = candidates.reduce((a, b) =>
-      contextScore(documentText, b, length, prefix, suffix) >
-      contextScore(documentText, a, length, prefix, suffix)
-        ? b
-        : a,
+    const best = pickByContext(
+      documentText,
+      candidates,
+      length,
+      prefix,
+      suffix,
     );
-    return { start: best, end: best + length, exact: false };
+    return { start: best.at, end: best.at + length, exact: false };
   }
   return null;
+}
+
+// Shortest partial quote accepted, and the fraction of the quote that must
+// survive. Both guard against matching an unrelated passage.
+const MIN_FUZZY_CHARS = 8;
+const FUZZY_RATIO = 0.6;
+
+/**
+ * Choose the candidate whose surroundings best reproduce the stored context.
+ * Scores are computed once per candidate rather than re-derived per comparison.
+ */
+function pickByContext(
+  documentText: string,
+  candidates: number[],
+  quoteLength: number,
+  prefix: string,
+  suffix: string,
+): { at: number; score: number } {
+  let best = { at: candidates[0], score: -1 };
+  for (const at of candidates) {
+    const score = contextScore(
+      documentText,
+      at,
+      quoteLength,
+      prefix,
+      suffix,
+    );
+    if (score > best.score) {
+      best = { at, score };
+    }
+  }
+  return best;
 }
 
 /**
@@ -154,13 +192,20 @@ export function resolveSelectionAnchor(
   }
   if (exact.length > 1) {
     // Ambiguous: the same sentence appears more than once. Context decides.
-    const best = exact.reduce((a, b) =>
-      contextScore(documentText, b, quote.length, anchor.prefix, anchor.suffix) >
-      contextScore(documentText, a, quote.length, anchor.prefix, anchor.suffix)
-        ? b
-        : a,
+    const best = pickByContext(
+      documentText,
+      exact,
+      quote.length,
+      anchor.prefix,
+      anchor.suffix,
     );
-    return { start: best, end: best + quote.length, exact: true };
+    return {
+      start: best.at,
+      end: best.at + quote.length,
+      // With no surrounding context reproduced, the occurrence was picked
+      // arbitrarily — report it as inexact so the UI marks it provisional.
+      exact: best.score > 0,
+    };
   }
 
   return fuzzyMatch(documentText, quote, anchor.prefix, anchor.suffix);

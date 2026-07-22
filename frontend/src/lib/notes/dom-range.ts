@@ -47,19 +47,53 @@ export function rangeToOffsets(
   root: HTMLElement,
   range: Range,
 ): { start: number; end: number } | null {
-  let offset = 0;
-  let start: number | null = null;
-  let end: number | null = null;
+  const nodes = textNodes(root);
 
-  for (const node of textNodes(root)) {
-    if (node === range.startContainer) {
-      start = offset + range.startOffset;
+  // Browsers may report a boundary as an element plus a child index (double
+  // click, cross-paragraph drags, selectAllChildren). Comparing only against
+  // text nodes would miss those and silently drop the selection, so fall back
+  // to boundary comparison against each text node.
+  const boundaryOffset = (
+    container: Node,
+    containerOffset: number,
+    isStart: boolean,
+  ): number | null => {
+    if (container.nodeType === Node.TEXT_NODE) {
+      let offset = 0;
+      for (const node of nodes) {
+        if (node === container) return offset + containerOffset;
+        offset += node.data.length;
+      }
+      return null;
     }
-    if (node === range.endContainer) {
-      end = offset + range.endOffset;
+
+    const probe = document.createRange();
+    try {
+      probe.setStart(container, containerOffset);
+    } catch {
+      return null;
     }
-    offset += node.data.length;
-  }
+    let offset = 0;
+    for (const node of nodes) {
+      // START_TO_START < 0 means the boundary precedes this text node, so the
+      // boundary sits at this node's start (or, for an end boundary, at the
+      // end of everything before it).
+      const nodeRange = document.createRange();
+      nodeRange.selectNodeContents(node);
+      if (probe.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0) {
+        return offset;
+      }
+      if (probe.compareBoundaryPoints(Range.START_TO_END, nodeRange) <= 0) {
+        return offset + node.data.length;
+      }
+      offset += node.data.length;
+    }
+    // Past every text node: clamp to the end for an end boundary.
+    return isStart ? null : offset;
+  };
+
+  const start = boundaryOffset(range.startContainer, range.startOffset, true);
+  const end = boundaryOffset(range.endContainer, range.endOffset, false);
 
   if (start === null || end === null || start >= end) {
     return null;
@@ -129,9 +163,16 @@ export function findEnclosingHeadingId(
     root.querySelectorAll<HTMLElement>("h2[id], h3[id], h4[id], h5[id], h6[id]"),
   );
   let found: string | undefined;
+  // querySelectorAll returns nodes in document order, so the last heading that
+  // precedes the start point is the enclosing one.
   for (const heading of headings) {
-    // DOCUMENT_POSITION_FOLLOWING: the heading comes after our start point, so
-    // the previous one encloses it.
+    // Selecting the heading's own text belongs to that heading, not the
+    // previous section — compareDocumentPosition returns 0 for self, which
+    // would otherwise fall through to the `break` below.
+    if (heading === startEl || heading.contains(startEl)) {
+      found = heading.id;
+      break;
+    }
     const position = heading.compareDocumentPosition(startEl);
     if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
       found = heading.id;

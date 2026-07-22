@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 
 type Filter = "all" | "page" | "anchored";
 
+// Set by the highlight layer on each rendered marker; lets a panel entry
+// scroll to the passage it annotates.
+const HIGHLIGHT_SELECTOR = "data-note-id";
+
 // Human-readable description of where a note is attached.
 function anchorLabel(anchor: NoteAnchor | undefined): string {
   if (!anchor) return "ページ全体";
@@ -274,11 +278,11 @@ function jumpToNote(note: Note): void {
   const target =
     note.anchor.kind === "heading"
       ? document.getElementById(note.anchor.headingId)
-      : document.querySelector(`[${HIGHLIGHT_SELECTOR}="${note.noteId}"]`);
+      : document.querySelector(
+          `[${HIGHLIGHT_SELECTOR}="${CSS.escape(note.noteId)}"]`,
+        );
   target?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
-
-const HIGHLIGHT_SELECTOR = "data-note-id";
 
 function formatTimestamp(iso: string): string {
   const date = new Date(iso);

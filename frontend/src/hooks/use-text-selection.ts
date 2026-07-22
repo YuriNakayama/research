@@ -51,7 +51,9 @@ export function useTextSelection(
         setSelection(null);
         return;
       }
-      setSelection({ range, x: rect.right, y: rect.bottom });
+      // The live Range mutates as the selection changes; store a snapshot so
+      // state stays immutable and the captured anchor matches what was seen.
+      setSelection({ range: range.cloneRange(), x: rect.right, y: rect.bottom });
     };
 
     document.addEventListener("selectionchange", onSelectionChange);

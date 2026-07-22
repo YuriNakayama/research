@@ -49,7 +49,19 @@ export function NotesProvider({
   const [open, setOpen] = useState<boolean>(false);
   const [draftAnchor, setDraftAnchor] = useState<NoteAnchor | null>(null);
   const [focusedNoteId, setFocusedNoteId] = useState<string | null>(null);
-  const [orphanIds, setOrphanIds] = useState<Set<string>>(() => new Set());
+  const [orphanIds, setOrphanIdsState] = useState<Set<string>>(() => new Set());
+
+  // The highlight layer recomputes on every resize and produces a fresh Set
+  // each time. Replacing state with an equal Set would invalidate this
+  // provider's memo and re-render every consumer, so only commit real changes.
+  const setOrphanIds = useCallback((next: Set<string>) => {
+    setOrphanIdsState((prev) => {
+      if (prev.size === next.size && [...next].every((id) => prev.has(id))) {
+        return prev;
+      }
+      return next;
+    });
+  }, []);
 
   const notesByHeading = useMemo(() => {
     const grouped = new Map<string | null, Note[]>();
@@ -100,6 +112,7 @@ export function NotesProvider({
       removeNote,
       notesByHeading,
       orphanIds,
+      setOrphanIds,
       focusedNoteId,
       focusNote,
       open,

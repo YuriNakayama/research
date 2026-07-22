@@ -450,17 +450,22 @@ AskUserQuestion:
 
 ### After writing
 
-Update the phase-level `latest` pointer (one per phase, pointing at the newest date directory) and the `domains/` view symlink for this cluster:
+Update the phase-level `latest` pointer, then regenerate the `domains/` view:
 
 ```bash
 # phase-level latest -> newest date directory
 ln -snf <YYYYMMDD> research/runs/<domain>/gather/latest
 
-# domains/ view: point this cluster at its newest date directory
-ln -snf ../../../runs/<domain>/gather/<YYYYMMDD>/<cluster> research/domains/<domain>/resources/<cluster>
+# domains/ browsing view: rebuilt from runs/ for every domain (idempotent)
+dev/sync-domain-links
 ```
 
 There is no per-cluster `latest_<cluster>` pointer — clusters are represented as subdirectories under the date directory.
+
+Do not hand-write links under `domains/`: `dev/sync-domain-links` derives them from
+`runs/`, pointing each cluster at the newest date directory that contains it. Note the
+viewer does not read those links at all — it derives the same view from `runs/` at request
+time — so they are a browsing convenience and a stale link never breaks the site.
 
 ## Parallel Processing
 

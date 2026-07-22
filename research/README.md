@@ -89,16 +89,29 @@ skill は次の手順で出力先を決定します。
   シンボリックリンク。あるクラスタが最新日付に存在しない場合は、そのクラスタを含む直近の
   日付ディレクトリを指す（クラスタ単位の最新ビューを維持するため）
 
-シンボリックリンク作成例:
+シンボリックリンクは手で張らず、**`dev/sync-domain-links` で再生成**します。上記の規則を
+そのまま実装したスクリプトで、`runs/` の実状から全ドメイン分を冪等に張り直します。
 
 ```bash
-# clustering: phase 単位の latest を指す
-ln -snf ../../runs/cate/clustering/latest research/domains/cate/clustering
-
-# gather/retrieval: 日付ディレクトリ配下のクラスタを直接指す
-ln -snf ../../../runs/cate/retrieval/20260322/metalearner research/domains/cate/reports/metalearner
-ln -snf ../../../runs/cate/gather/20260602/uplift_ranking  research/domains/cate/resources/uplift_ranking
+dev/sync-domain-links           # 再生成
+dev/sync-domain-links --check   # 差分があれば exit 1（CI 向け）
 ```
+
+### `domains/` は表示の正しさに関与しない
+
+viewer は `domains/` のシンボリックリンクを**読みません**。`/research/domains/...` の内容は
+リクエスト時に `runs/` から同じ規則で導出されます（`frontend/src/lib/domain-view.ts`）。
+
+理由は 2 つあります。
+
+1. `readdirSync` はシンボリックリンクをファイルともディレクトリとも判定しないため
+   （`Dirent.isDirectory()` が false）、リンクだけで構成されたディレクトリを走査すると
+   一覧が空になる
+2. 表示の正しさを、更新を忘れうる手動リンクに依存させたくない
+
+したがって `domains/` のリンクが古くても・壊れていても・存在しなくても、**公開される
+表示内容は常に正しい**。リンクは git やファイラで人がドメインを辿るための便宜であり、
+ずれた場合は `dev/sync-domain-links` で直せます。
 
 ## ドメインメタファイル `domain.yaml`（任意）
 

@@ -184,7 +184,12 @@ test.describe("Anchored notes", () => {
       document.dispatchEvent(new Event("selectionchange"));
     });
 
-    const addFromSelection = page.getByRole("button", { name: "メモを追加" });
+    // Exact match: the heading affordances are labelled "「…」にメモを追加",
+    // which a substring match would also resolve to.
+    const addFromSelection = page.getByRole("button", {
+      name: "メモを追加",
+      exact: true,
+    });
     await expect(addFromSelection).toBeVisible();
     await addFromSelection.click();
 

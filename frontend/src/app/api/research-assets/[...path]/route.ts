@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
+import { resolveDomainSlug } from "@/lib/domain-view";
 
 const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
@@ -26,7 +27,10 @@ export async function GET(
     }
   }
 
-  const filePath = path.resolve(RESEARCH_ROOT, ...segments);
+  // Assets referenced from a `domains/` page resolve into the backing run
+  // directory, since `domains/` is a virtual view (see lib/domain-view.ts).
+  const resolved = resolveDomainSlug(segments) ?? segments;
+  const filePath = path.resolve(RESEARCH_ROOT, ...resolved);
 
   // Ensure resolved path is within RESEARCH_ROOT
   if (!filePath.startsWith(RESEARCH_ROOT + path.sep)) {

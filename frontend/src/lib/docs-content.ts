@@ -1,5 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  isDomainViewDirectory,
+  listDomainViewEntries,
+  resolveDomainSlug,
+} from "./domain-view";
 
 const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
@@ -63,10 +68,42 @@ export function getRootEntries(): { name: string; isDirectory: boolean; slug: st
 }
 
 export function getDocsTree(): TreeNode[] {
-  return buildTree(RESEARCH_ROOT, "research", "/research").children;
+  return buildTree(RESEARCH_ROOT, "research", "/research", []).children;
 }
 
-function buildTree(fullPath: string, name: string, urlPath: string): TreeNode {
+function buildTree(
+  fullPath: string,
+  name: string,
+  urlPath: string,
+  slug: string[],
+): TreeNode {
+  // Under `domains/` the on-disk entries are symlinks, which readdirSync cannot
+  // classify. Build those branches from the virtual view instead so the sidebar
+  // mirrors what the pages actually render.
+  const virtualEntries = listDomainViewEntries(slug);
+  if (virtualEntries) {
+    return {
+      name,
+      path: urlPath,
+      isDirectory: true,
+      children: virtualEntries.map((entry) =>
+        entry.isDirectory
+          ? buildTree(
+              fullPath,
+              entry.name,
+              `${urlPath}/${entry.name}`,
+              entry.slug,
+            )
+          : {
+              name: entry.name,
+              path: `${urlPath}/${entry.name}`,
+              isDirectory: false,
+              children: [],
+            },
+      ),
+    };
+  }
+
   const entries = fs.readdirSync(fullPath, { withFileTypes: true });
   const children: TreeNode[] = [];
 
@@ -85,6 +122,7 @@ function buildTree(fullPath: string, name: string, urlPath: string): TreeNode {
           path.join(fullPath, entry.name),
           entry.name,
           `${urlPath}/${entry.name}`,
+          [...slug, entry.name],
         ),
       );
     } else if (isMarkdownFile(entry.name)) {
@@ -102,7 +140,10 @@ function buildTree(fullPath: string, name: string, urlPath: string): TreeNode {
 }
 
 export function getDocContent(slug: string[]): DocContent | null {
-  const mdPath = resolveDocsPath([...slug.slice(0, -1), `${slug[slug.length - 1]}.md`]);
+  // `domains/` paths are a virtual view over `runs/` (see domain-view.ts); read
+  // the backing run file rather than the symlink tree.
+  const target = resolveDomainSlug(slug) ?? slug;
+  const mdPath = resolveDocsPath([...target.slice(0, -1), `${target[target.length - 1]}.md`]);
 
   if (!fs.existsSync(mdPath) || !fs.statSync(mdPath).isFile()) {
     return null;
@@ -116,6 +157,9 @@ export function getDocContent(slug: string[]): DocContent | null {
 }
 
 export function isDirectory(slug: string[]): boolean {
+  validateSlug(slug);
+  if (slug[0] === "domains") return isDomainViewDirectory(slug);
+
   const fullPath = resolveDocsPath(slug);
   return fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory();
 }
@@ -123,6 +167,13 @@ export function isDirectory(slug: string[]): boolean {
 export function getDirectoryEntries(
   slug: string[],
 ): { name: string; isDirectory: boolean; slug: string[] }[] {
+  validateSlug(slug);
+
+  // `domains/` listings are assembled from `runs/` because the on-disk view is
+  // built from symlinks, which readdirSync reports as neither file nor dir.
+  const virtualEntries = listDomainViewEntries(slug);
+  if (virtualEntries) return virtualEntries;
+
   const fullPath = resolveDocsPath(slug);
   if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) return [];
 

@@ -74,11 +74,14 @@ function shouldInclude(name: string): boolean {
   return !IGNORED_NAMES.has(name) && !name.startsWith(".");
 }
 
-// `latest[_<cluster>]` run directories are symlink aliases of a dated run
-// (per research directory rules). The build-time `cp -r` dereferences those
-// symlinks into real directory copies, so realpath dedup alone can't collapse
-// them. Skipping the alias by name keeps the dated run as the canonical URL and
-// prevents every report from being indexed twice.
+// `latest[_<cluster>]` run directories are symlink aliases of a dated run (per
+// research directory rules). Skipping them by name keeps the dated directory as
+// the canonical URL for every report, so search results and dashboard links
+// point at a stable path rather than one that moves with each new run.
+//
+// The realpath dedup below is a second line of defence: the build-time copy
+// preserves symlinks (`cp -a`), so an alias that slipped through would resolve
+// to an already-seen file rather than a distinct duplicate.
 function isLatestAlias(name: string): boolean {
   return name === "latest" || name.startsWith("latest_");
 }

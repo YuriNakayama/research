@@ -76,6 +76,9 @@ __pycache__/
 *.tfstate.*
 *.tfplan
 *.tfplan.*
+# Saved plan files are commonly written without an extension (terraform plan
+# -out=tfplan); they embed resource attributes and must never be committed.
+tfplan
 .terraform
 .terraform.lock.hcl
 .infracost

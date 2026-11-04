@@ -348,3 +348,9 @@ Alibaba / Tencent / Baidu / ByteDance を出願人とする LLM 蒸留特許は�
 - **xAI 規約の一次確認**: 403 で取得できなかった Enterprise ToS / AUP の原文確認
   - （2026-10-22 訂正）完了（技術情報 #36–#38）
 - （2026-10-22 追記）**残る未取得**: OpenAI の下院覚書原文、BLADE Act 条文、Vertex AI の Gemini 蒸留ドキュメント、AI 事業者ガイドライン第 1.2 版本文、蒸留と利用規約を正面から扱う日本の弁護士解説（5 回の検索で発見できず）、EPO T 1425/21 の理由本文
+
+## 2026-10-23 追記: 出願人別件数の集計ソース
+
+| # | リソース | 種別 | 用途 |
+|---|---------|------|------|
+| 追-1 | DEPATISnet エキスパート検索（DPMA）<https://depatisnet.dpma.de/DepatisNet/depatisnet?action=experte> | Patent DB | 出願人別の蒸留特許件数（海外 50 社・国内 40 社、retrieval 13 に集計） |

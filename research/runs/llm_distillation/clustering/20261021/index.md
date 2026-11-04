@@ -242,6 +242,8 @@ graph LR
     OP -.国内本番 A/B は 0 件.-> GAP
 ```
 
+> **（2026-11-04 追記）** 事業者が蒸留を使う目的別（コスト削減 / 情報抽出 / エッジ / tool calling / 安全 / モデル製造）の国内外比較は [retrieval/20261021/all/01](../../retrieval/20261021/all/01-distillation-use-cases-by-purpose.md) にまとめました。
+
 ### ビジネス価値式から見た示唆
 
 $$
@@ -272,6 +274,7 @@ $$
 | 金融・法務・医療の「蒸留で小型化した本番モデル」の一次数値 | 英日 60 回超の検索、Robin AI / Abridge / BNY / Nubank 等を個別確認 | ベンダーへの直接ヒアリング、学会 Industry Track の継続監視 |
 | 国内事業会社の本番 A/B | 金融 5 社・通信 3 社・SIer 3 社・検索/推薦 5 社を日本語で個別検索 | NLP2027 / JSAI 2027 の予稿、各社テックブログの定期巡回 |
 | 日本特許庁の蒸留特許 | Google Patents は 503 でブロック、J-PlatPat は JS アプリで取得不能 | J-PlatPat の手動検索（「知識蒸留」×「言語モデル」、出願人指定） |
+| （2026-10-23 追記）出願人別の特許件数 | Google Patents の遮断が続いたため DEPATISnet（DPMA）で海外 50 社・国内 40 社を同一条件で集計（[C8-13](../../retrieval/20261021/legal_ip_patents/13-patent-counts-by-assignee.md)）。知識蒸留は国家電網 130 / Huawei 65 / Samsung 59 / Tencent 53 件、言語モデル蒸留は之江実験室 19 / Microsoft 9 件、国内は東芝 3 / LINE 2 件のみ | 名称・要約検索かつ公報数のため下限値。ファミリー単位・全文検索（Google Patents 復旧後）と J-PlatPat で再集計 |
 | 取得できなかった一次資料 | OpenAI 発表（403）、Gemini 蒸留ページ（404）、富士通 PR（429）、Etsy / DoorDash（403） | ブラウザ経由の手動取得 |
 
 ## 次フェーズへの申し送り

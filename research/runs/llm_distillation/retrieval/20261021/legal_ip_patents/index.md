@@ -4,7 +4,7 @@
 
 ## Parameters
 
-- **Resources analyzed**: 12 レポート（一次資料・論評・報道を計 50 件超参照。2026-10-22 追記: [12 特許ランドスケープ](12-patent-landscape.md) を追加し、04 / 05 / 06 / 08 / 09 / 11 に再検証の追記・訂正を加えた）
+- **Resources analyzed**: 13 レポート（2026-10-23 追記: [13 出願人別件数](13-patent-counts-by-assignee.md) を追加。一次資料・論評・報道を計 50 件超参照。2026-10-22 追記: [12 特許ランドスケープ](12-patent-landscape.md) を追加し、04 / 05 / 06 / 08 / 09 / 11 に再検証の追記・訂正を加えた）
 - **Resource types**: Paper / Patent / Technical（規約・ライセンス・一次ブログ・法律分析・政策） / Business
 - **Generated on**: 2026-10-21（2026-10-22 追記・訂正）
 - **Input source**: gather 出力（`research/runs/llm_distillation/gather/20261021/legal_ip_patents/resources-legal-ip-patents.md`）
@@ -86,6 +86,7 @@ flowchart TD
 |---|-------|-----------|----------|------|--------|
 | 11 | Generating natural language model insights for data charts using light language models distilled from large language models（＋ランドスケープ 11 件） | US12626056B2 | Adobe Inc. | 2026 | [Details](11-patent-adobe-us12626056-and-landscape.md) |
 | 12 | （2026-10-22 追記）Robust documentation understanding using LLM knowledge distillation and joint training（＋ USPTO 公報確認 8 件、JP / CN / EP 検索結果レベル約 30 件、EPO 審決 T 1425/21） | US12475175B1 | SAP SE | 2025 | [Details](12-patent-landscape.md) |
+| 13 | （2026-10-23 追記）蒸留関連特許の出願人別件数（海外 50 社・国内 40 社、DEPATISnet 集計。知識蒸留 5,588 件 / 言語モデル蒸留 280 件 / LLM 蒸留 2022〜 288 件の分母と、国家電網 130・Huawei 65・Microsoft 21・東芝 3・LINE 2 などの出願人別件数） | （件数集計） | 複数 | 2026 | [Details](13-patent-counts-by-assignee.md) |
 
 ### Technical Articles
 
@@ -181,7 +182,7 @@ graph TD
 | law-ai.org「Responding to AI distillation without panic」 | CFAA と規約違反の関係 | 403 |
 | IAPS 2026-03 メモ「The Case for Targeted Government Intervention」 | 政策の前提整理 | 未取得 |
 | Antidistillation Fingerprinting（Xu et al., 2026） | 事後帰属の新手法 | 未取得 |
-| J-PlatPat での LLM 蒸留特許（FI G06N3/096） | 日本の特許空白 | （2026-10-22 追記）**試行したが J-PlatPat は 403 で拒否**。Google Patents 検索 API で JP 127 件中 50 件を取得（12 の表 3）。日本企業の出願人絞り込みは未完 |
+| J-PlatPat での LLM 蒸留特許（FI G06N3/096） | 日本の特許空白 | （2026-10-22 追記）**試行したが J-PlatPat は 403 で拒否**。Google Patents 検索 API で JP 127 件中 50 件を取得（12 の表 3）。日本企業の出願人絞り込みは未完。（2026-10-23 追記）DEPATISnet で出願人別に集計: 国内は東芝 3 件・LINE 2 件のみが言語モデル蒸留（[13](13-patent-counts-by-assignee.md)）。J-PlatPat の手動確認は未実施 |
 | Google Threat Intelligence のモデル抽出報告（2025） | Google 側の一次データ | 未取得（IAM 記事で言及のみ） |
 | （2026-10-22 追記）NSA / CISA / FBI 共同勧告 AA26-251A（2026-09-08） | 6 社を名指しした政府一次資料 | **取得済み**（cisa.gov、09 追記） |
 | （2026-10-22 追記）EPO 審決 T 1425/21 の理由本文 | 蒸留手法特許の進歩性判断 | 書誌のみ取得（12） |

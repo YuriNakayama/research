@@ -30,6 +30,8 @@ graph TD
 4. 2026 年には **教師選びの方法論**（三菱電機・CyberAgent）が国内企業から出ており、「大きい教師ほど良い」とは限らないことが日本語でも確認されています。
 5. （2026-10-22 追記）国内事業者の一覧（蒸留を売る事業者 / 蒸留モデルを売る事業者 / SIer・防御・市場予測の空白）は [distillation_platforms/15-distillation-business-landscape-japan-vs-overseas.md](../distillation_platforms/15-distillation-business-landscape-japan-vs-overseas.md) を参照してください。
 
+> **（2026-11-04 追記）** 海外事例を含む目的別のユースケース一覧は [all/01](../all/01-distillation-use-cases-by-purpose.md) を参照してください。
+
 ## Report List
 
 ### Academic Papers

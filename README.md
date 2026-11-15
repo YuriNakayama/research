@@ -18,6 +18,7 @@ dev/       開発用スクリプト（setup / format / lint / create-worktree）
 
 - research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先は `research/runs/<domain>/<phase>/...`。配置ルールは [`research/README.md`](./research/README.md) を参照。
 - `research/**` は append-only。ファイル配置がそのまま viewer の公開 URL（`/research/...`）構造になる。
+- ドメインには `domain.yaml` の `tags` でタグを付ける。タグの付け直しやドメインの改名・統合・分離は、`research-housekeeping` skill を起動して行う（実行は `dev/research-admin`）。
 
 ## セットアップ
 

@@ -38,7 +38,5 @@ clusters:
     name: 模倣学習モデル設計
     keywords: [behavioral cloning, DAgger, autoregressive policy, pointer network, parameterized action space, meta kaggle episodes, top bot replay, AlphaStar Unplugged, AlphaStar supervised, IL to RL hybrid, Kore 2022 autoregressive IL, Hungry Geese BC, Halite semantic segmentation IL]
     priority: high
-output_paths:
-  clustering: runs/{domain}/clustering/{date}/
-  gather: runs/{domain}/gather/{date}_{cluster}/
-  retrieval: runs/{domain}/retrieval/{date}_{cluster}/
+tags: [kaggle, game_ai, reinforcement_learning]
+tags_reviewed: 2026-11-16

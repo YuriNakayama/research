@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import {
   getDocContent,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/docs-content";
 import { extractTocItems } from "@/lib/toc";
 import { getHomeData } from "@/lib/home-feed";
+import { findRedirect } from "@/lib/research-redirects";
 import { DocsLayout } from "@/components/docs/docs-layout";
 import { DirectoryIndex } from "@/components/docs/directory-index";
 import { HomeView } from "@/components/home/home-view";
@@ -88,6 +89,10 @@ export default async function DocsPage({ params }: PageProps) {
   // Markdown page: render content
   const doc = getDocContent(currentSlug);
   if (!doc) {
+    // Housekeeping (rename / merge / split) records moved paths in
+    // research/_meta/redirects.yaml; send old links to the new location.
+    const moved = findRedirect(currentSlug);
+    if (moved) permanentRedirect(`/research/${moved}`);
     notFound();
   }
 

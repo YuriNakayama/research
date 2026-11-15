@@ -8,7 +8,8 @@ import {
 
 const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
-const IGNORED_NAMES = new Set(["node_modules", ".git", ".DS_Store"]);
+// `_meta/` holds housekeeping data (tags, redirects, change records), not content.
+const IGNORED_NAMES = new Set(["node_modules", ".git", ".DS_Store", "_meta"]);
 
 export type TreeNode = {
   name: string;

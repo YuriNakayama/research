@@ -68,13 +68,16 @@ export function useNotes(slug: string): UseNotesResult {
     async (noteId: string): Promise<void> => {
       setError(null);
       try {
-        await deleteNoteRequest(slug, noteId);
+        // A note listed here may have been written under an earlier path of
+        // this document (housekeeping moved it); delete it where it is stored.
+        const stored = notes.find((note) => note.noteId === noteId)?.slug ?? slug;
+        await deleteNoteRequest(stored, noteId);
         setNotes((prev) => prev.filter((note) => note.noteId !== noteId));
       } catch (err) {
         setError(err instanceof Error ? err.message : "メモの削除に失敗しました");
       }
     },
-    [slug],
+    [slug, notes],
   );
 
   return { notes, loading, error, submitting, addNote, removeNote };

@@ -34,7 +34,15 @@ RESEARCH = REPO_ROOT / "research"
 RUNS = RESEARCH / "runs"
 DOMAINS = RESEARCH / "domains"
 
-DATE_DIR = re.compile(r"^\d{8}$")
+# `<YYYYMMDD>`, or `<YYYYMMDD>-<n>` when a merge moved a second run onto a date
+# the domain already had (dev/research-admin). A larger n is newer.
+DATE_DIR = re.compile(r"^(\d{8})(?:-(\d+))?$")
+
+
+def run_dir_key(name: str) -> tuple[str, int]:
+    m = DATE_DIR.match(name)
+    assert m is not None
+    return (m.group(1), int(m.group(2) or 1))
 
 # View directory name -> backing run phase.
 VIEWS = {"resources": "gather", "reports": "retrieval"}
@@ -50,7 +58,7 @@ def run_dates(domain: str, phase: str) -> list[str]:
         for d in phase_dir.iterdir()
         if DATE_DIR.match(d.name) and d.is_dir()
     ]
-    return sorted(dates, reverse=True)
+    return sorted(dates, key=run_dir_key, reverse=True)
 
 
 def cluster_dates(domain: str, phase: str) -> dict[str, str]:

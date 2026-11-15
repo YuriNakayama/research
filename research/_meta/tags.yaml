@@ -1,0 +1,43 @@
+# Tag dictionary. Edit label / aliases / description freely; change ids with
+# `dev/research-admin tags rename|merge` (see research/README.md).
+- id: ai_agents
+  label: AI エージェント
+  description: 自律的にタスクを進めるエージェント
+- id: business_cases
+  label: ビジネス事例
+- id: causal_inference
+  label: 因果推論
+  description: 施策の因果効果の推定と活用
+- id: data_platform
+  label: データ基盤・MLOps
+- id: evaluation
+  label: 評価・ベンチマーク
+- id: game_ai
+  label: ゲーム AI
+  description: ゲームをプレイするエージェントの設計
+- id: gpu_acceleration
+  label: GPU 高速化
+- id: hvac
+  label: 空調制御
+  description: データセンター・ビルの空調設備の制御
+- id: imperfect_info
+  label: 不完全情報ゲーム
+  description: 相手の情報が隠れたゲームの探索・学習
+- id: kaggle
+  label: Kaggle コンペ
+- id: knowledge_distillation
+  label: 知識蒸留
+- id: legal
+  label: 法務・リーガル
+- id: llm
+  label: LLM
+- id: marketing
+  label: マーケティング
+- id: organizational_behavior
+  label: 組織行動・経営学
+  description: 組織内の人の行動と経営学の研究成果
+- id: reinforcement_learning
+  label: 強化学習
+- id: uplift_modeling
+  label: アップリフトモデリング
+  description: CATE を予測して施策対象を選ぶ手法

@@ -1,0 +1,30 @@
+#!/bin/bash
+# Housekeeping for research/: tags, display names, rename / merge / split of
+# domains, and the integrity check. See research/README.md「整理」.
+#
+#   dev/research-admin check
+#   dev/research-admin report
+#   dev/research-admin merge kaggle_ptcg_ai_battle --into kaggle_ptcg          # dry-run
+#   dev/research-admin merge kaggle_ptcg_ai_battle --into kaggle_ptcg --apply
+#
+# Moving commands re-run dev/sync-domain-links after a successful --apply.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+ROOT_DIR="$(pwd)"
+
+if ! command -v bun >/dev/null 2>&1; then
+  echo "bun is required (see dev/setup)" >&2
+  exit 2
+fi
+
+status=0
+bun "$ROOT_DIR/frontend/src/lib/research-admin/cli.ts" --root "$ROOT_DIR/research" "$@" || status=$?
+
+if [[ $status -eq 0 && " $* " == *" --apply "* ]]; then
+  case "${1:-}" in
+    rename|merge|split) "$ROOT_DIR/dev/sync-domain-links" ;;
+  esac
+fi
+
+exit $status

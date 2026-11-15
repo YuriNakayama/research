@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
 import { resolveDomainSlug } from "@/lib/domain-view";
+import { findRedirect } from "@/lib/research-redirects";
 
 const RESEARCH_ROOT = path.join(process.cwd(), "research");
 
@@ -15,7 +16,7 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path: segments } = await params;
@@ -45,6 +46,11 @@ export async function GET(
   }
 
   if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    // The asset may have moved with its domain (see research/_meta/redirects.yaml).
+    const moved = findRedirect(segments);
+    if (moved) {
+      return NextResponse.redirect(new URL(`/api/research-assets/${moved}`, request.url), 308);
+    }
     return new NextResponse("Not Found", { status: 404 });
   }
 

@@ -4,6 +4,7 @@ import { getCurrentUserSub } from "@/lib/notes/auth";
 import { createNoteSchema, slugQuerySchema } from "@/lib/notes/schema";
 import { listNotes, createNote } from "@/lib/notes/dynamo";
 import { ok, fail } from "@/lib/notes/http";
+import { findPreviousPaths } from "@/lib/research-redirects";
 
 // DynamoDB access requires the Node.js runtime (AWS SDK), not the Edge runtime.
 export const runtime = "nodejs";
@@ -25,7 +26,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const notes = await listNotes(sub, parsed.data.slug);
+    // Notes are keyed by document path. When housekeeping moved the document,
+    // notes written under its earlier paths are listed too (each keeps its own
+    // stored slug, which the client uses to delete it).
+    const slugs = [parsed.data.slug, ...findPreviousPaths(parsed.data.slug)];
+    const lists = await Promise.all(slugs.map((slug) => listNotes(sub, slug)));
+    const notes = lists.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return ok(notes);
   } catch (error) {
     console.error("Failed to list notes:", error);

@@ -34,7 +34,5 @@ clusters:
     name: RNG 重め大規模確率ゲーム
     keywords: [Suphx mahjong, DouZero DouDizhu, Deep Monte Carlo, global reward prediction, oracle guiding, bridge determinization, Maven Scrabble, AlphaStar, CICERO piKL]
     priority: medium_high
-output_paths:
-  clustering: runs/{domain}/clustering/{date}/
-  gather: runs/{domain}/gather/{date}_{cluster}/
-  retrieval: runs/{domain}/retrieval/{date}_{cluster}/
+tags: [kaggle, game_ai, imperfect_info, reinforcement_learning, ai_agents]
+tags_reviewed: 2026-11-16

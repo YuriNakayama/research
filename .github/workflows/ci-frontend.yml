@@ -5,6 +5,8 @@ on:
     paths:
       - "frontend/**"
       - "research/**"
+      - "dev/research-admin"
+      - "dev/sync-domain-links"
       - ".github/workflows/ci-frontend.yml"
     types:
       - opened
@@ -59,6 +61,12 @@ jobs:
         working-directory: frontend
         run: bun install --frozen-lockfile
 
+      # Every domain has a domain.yaml with tags from research/_meta/tags.yaml,
+      # `latest` points at the newest run, and housekeeping redirects resolve.
+      # Run against the repository tree, not the staged copy above.
+      - name: Check research housekeeping integrity
+        run: dev/research-admin check
+
       # E2E specs assert against a deterministic report; add it to the copied
       # research tree before `next build` so that generateStaticParams sees it.
       - name: Setup E2E fixtures
@@ -68,6 +76,10 @@ jobs:
       - name: Type check
         working-directory: frontend
         run: bun run type-check
+
+      - name: Unit tests
+        working-directory: frontend
+        run: bun run test:unit
 
       - name: Lint
         working-directory: frontend

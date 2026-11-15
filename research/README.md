@@ -4,10 +4,11 @@
 
 ## 設計原則
 
-1. **`runs/` は append-only** — 実行のたびに新しいディレクトリを追加し、過去のものは書き換えません。これが source of truth です。
+1. **`runs/` は append-only** — 実行のたびに新しいディレクトリを追加し、過去のものは書き換えません。これが source of truth です。例外は「整理」（後述）だけで、`dev/research-admin` 経由に限り、実行結果の**置き場所**の移動と、移動で壊れる内部リンクの書き換えを行えます。実行結果の中身そのものは整理でも書き換えません。
 2. **`domains/` は最新ビュー** — 各ドメインの最新成果物を見やすく整理した参照用レイヤー。`runs/` 内の最新版を指すシンボリックリンクで構成します。
 3. **同一ドメインで `clustering` は複数回実行され得る** — 再クラスタリングで構造が変わった場合も過去の run は残し、`latest` ポインタだけを更新します。
 4. **phase は3種固定**: `clustering` / `gather` / `retrieval`
+5. **最上位は分類しない。タグで横断する** — 調査は任意の観点で始まるため、ドメインを上位分類の木に収めることはしません。各ドメインに `domain.yaml` の `tags` を付け、タグの付け直し・ドメインの改名・統合・分離は「整理」で随時行います。
 
 ## ディレクトリ構成
 
@@ -20,9 +21,15 @@ phase ごとに **1本** で、最新の日付ディレクトリを指します�
 research/
 ├── README.md                                # このファイル（構成の単一情報源）
 │
+├── _meta/                                   # 【整理の管理情報】dev/research-admin が更新する
+│   ├── tags.yaml                            # タグ辞書
+│   ├── redirects.yaml                       # 転送表（旧パス → 新パス）
+│   └── changes/                             # 変更記録（構造・タグ id の変更 1 回 = 1 ファイル）
+│       └── <YYYYMMDD>-<op>-<target>.yaml
+│
 ├── domains/                                 # 【最新ビュー】ドメイン中心
 │   └── <domain>/
-│       ├── domain.yaml                      # ドメインメタ（任意・存在すれば skill が読む）
+│       ├── domain.yaml                      # ドメインメタ（必須。タグもここに書く）
 │       ├── clustering -> ../../runs/<domain>/clustering/latest
 │       ├── resources/                       # 各クラスタの最新リソース一覧
 │       │   └── <cluster> -> ../../../runs/<domain>/gather/<YYYYMMDD>/<cluster>
@@ -64,6 +71,7 @@ skill は次の手順で出力先を決定します。
 3. **存在しない場合は下表の既定パスを使用**
 4. **`<date>` は実行日 (`YYYYMMDD`)、`<cluster>` は対象クラスタ ID (`snake_case` or `kebab-case`)**
 5. **完了後、phase ごとの `latest` ポインタと `domains/` ビューを更新**（skill / 人手）
+6. **新規ドメインの場合は `domains/<domain>/domain.yaml` を作成**（`domain` / `display_name` と、空の `tags: []`）。タグは整理で付けます。
 
 ### phase 別の既定出力先
 
@@ -113,25 +121,78 @@ viewer は `domains/` のシンボリックリンクを**読みません**。`/r
 表示内容は常に正しい**。リンクは git やファイラで人がドメインを辿るための便宜であり、
 ずれた場合は `dev/sync-domain-links` で直せます。
 
-## ドメインメタファイル `domain.yaml`（任意）
+## ドメインメタファイル `domain.yaml`（必須）
 
-ドメインごとに固有のクラスタ定義や出力先テンプレを持たせたい場合に作成します。存在しなければ skill は既定値を使います。
+すべてのドメインに置きます。viewer は表示名とタグを、skill はクラスタ定義と出力先テンプレをここから読みます。
 
 ```yaml
-domain: cate
-display_name: CATE (Conditional Average Treatment Effect)
-clusters:
+domain: cate                      # フォルダ名と一致させる（必須）
+display_name: CATE (Conditional Average Treatment Effect)   # 画面に出す名前（必須）
+description: CATE 推定の精度向上手法の調査                   # 任意
+tags: [causal_inference, uplift_modeling]   # _meta/tags.yaml の id のみ（必須。空配列可）
+tags_reviewed: 2026-11-15         # ドメイン内の全ファイルからタグを見直した日（任意）
+clusters:                         # 任意
   - id: metalearner
     keywords: [S-learner, T-learner, X-learner, DR-learner]
-  - id: theory
-    keywords: [identification, ignorability]
-  - id: deep_learning
-    keywords: [TARNet, Dragonnet, BCAUSS]
-output_paths:
+output_paths:                     # 任意。書く場合は下記の現行形式に限る
   clustering: runs/{domain}/clustering/{date}/
   gather:     runs/{domain}/gather/{date}/{cluster}/
   retrieval:  runs/{domain}/retrieval/{date}/{cluster}/
 ```
+
+- **タグはドメイン単位**です。`runs/` の全 phase・全日付のファイルを総合して付けます。
+- `tags_reviewed` より新しい実行結果が増えると、整理の診断で「タグが古い」と判定されます。
+- 表示名を変えたいだけなら `display_name` を書き換えます。フォルダ名は変わりません。
+
+## 整理（タグ・改名・統合・分離）
+
+ドメインの構成は随時見直します。何を変えるかは整理 skill（`research-housekeeping`）が中身を読んで提案し、承認された操作を管理スクリプト（`dev/research-admin`）が実行します。手でファイルを移動しないでください。
+
+| 操作 | コマンド | 変わるもの |
+|---|---|---|
+| タグの付け直し | `tags set <domain> <id...>` | その `domain.yaml` の `tags` / `tags_reviewed` |
+| タグの改名・統合 | `tags rename <old> <new>` / `tags merge <id...> --into <id>` | `_meta/tags.yaml` と該当する全 `domain.yaml` |
+| 表示名の変更 | `title <domain> "<表示名>"` | `display_name` のみ |
+| ドメインの改名 | `rename <old> <new>` | フォルダ名（`runs/` と `domains/` の両方） |
+| ドメインの統合 | `merge <domain...> --into <domain>` | 統合元の全実行結果と `domains/<domain>/` の実ファイルを統合先へ移動 |
+| ドメインの分離 | `split <domain> --to <new> --paths <path...>` | 指定した実行結果（日付ディレクトリまたはクラスタ）だけを新ドメインへ移動 |
+| 検証 | `check` | 何も変えない（CI でも実行） |
+| 診断 | `report` | 何も変えない（整理 skill が使う） |
+
+- どのコマンドも既定では変更内容を表示するだけで、`--apply` を付けたときだけ実行します。
+- 改名・統合・分離では、ファイル移動、`latest` の張り直し、内部リンクの書き換え、`_meta/redirects.yaml` と `_meta/changes/` への追記、`dev/sync-domain-links` の実行までをまとめて行います。
+- 古い URL は `_meta/redirects.yaml` によって新しい URL へ転送されます。個人メモも旧パスのものが引き継がれて表示されます。
+- 統合・分離で `latest` が別の run に変わる場合は、dry-run に `latest a -> b` と表示されます。このとき、関係するドメインの `latest` や `domains/` ビューを経由したリンクは、その時点で指していた run に固定してから書き換えます。統合元の `latest` とビューの旧 URL も、統合前に表示していた run へ転送します。
+- コードブロックとインラインコードの中にあるリンク風の文字列は、検査も書き換えもしません。
+
+### `_meta/tags.yaml`（タグ辞書）
+
+```yaml
+- id: imperfect_info              # domain.yaml から参照するキー（snake_case）
+  label: 不完全情報ゲーム          # 画面表示。自由に書き換えてよい
+  aliases: [imperfect information]   # 同義語（任意）
+  description: 相手の情報が隠れたゲームの AI   # 任意
+```
+
+画面上のタグ名を変えるときは `label` だけを書き換えます。`id` の改名・統合は `dev/research-admin tags` で行います。
+
+### `_meta/redirects.yaml`（転送表）
+
+```yaml
+- from: runs/kaggle_ptcg_ai_battle      # research/ からの相対パス。先頭一致で置き換える
+  to: runs/kaggle_ptcg
+  change: 20261115-merge-kaggle_ptcg    # 対応する変更記録
+```
+
+一番長く一致する `from` を採用し、転送先がさらに転送されていればたどります。`dev/research-admin` だけが追記します。
+
+### `_meta/changes/`（変更記録）
+
+改名・統合・分離と、タグ id の改名・統合のたびに `<YYYYMMDD>-<op>-<target>.yaml` を 1 つ作ります（タグの付け直しと表示名の変更は git の履歴で追えるので作りません）。統合では、消えた `domain.yaml` の中身も `args.source_domain_yaml` に残します。`op`（操作）、`reason`（理由）、`moved`（移動したパスの一覧）を残し、あとから「いつ・なぜ・何を変えたか」を追えるようにします。
+
+### 日付ディレクトリの衝突
+
+統合先に同じ日付の clustering run がある場合、移動する側を `<YYYYMMDD>-<n>`（n = 2, 3, …）にします。同じ日付の中では n が大きいほど新しいものとして扱います。gather / retrieval は、クラスタ名が重ならなければ同じ日付ディレクトリにまとめます。
 
 ## 命名規約
 
@@ -139,10 +200,11 @@ output_paths:
 |---------------|------------------------------------------------------------|-----------------------------|
 | ドメイン名    | `snake_case`                                               | `data_analysis_agent`       |
 | クラスタ ID   | `snake_case` または `kebab-case`（ドメイン内で統一）       | `metalearner`, `nl2sql-nl2code` |
-| 日付ディレクトリ | `YYYYMMDD`                                             | `20260330`                  |
+| 日付ディレクトリ | `YYYYMMDD`（統合で衝突した場合のみ `YYYYMMDD-<n>`）     | `20260330`, `20260626-2`    |
 | クラスタディレクトリ | `<YYYYMMDD>/<cluster>`（gather / retrieval）        | `20260330/metalearner`      |
 | レポートファイル | `NN-kebab-case.md`（NN = 0埋め連番）                     | `01-causal-forest.md`       |
 | index ファイル | `index.md`                                                | -                           |
+| タグ id       | `snake_case`（`_meta/tags.yaml` に定義）                   | `imperfect_info`            |
 
 ## phase 定義
 

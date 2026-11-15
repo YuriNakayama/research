@@ -2,6 +2,8 @@ import {
   getContentEntries,
   getDomainSummaries,
   type ContentEntry,
+  type DomainSummary,
+  type DomainTag,
   type Phase,
 } from "./content-index";
 
@@ -35,9 +37,29 @@ export type ActiveDomain = {
   phaseCounts: Record<Phase, number>;
 };
 
+// Every domain with its tags, for browsing by tag. Tags replace a top-level
+// category tree: research starts from arbitrary angles, so domains are linked
+// across by tags instead of being forced into one hierarchy.
+export type TaggedDomain = {
+  domain: string;
+  displayName: string;
+  href: string;
+  tags: DomainTag[];
+};
+
+export type TagCount = DomainTag & {
+  count: number;
+};
+
+export type TagIndex = {
+  tags: TagCount[];
+  domains: TaggedDomain[];
+};
+
 export type HomeData = {
   recentReports: RecentReport[];
   activeDomains: ActiveDomain[];
+  tagIndex: TagIndex;
   totalReportCount: number;
   totalDomainCount: number;
 };
@@ -95,6 +117,23 @@ export function getActiveDomains(limit: number = DEFAULT_DOMAIN_LIMIT): ActiveDo
     }));
 }
 
+export function buildTagIndex(summaries: readonly DomainSummary[]): TagIndex {
+  const counts = new Map<string, TagCount>();
+  for (const summary of summaries) {
+    for (const tag of summary.tags) {
+      const current = counts.get(tag.id);
+      counts.set(tag.id, { ...tag, count: (current?.count ?? 0) + 1 });
+    }
+  }
+  const tags = [...counts.values()].sort(
+    (a, b) => b.count - a.count || a.label.localeCompare(b.label),
+  );
+  const domains = summaries
+    .map((s) => ({ domain: s.domain, displayName: s.displayName, href: s.href, tags: s.tags }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  return { tags, domains };
+}
+
 // Single entry point for the home page so the page component makes one call and
 // the underlying scan is shared (see `getContentEntries`'s cache wrapper).
 export function getHomeData(): HomeData {
@@ -103,6 +142,7 @@ export function getHomeData(): HomeData {
   return {
     recentReports: getRecentReports(),
     activeDomains: getActiveDomains(),
+    tagIndex: buildTagIndex(summaries),
     totalReportCount: getContentEntries().length,
     totalDomainCount: summaries.length,
   };

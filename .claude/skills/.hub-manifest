@@ -1,0 +1,44 @@
+# Managed by the skills hub (~/project/98_skills). Do not edit these skills here.
+# Edit the hub copy and run: cd ~/project/98_skills && uv run src/hub.py export
+# Changed one here anyway? Run: cd ~/project/98_skills && uv run src/hub.py import <repo> --path <this worktree>
+agent-browser	6918be9ce9c84675
+checkpoint	077ae7c6559528a5
+ci-fix	6032360f7bd0769e
+code-review	ef44b04da9147f11
+deploy	67b8cc47785815e6
+e2e-fix	1db6189a9acc8e5a
+eval-driven	ea263c889a574180
+feature-plan	00002a52835b977f
+find-skills	9e1c8b3103f92fa8
+frontend-design	665c585455decbcb
+instinct-evolve	03b389745470811a
+instinct-export	d71dc4ee3ec1d08e
+instinct-import	4df1aaeef996921f
+instinct-status	e9d0b42569103ce2
+learn	4a6ca075f857e5df
+orchestrate	ca270c6a4e613baa
+pdf	2523d04c86bf3cd0
+plan	7e10cf6f2708d2b9
+playwright	c541ec5c30c88b92
+pr	57c5765e7950f567
+python-lint	46ad766564ab7580
+python-review	c8024036e765cde6
+python-tdd	d565c344311b69de
+release-tag	99eada6b05d5851a
+remove-unused	ec87092be5b707f0
+research-clustering	e1125ca2c95d5c8f
+research-gather	fdd443a90e524546
+research-housekeeping	ac812d4059441011
+research-prompt-builder	787ae61ca88366c5
+research-retrieval	b197e07fa678b5ea
+skill-creator	af87e51188444b28
+skill-list	a5a08ef48b56485c
+tdd	281c8b7dcdf6a840
+test-coverage	6388c59e24f41ca1
+typescript-lint	15da47d80dfc6c57
+ui-ux-pro-max	85c9f4be22f7af5d
+update-codemaps	996b23472236568d
+update-docs	94f72873e18ad405
+vercel-react-best-practices	ee0fe177880a6dd9
+verify	e3211c7147bf1f89
+web-design-guidelines	f3bc47f890f42a44

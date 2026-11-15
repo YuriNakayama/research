@@ -6,7 +6,7 @@ description: Analyze test coverage and generate missing tests
 
 Analyze test coverage and generate missing tests:
 
-1. Run tests: `dev/test-backend` or `dev/test-frontend`
+1. Run tests with the repo's test script under `dev/` (`ls dev/`: e.g. `dev/test`, `dev/test-backend`, `dev/test-bot`, `dev/test-frontend`; if there is none, the test command in `CLAUDE.md` / `README.md` / `pyproject.toml`)
 
 2. Analyze coverage report (coverage/coverage-summary.json)
 

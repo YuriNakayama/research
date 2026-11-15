@@ -12,7 +12,7 @@ TDD ワークフロー、テストパターン、E2E テスト、eval 駆動開�
 
 - `/tdd` - TDD ワークフロー（RED→GREEN→REFACTOR）
 - `/test-coverage` - カバレッジ分析と不足テスト生成
-- `/playwright` - Playwright E2E テストの生成・実行
+- `/playwright` - Playwright E2E テストの生成・実行（フロントエンドがあるリポジトリのみ）
 - `/eval-driven` - eval 駆動開発（定義・チェック・レポート）
 
 ## TDD Workflow
@@ -66,6 +66,8 @@ describe('GET /api/markets', () => {
 ```
 
 ## E2E Tests (Playwright)
+
+フロントエンドの無いリポジトリでは、同じ流れを pytest の end-to-end テストとして書く。
 
 ```typescript
 import { test, expect } from '@playwright/test'

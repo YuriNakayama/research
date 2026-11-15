@@ -1,0 +1,3 @@
+# skills hub: ブランチのマージで .hub-manifest がぶつからないように、両方の行を残す。
+# 判定は記録のどれかと一致すれば「変わっていない」とみなし、次の export で 1 行に戻す。
+.hub-manifest merge=union

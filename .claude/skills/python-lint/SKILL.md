@@ -16,7 +16,7 @@ Fix Python build errors, type errors, and lint issues incrementally. Invokes the
 
 ## What This Command Does
 
-1. **Run diagnostics** (`dev/lint` or `dev/test-backend`)
+1. **Run diagnostics** (`dev/lint`, or the repo's test script under `dev/` (`ls dev/`: e.g. `dev/test`, `dev/test-backend`, `dev/test-bot`, `dev/test-frontend`; if there is none, the test command in `CLAUDE.md` / `README.md` / `pyproject.toml`))
 2. **Parse errors** grouped by file and severity
 3. **Fix incrementally**, one error at a time
 4. **Verify each fix** with re-run

@@ -32,14 +32,16 @@ gh run view <run-id> --log-failed
 
 ### 4. Analyze and fix failure cause
 
+The commands below are the usual `dev/` scripts. Check `ls dev/` and use what the repo actually has: the test script may be `dev/test`, `dev/test-backend`, `dev/test-bot`, etc. Skip the frontend section in repos without a frontend.
+
 #### Backend CI failure patterns
 
 | Step | Check command | Fix method |
 |------|--------------|------------|
-| ruff format | `dev/test-backend` (includes format check) | `dev/format` |
+| ruff format | backend test script, e.g. `dev/test` / `dev/test-backend` (includes format check) | `dev/format` |
 | ruff check | `dev/lint` | `dev/lint` (with --fix) |
 | mypy | `dev/lint` (includes mypy) | Fix type errors |
-| pytest | `dev/test-backend` | Fix test failures |
+| pytest | backend test script, e.g. `dev/test` / `dev/test-backend` | Fix test failures |
 
 #### Frontend CI failure patterns
 
@@ -53,10 +55,10 @@ gh run view <run-id> --log-failed
 ### 5. Local verification after fix
 
 ```bash
-# Backend (format check → lint → type check → pytest)
-dev/test-backend
+# Backend (format check → lint → type check → pytest): the repo's backend test script
+dev/test            # or dev/test-backend, dev/test-bot ...
 
-# Frontend (type-check → format:check → lint → Mockoon + Playwright)
+# Frontend, only if the repo has one (type-check → format:check → lint → Mockoon + Playwright)
 dev/test-frontend
 ```
 

@@ -1,5 +1,7 @@
 # Kaggle「Pokémon TCG AI Battle Challenge」攻略リサーチ（実戦・戦略プレイブック）
 
+- **Type**: playbook
+
 **作成日**: 2026-06-26
 **ドメイン**: `kaggle_ptcg_ai_battle`
 **目的**: 本コンペで勝つための戦略立案（コンペ仕様・ゲームルール・メタ・エージェント実装方針の整理）

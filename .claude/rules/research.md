@@ -23,7 +23,7 @@
 | studies     | `research/domains/<domain>/studies/<YYYYMMDD>-<slug>/` | 新しい調査は新しいディレクトリで追加。既存の加筆修正は可 |
 | discussions | `research/domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` | 書き換え可 |
 
-- studies の `index.md` 冒頭に `- **Type**: playbook | experiment | spec | memo` を書く
+- studies の `index.md` 冒頭に `- **Type**: playbook | survey | experiment | spec | memo` を書く
 - discussions は冒頭で対象を `/research/...` リンクで示す
 - `<YYYYMMDD>` は作成日、`<slug>` は `kebab-case`
 
@@ -55,4 +55,4 @@
 
 - `research/**` はビルド時に `frontend/research` へコピーされ、`/research` 配下で描画される。ファイル配置がそのまま公開 URL 構造になる。
 - 開発用ドキュメントは `docs/**`（viewer 非対象）。両者を混同しないこと。
-- E2E フィクスチャは `research/_e2e_fixture/...` にビルド時生成される（`frontend/scripts/setup-e2e-fixtures.mjs`）。手動で編集・コミットしない。
+- E2E フィクスチャは `research/_e2e_fixture/...` と `research/domains/_e2e_fixture/{studies,discussions}/...` にビルド時生成される（`frontend/scripts/setup-e2e-fixtures.mjs`）。手動で編集・コミットしない。

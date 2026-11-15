@@ -127,10 +127,10 @@ viewer は `domains/` のシンボリックリンクを**読みません**（実
 
 | 種別 | 置き場所 | 用途 | 更新 |
 |---|---|---|---|
-| studies | `domains/<domain>/studies/<YYYYMMDD>-<slug>/` | skill のフローに乗らない調査（プレイブック、実験、仕様整理、メモなど） | 新しい調査は新しいディレクトリで追加。既存ディレクトリの加筆修正は可 |
+| studies | `domains/<domain>/studies/<YYYYMMDD>-<slug>/` | skill のフローに乗らない調査（プレイブック、手作業の文献整理、実験、仕様整理、メモなど） | 新しい調査は新しいディレクトリで追加。既存ディレクトリの加筆修正は可 |
 | discussions | `domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` | 論文・レビュー（`runs/` の成果物や studies）に対する議論 | 書き換え可 |
 
-- **studies** の入口は `index.md`。冒頭のメタデータ行に `- **Type**: playbook | experiment | spec | memo` を書きます。
+- **studies** の入口は `index.md`。冒頭のメタデータ行に `- **Type**: playbook | survey | experiment | spec | memo` を書きます。
 - **discussions** は冒頭で対象を `/research/...` リンクで示します（例: `/research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/01-foo`）。
 - `<YYYYMMDD>` は作成日。ホームの新着はこの日付で並びます（`studies/` / `discussions/` の一覧とサイドバーは名前順）。
 - skill の run が存在しないドメインでも、`domains/<domain>/` を作って studies / discussions だけを置けます。

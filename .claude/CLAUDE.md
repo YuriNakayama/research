@@ -94,7 +94,7 @@ dev/create-worktree  # Create git worktree with .env copy
 | Viewer | `research/**` を `/research` 配下で描画する Next.js UI |
 | research-assets | viewer が画像等を配信する API ルート（`/api/research-assets/<path>`） |
 | Cognito | viewer の認証を担う AWS User Pool |
-| E2E fixture | Playwright が参照する決定的アンカー（`research/_e2e_fixture/...`、ビルド時生成） |
+| E2E fixture | Playwright が参照する決定的アンカー（`research/_e2e_fixture/...` と `research/domains/_e2e_fixture/{studies,discussions}/...`、ビルド時生成） |
 
 ## Rules
 

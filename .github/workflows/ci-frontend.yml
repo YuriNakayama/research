@@ -74,6 +74,10 @@ jobs:
         working-directory: frontend
         run: bun run lint
 
+      - name: Unit tests
+        working-directory: frontend
+        run: bun run test:unit
+
       # Validate the research content itself: markdownlint for broken markup and
       # a mermaid parse pass so no diagram renders as "Syntax error" on the site.
       - name: Check research content (markdown + mermaid)

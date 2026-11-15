@@ -36,5 +36,5 @@ clusters:
     priority: medium_high
 output_paths:
   clustering: runs/{domain}/clustering/{date}/
-  gather: runs/{domain}/gather/{date}_{cluster}/
-  retrieval: runs/{domain}/retrieval/{date}_{cluster}/
+  gather: runs/{domain}/gather/{date}/{cluster}/
+  retrieval: runs/{domain}/retrieval/{date}/{cluster}/

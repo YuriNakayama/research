@@ -4,7 +4,7 @@
 **ドメイン**: `kaggle_ptcg_ai_battle`
 **目的**: 本コンペで勝つための戦略立案（コンペ仕様・ゲームルール・メタ・エージェント実装方針の整理）
 
-> 📎 本ファイル群（`strategy-01〜09`）は**実戦寄りの攻略プレイブック**。同じ run には別アプローチの**学術研究領域マップ**（`index.md` + `cluster-01〜07` + `gather/` + `retrieval/`）が併存します。**研究背景・先行手法（ISMCTS/自己対戦RL/LLMエージェント等）はそちら**を、**実装・デッキ選択の行動計画は本 `strategy-*`** を参照してください。エントリは [`index.md`](index.md)。
+> 📎 本ファイル群（`strategy-01〜09`）は**実戦寄りの攻略プレイブック**。別アプローチの**学術研究領域マップ**（clustering run の `index.md` + `cluster-01〜07` と、その `gather/` + `retrieval/`）があります。**研究背景・先行手法（ISMCTS/自己対戦RL/LLMエージェント等）はそちら**を、**実装・デッキ選択の行動計画は本 `strategy-*`** を参照してください。研究マップの入口は [clustering run の `index.md`](../../../../runs/kaggle_ptcg_ai_battle/clustering/20260626/index.md)。
 
 ---
 

@@ -124,8 +124,8 @@ flowchart TD
 
 | run | 切り口 | 本 run との関係 |
 |-----|--------|---------------|
-| [20261115_schools](../20261115_schools/index.md) | 10 流派の定義・原因・帰結 | 本 run の各章の文献は、主に流派 A（組織行動論）・C（政治的有効性）・E（戦略的意思決定）・I（社会心理学）・J（日本）に属する |
-| [20261115_definition](../20261115_definition/index.md) | 定義の 5 系統 | 第3章第2節の定義の整理と重なる |
+| [20261115_schools](../../../../runs/internal_politics/clustering/20261115_schools/index.md) | 10 流派の定義・原因・帰結 | 本 run の各章の文献は、主に流派 A（組織行動論）・C（政治的有効性）・E（戦略的意思決定）・I（社会心理学）・J（日本）に属する |
+| [20261115_definition](../../../../runs/internal_politics/clustering/20261115_definition/index.md) | 定義の 5 系統 | 第3章第2節の定義の整理と重なる |
 
 ## Sources
 

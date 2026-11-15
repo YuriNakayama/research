@@ -42,6 +42,16 @@ export function ActiveDomains({ domains }: ActiveDomainsProps) {
                 phase="clustering"
                 count={domain.phaseCounts.clustering}
               />
+              {/* Optional layers: only shown when present, to keep chips compact. */}
+              {domain.phaseCounts.studies > 0 && (
+                <PhaseBadge phase="studies" count={domain.phaseCounts.studies} />
+              )}
+              {domain.phaseCounts.discussions > 0 && (
+                <PhaseBadge
+                  phase="discussions"
+                  count={domain.phaseCounts.discussions}
+                />
+              )}
             </span>
             <span className="brutal-label tabular-nums text-[var(--text-tertiary)]">
               {formatRunDate(domain.latestRunDate)}

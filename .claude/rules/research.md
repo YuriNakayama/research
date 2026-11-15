@@ -9,11 +9,23 @@
 ## 基本ルール
 
 1. **`runs/` は append-only**: 既存の run ディレクトリを書き換えたり削除したりしないでください。新しい結果は必ず新しい日付ディレクトリを作成して追加します。
-2. **新規出力は必ず日付ディレクトリ配下に配置**: clustering は `runs/<domain>/clustering/<date>/`、gather / retrieval は `runs/<domain>/<phase>/<date>/<cluster>/` に置きます。`domains/` に直接ファイルを作成しないでください（`domains/` は `runs/` への symlink で構成されます）。
+2. **skill の新規出力は必ず日付ディレクトリ配下に配置**: clustering は `runs/<domain>/clustering/<date>/`、gather / retrieval は `runs/<domain>/<phase>/<date>/<cluster>/` に置きます。skill の出力を `domains/` に直接置かないでください（`domains/<domain>/{clustering,resources,reports}` は `runs/` への symlink です）。
 3. **`domains/<domain>/domain.yaml` が存在する場合は最優先で参照**: ここに `output_paths` が定義されていれば、その値を README の既定値より優先します。
 4. **clustering は複数回実行され得る**: 同一ドメインで再クラスタリングを行う場合、過去の `runs/<domain>/clustering/<old_date>/` は残し、新しい `<new_date>/` を追加して `latest` symlink を更新します。
 5. **完了後の latest 更新**: 新規 run を追加したら、phase ごとに 1 本の `runs/<domain>/<phase>/latest`（最新の日付ディレクトリを指す）を更新し、続いて `dev/sync-domain-links` を実行して `domains/` ビューを再生成します。クラスタごとの `latest_<cluster>` は使いません。
-6. **`domains/` は表示の正しさに関与しない**: viewer は `domains/` の symlink を読まず、`runs/` から同じ規則で導出します（`frontend/src/lib/domain-view.ts`）。symlink は人が git やファイラで辿るための便宜なので、ずれても表示は壊れません。`dev/sync-domain-links --check` で差分を検出できます。
+6. **`domains/` の symlink は表示の正しさに関与しない**: viewer は `domains/` の symlink を読まず、`runs/` から同じ規則で導出します（`frontend/src/lib/domain-view.ts`）。symlink は人が git やファイラで辿るための便宜なので、ずれても表示は壊れません。`dev/sync-domain-links --check` で差分を検出できます。
+7. **skill 外の成果物は `domains/<domain>/` に実ファイルで置く**: skill のフローに乗らない調査は `domains/<domain>/studies/<YYYYMMDD>-<slug>/`（入口は `index.md`）、論文・レビューへの議論は `domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` に置きます。どちらも `runs/` と違い加筆修正してよい領域です。
+
+## 人手の層の配置
+
+| 種別        | 置き場所                                              | 更新 |
+|-------------|-------------------------------------------------------|------|
+| studies     | `research/domains/<domain>/studies/<YYYYMMDD>-<slug>/` | 新しい調査は新しいディレクトリで追加。既存の加筆修正は可 |
+| discussions | `research/domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` | 書き換え可 |
+
+- studies の `index.md` 冒頭に `- **Type**: playbook | experiment | spec | memo` を書く
+- discussions は冒頭で対象を `/research/...` リンクで示す
+- `<YYYYMMDD>` は作成日、`<slug>` は `kebab-case`
 
 ## phase 別の既定出力先
 
@@ -34,7 +46,9 @@
 ## 禁止事項
 
 - `runs/` 配下の既存ファイルを書き換えること（過去 run の改変）
-- `domains/` 配下に symlink ではない実ファイルを作成すること
+- `domains/<domain>/{clustering,resources,reports}` に実ファイルを作成すること（symlink のビュー専用）
+- `domains/<domain>/` 直下に `domain.yaml` / `README.md` / `studies/` / `discussions/` 以外の実ファイル・ディレクトリを作成すること
+- skill 外の調査や議論を `runs/` 配下に置くこと
 - `research/` 直下に新規ディレクトリを作成すること（`runs/` `domains/` `_schema/` 以外）
 
 ## viewer との境界

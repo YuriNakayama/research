@@ -49,7 +49,8 @@ jobs:
 
       # Mirror amplify.yml: `-a` keeps symlinks (plain `cp -r` expands every
       # `latest` pointer into a duplicate copy), and the `domains/` links are
-      # dropped because the viewer never reads them.
+      # dropped because the viewer never reads them. Real files under
+      # `domains/<d>/` (studies/, discussions/, domain.yaml) are kept.
       - name: Copy research content into frontend
         run: |
           cp -a research frontend/research

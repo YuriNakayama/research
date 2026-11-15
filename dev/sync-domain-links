@@ -16,6 +16,10 @@ Clusters are resolved individually because a run does not necessarily re-run
 every cluster: the newest run directory is not the newest version of each
 cluster.
 
+Only symlinks are touched. `domains/<d>/` also holds the human-authored layer as
+real files (`domain.yaml`, `README.md`, `studies/`, `discussions/`); this script
+never creates, rewrites or removes those.
+
 Usage:
   dev/sync-domain-links           # apply
   dev/sync-domain-links --check   # exit 1 if anything would change (CI)

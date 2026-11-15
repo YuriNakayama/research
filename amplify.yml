@@ -17,8 +17,9 @@ applications:
             #
             # `domains/**` symlinks are excluded because they are a browsing aid
             # only — the viewer derives that view from `runs/` at request time
-            # (lib/domain-view.ts). The real files under `domains/` (domain.yaml,
-            # README.md) are still read, so they are copied back afterwards.
+            # (lib/domain-view.ts). Only symlinks are deleted: the human-authored
+            # real files under `domains/<d>/` (domain.yaml, README.md, studies/,
+            # discussions/) are read by the viewer and stay in place.
             - rm -rf ./research && cp -a ../research ./research
             - find ./research/domains -type l -delete
             - curl -fsSL https://bun.sh/install | bash

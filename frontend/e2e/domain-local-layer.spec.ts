@@ -23,14 +23,18 @@ test.describe("Domain human-authored layer (studies / discussions)", () => {
   test("renders a study document", async ({ page }) => {
     await page.goto(`${DOMAIN}/studies/20000101-sample-study/index`);
     await expect(
-      page.getByRole("heading", { name: "E2E Sample Study" }),
+      // Documents with header metadata render the title twice (report
+      // header + Markdown h1), matching report-detail.spec.ts.
+      page.getByRole("heading", { name: "E2E Sample Study" }).first(),
     ).toBeVisible();
   });
 
   test("renders a discussion document", async ({ page }) => {
     await page.goto(`${DOMAIN}/discussions/20000101-sample-discussion`);
     await expect(
-      page.getByRole("heading", { name: "E2E Sample Discussion" }),
+      // Documents with header metadata render the title twice (report
+      // header + Markdown h1), matching report-detail.spec.ts.
+      page.getByRole("heading", { name: "E2E Sample Discussion" }).first(),
     ).toBeVisible();
   });
 });

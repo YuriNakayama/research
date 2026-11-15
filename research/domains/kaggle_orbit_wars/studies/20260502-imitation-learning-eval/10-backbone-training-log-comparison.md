@@ -1,6 +1,6 @@
 # 10. Backbone 別学習ログ比較（実測）
 
-**実測元**: `/Users/user/project/orbit-wars/data/output/models/imitation/case{1,3,4,5,8}/runs/`（DVC キャッシュから復元）
+**実測元**: orbit-wars リポジトリの `data/output/models/imitation/case{1,3,4,5,8}/runs/`（DVC キャッシュから復元）
 **対象期間**: 2026-04-30 〜 2026-05-06
 **取得項目**: config.yaml, summary.json, history.jsonl
 **可視化**: `./figures/` 配下に 4 枚の PNG（01 loss / 02 accuracy / 03 case8 ship diagnostics / 04 best summary）

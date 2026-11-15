@@ -10,10 +10,12 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 type DomainView = typeof import("./domain-view");
 type ContentIndex = typeof import("./content-index");
+type DocsContent = typeof import("./docs-content");
 
 let tmpRoot: string;
 let domainView: DomainView;
 let contentIndex: ContentIndex;
+let docsContent: DocsContent;
 
 function write(relative: string, content: string): void {
   const full = path.join(tmpRoot, "research", relative);
@@ -40,6 +42,7 @@ beforeAll(async () => {
   vi.resetModules();
   domainView = await import("./domain-view");
   contentIndex = await import("./content-index");
+  docsContent = await import("./docs-content");
 });
 
 afterAll(() => {
@@ -116,5 +119,40 @@ describe("content index", () => {
       discussions: 1,
     });
     expect(summary?.latestRunDate).toBe("20260301");
+  });
+});
+
+describe("docs content (sidebar, listings, pages)", () => {
+  it("builds the sidebar tree for real directories under domains/<d>/", () => {
+    const domains = docsContent.getDocsTree().find((n) => n.name === "domains");
+    const demo = domains?.children.find((n) => n.name === "demo");
+    const studies = demo?.children.find((n) => n.name === "studies");
+    const study = studies?.children.find((n) => n.name === "20260201-playbook");
+    expect(study?.path).toBe("/research/domains/demo/studies/20260201-playbook");
+    expect(study?.children.map((c) => c.name)).toEqual(["index", "latest_benchmark"]);
+
+    const discussions = demo?.children.find((n) => n.name === "discussions");
+    expect(discussions?.children.map((c) => c.name)).toEqual(["20260301-paper-review"]);
+  });
+
+  it("lists, detects and renders human-authored paths", () => {
+    const studies = ["domains", "demo", "studies"];
+    expect(docsContent.isDirectory(studies)).toBe(true);
+    expect(docsContent.getDirectoryEntries(studies).map((e) => e.name)).toEqual([
+      "20260201-playbook",
+    ]);
+    expect(
+      docsContent.getDocContent([...studies, "20260201-playbook", "index"])?.title,
+    ).toBe("Playbook");
+    expect(
+      docsContent.getDocContent(["domains", "demo", "discussions", "20260301-paper-review"])
+        ?.title,
+    ).toBe("Review");
+  });
+
+  it("still serves the virtual views from runs/", () => {
+    expect(
+      docsContent.getDocContent(["domains", "demo", "reports", "all", "01-paper"])?.title,
+    ).toBe("Paper");
   });
 });

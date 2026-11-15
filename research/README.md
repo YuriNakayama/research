@@ -123,7 +123,7 @@ viewer は `domains/` のシンボリックリンクを**読みません**（実
 
 ## 人手の層（`studies/` / `discussions/`）
 
-`domains/<domain>/` 配下の実ファイルとして置く、skill の出力ではない成果物です。`dev/sync-domain-links` はシンボリックリンクしか操作しないため、これらに影響しません。
+`domains/<domain>/` 配下の実ファイルとして置く、skill の出力ではない成果物です。`dev/sync-domain-links` は `clustering` / `resources/` / `reports/` のシンボリックリンクしか操作しないため、これらに影響しません（studies 内に置いた symlink も含む）。
 
 | 種別 | 置き場所 | 用途 | 更新 |
 |---|---|---|---|
@@ -132,7 +132,7 @@ viewer は `domains/` のシンボリックリンクを**読みません**（実
 
 - **studies** の入口は `index.md`。冒頭のメタデータ行に `- **Type**: playbook | experiment | spec | memo` を書きます。
 - **discussions** は冒頭で対象を `/research/...` リンクで示します（例: `/research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/01-foo`）。
-- `<YYYYMMDD>` は作成日。viewer はこの日付で新着順に並べます。
+- `<YYYYMMDD>` は作成日。ホームの新着はこの日付で並びます（`studies/` / `discussions/` の一覧とサイドバーは名前順）。
 - skill の run が存在しないドメインでも、`domains/<domain>/` を作って studies / discussions だけを置けます。
 
 ## ドメインメタファイル `domain.yaml`（任意）

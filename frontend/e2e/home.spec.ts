@@ -3,9 +3,10 @@ import { test, expect } from "@playwright/test";
 // The home page is a "work resumption point": a recent-report feed as the
 // primary content, a prominent search entry point, and a compact active-domain
 // strip. Assertions here are structural rather than content-based on purpose —
-// the `_e2e_fixture` anchor lives outside `research/runs/`, which is the only
-// tree `getContentEntries()` scans, so the feed is built from the real research
-// content and its individual titles are not deterministic.
+// the feed is built from the real research content (`runs/` plus the
+// human-authored `domains/<d>/{studies,discussions}`), so its individual titles
+// are not deterministic. The `domains/_e2e_fixture` anchors are dated 2000-01-01
+// and never reach the top of the feed.
 test.describe("Home page (research root)", () => {
   test("redirects to /research and displays the home view", async ({ page }) => {
     await page.goto("/");

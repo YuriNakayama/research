@@ -3,6 +3,8 @@ import path from "node:path";
 import { cache } from "react";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
+import { readTagsSafe } from "./research-admin/meta";
+import { runDirDate } from "./research-admin/run-dirs";
 
 // Shared content-index basis for the Research Viewer.
 //
@@ -62,10 +64,17 @@ export type ContentEntry = {
   headings: string[];
 };
 
+export type DomainTag = {
+  id: string;
+  label: string;
+};
+
 export type DomainSummary = {
   domain: string;
   displayName: string;
   description?: string;
+  /** Tags from domain.yaml, labelled from research/_meta/tags.yaml. */
+  tags: DomainTag[];
   href: string;
   clusterCount: number;
   reportCount: number;
@@ -79,6 +88,7 @@ const DomainYamlSchema = z.object({
   domain: z.string().optional(),
   display_name: z.string().optional(),
   description: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   clusters: z.array(z.unknown()).optional(),
 });
 
@@ -182,9 +192,10 @@ export function parseRunContext(slug: string[]): {
     if (combined) {
       runDate = combined[1];
       cluster = combined[2];
-    } else if (/^\d{8}$/.test(runSegment)) {
-      // Current form: `<date>` with the cluster (if any) as the next segment.
-      runDate = runSegment;
+    } else if (runDirDate(runSegment)) {
+      // Current form: `<date>` (or `<date>-<n>` after a merge) with the cluster
+      // (if any) as the next segment.
+      runDate = runDirDate(runSegment) ?? undefined;
       // clustering has no cluster dir; gather/retrieval do (slug[4]).
       const next = slug[4];
       // Only treat it as a cluster when there is a further path segment after
@@ -340,6 +351,7 @@ export function getDomainSummaries(): DomainSummary[] {
 
   const domains = listDomains();
   const summaries: DomainSummary[] = [];
+  const labels = new Map(readTagsSafe(RESEARCH_ROOT).map((t) => [t.id, t.label]));
 
   for (const domain of domains) {
     const domainEntries = byDomain.get(domain) ?? [];
@@ -364,6 +376,7 @@ export function getDomainSummaries(): DomainSummary[] {
       domain,
       displayName: yaml?.display_name ?? domain,
       description: yaml?.description,
+      tags: (yaml?.tags ?? []).map((id) => ({ id, label: labels.get(id) ?? id })),
       href: `/research/domains/${domain}`,
       clusterCount: yaml?.clusters?.length ?? 0,
       reportCount: domainEntries.length,

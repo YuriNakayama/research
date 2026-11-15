@@ -1,0 +1,4 @@
+domain: dc_hvac_control
+display_name: 空調制御（データセンター・ビル）
+tags: [hvac, reinforcement_learning]
+tags_reviewed: 2026-11-16

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { isRunDir, sortRunDirsDesc } from "./research-admin/run-dirs";
 
 // Virtual `domains/` view resolution.
 //
@@ -41,8 +42,6 @@ const VIEW_TO_PHASE = {
 
 type ViewName = keyof typeof VIEW_TO_PHASE;
 
-const DATE_DIR = /^\d{8}$/;
-
 function isViewName(value: string): value is ViewName {
   return Object.prototype.hasOwnProperty.call(VIEW_TO_PHASE, value);
 }
@@ -70,11 +69,12 @@ function isDirectorySync(fullPath: string): boolean {
 // one of these dates and would otherwise be indistinguishable from a real run.
 function listRunDates(domain: string, phase: string): string[] {
   const phaseDir = path.join(RUNS_DIR, domain, phase);
-  return safeReaddir(phaseDir)
-    .filter((e) => DATE_DIR.test(e.name))
+  // `<YYYYMMDD>` or `<YYYYMMDD>-<n>` (a merge renumbers a colliding date).
+  const names = safeReaddir(phaseDir)
+    .filter((e) => isRunDir(e.name))
     .filter((e) => isDirectorySync(path.join(phaseDir, e.name)))
-    .map((e) => e.name)
-    .sort((a, b) => b.localeCompare(a));
+    .map((e) => e.name);
+  return sortRunDirsDesc(names);
 }
 
 /** Newest dated run directory for a phase, or null when the phase has no runs. */

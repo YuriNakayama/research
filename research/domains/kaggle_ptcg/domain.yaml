@@ -38,3 +38,5 @@ output_paths:
   clustering: runs/{domain}/clustering/{date}/
   gather: runs/{domain}/gather/{date}/{cluster}/
   retrieval: runs/{domain}/retrieval/{date}/{cluster}/
+tags: [kaggle, game_ai, imperfect_info, reinforcement_learning, ai_agents]
+tags_reviewed: 2026-11-16

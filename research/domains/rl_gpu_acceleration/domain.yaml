@@ -23,7 +23,5 @@ clusters:
     name: 実装・選定実践ガイド
     keywords: [PyTorch vs JAX, decision tree, hardware tier, migration cost, optimization checklist, pitfalls, jittable env, consumer GPU, TPU pod]
     priority: high
-output_paths:
-  clustering: runs/{domain}/clustering/{date}/
-  gather: runs/{domain}/gather/{date}_{cluster}/
-  retrieval: runs/{domain}/retrieval/{date}_{cluster}/
+tags: [reinforcement_learning, gpu_acceleration]
+tags_reviewed: 2026-11-16

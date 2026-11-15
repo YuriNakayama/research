@@ -2,6 +2,7 @@ import type { HomeData } from "@/lib/home-feed";
 import { HomeSearch } from "./home-search";
 import { RecentReports } from "./recent-reports";
 import { ActiveDomains } from "./active-domains";
+import { TagBrowser } from "./tag-browser";
 
 type HomeViewProps = {
   data: HomeData;
@@ -12,8 +13,13 @@ type HomeViewProps = {
 // last changed (recent reports), find something specific (search), or check
 // which domains are in flight (active domains).
 export function HomeView({ data }: HomeViewProps) {
-  const { recentReports, activeDomains, totalReportCount, totalDomainCount } =
-    data;
+  const {
+    recentReports,
+    activeDomains,
+    tagIndex,
+    totalReportCount,
+    totalDomainCount,
+  } = data;
 
   return (
     <div>
@@ -46,6 +52,7 @@ export function HomeView({ data }: HomeViewProps) {
       <HomeSearch totalCount={totalReportCount} />
       <RecentReports reports={recentReports} />
       <ActiveDomains domains={activeDomains} />
+      <TagBrowser index={tagIndex} />
     </div>
   );
 }

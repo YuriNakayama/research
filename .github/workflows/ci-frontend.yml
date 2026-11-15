@@ -51,7 +51,8 @@ jobs:
 
       # Mirror amplify.yml: `-a` keeps symlinks (plain `cp -r` expands every
       # `latest` pointer into a duplicate copy), and the `domains/` links are
-      # dropped because the viewer never reads them.
+      # dropped because the viewer never reads them. Real files under
+      # `domains/<d>/` (studies/, discussions/, domain.yaml) are kept.
       - name: Copy research content into frontend
         run: |
           cp -a research frontend/research
@@ -77,13 +78,13 @@ jobs:
         working-directory: frontend
         run: bun run type-check
 
-      - name: Unit tests
-        working-directory: frontend
-        run: bun run test:unit
-
       - name: Lint
         working-directory: frontend
         run: bun run lint
+
+      - name: Unit tests
+        working-directory: frontend
+        run: bun run test:unit
 
       # Validate the research content itself: markdownlint for broken markup and
       # a mermaid parse pass so no diagram renders as "Syntax error" on the site.

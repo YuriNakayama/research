@@ -25,8 +25,19 @@ const IGNORED_NAMES = new Set(["node_modules", ".git", ".DS_Store"]);
 
 // Known research phases. Anything else is left `undefined` so the UI can
 // degrade gracefully rather than mislabel an unexpected directory.
-export const PHASES = ["gather", "retrieval", "clustering"] as const;
+//   - skill output (append-only, under `runs/<d>/`): gather / retrieval / clustering
+//   - human-authored (real files under `domains/<d>/`): studies / discussions
+export const PHASES = [
+  "gather",
+  "retrieval",
+  "clustering",
+  "studies",
+  "discussions",
+] as const;
 export type Phase = (typeof PHASES)[number];
+
+// Human-authored layers scanned from `domains/<d>/<phase>/`.
+const DOMAIN_LOCAL_PHASES = ["studies", "discussions"] as const satisfies readonly Phase[];
 
 // Resource types as written in report headers (`- **Type**: ...`).
 const RESOURCE_TYPES = [
@@ -148,12 +159,14 @@ function extractHeadings(lines: string[]): string[] {
   return headings;
 }
 
-// Parse run context from a slug relative to `research/`. Supports both layouts:
+// Parse run context from a slug relative to `research/`. Supports these layouts:
 //   - current: `runs/<domain>/<phase>/<date>/<cluster>/...`
 //              (clustering has no <cluster> segment: `.../<date>/...`)
 //   - legacy:  `runs/<domain>/<phase>/<date>[_<cluster>]/...`
+//   - human:   `domains/<domain>/studies/<date>-<slug>/...`
+//              `domains/<domain>/discussions/<date>-<slug>`
 // Returns best-effort fields; unknown positions stay undefined.
-function parseRunContext(slug: string[]): {
+export function parseRunContext(slug: string[]): {
   domain: string;
   phase?: Phase;
   runDate?: string;
@@ -167,7 +180,13 @@ function parseRunContext(slug: string[]): {
   let cluster: string | undefined;
 
   const runSegment = slug[3];
-  if (runSegment) {
+  const isDomainLocal =
+    slug[0] === "domains" && DOMAIN_LOCAL_PHASES.some((p) => p === phase);
+  if (runSegment && isDomainLocal) {
+    // Human-authored `<date>-<slug>`: dated, but never split by cluster.
+    const dated = runSegment.match(/^(\d{8})-/);
+    if (dated) runDate = dated[1];
+  } else if (runSegment) {
     // Legacy combined form `<date>_<cluster>`.
     const combined = runSegment.match(/^(\d{8})_(.+)$/);
     if (combined) {
@@ -190,9 +209,14 @@ function parseRunContext(slug: string[]): {
 // Recursively collect Markdown files under a directory, resolving symlinked
 // dirs (e.g. `latest_*`) but recording each file once by its real path so
 // symlink aliases don't produce duplicate entries.
+//
+// `skipLatestAliases` applies only to `runs/`, where `latest*` names are phase
+// pointers. In the human-authored layer they are ordinary names (e.g.
+// `latest_benchmark.md`) and must be indexed.
 function collectMarkdownFiles(
   dir: string,
   seenRealPaths: Set<string>,
+  skipLatestAliases: boolean,
 ): string[] {
   let dirents: fs.Dirent[];
   try {
@@ -204,7 +228,7 @@ function collectMarkdownFiles(
   const files: string[] = [];
   for (const dirent of dirents) {
     if (!shouldInclude(dirent.name)) continue;
-    if (isLatestAlias(dirent.name)) continue;
+    if (skipLatestAliases && isLatestAlias(dirent.name)) continue;
     const full = path.join(dir, dirent.name);
 
     // Resolve so symlinked directories are traversed and dedup is by real path.
@@ -216,7 +240,7 @@ function collectMarkdownFiles(
     }
 
     if (stat.isDirectory()) {
-      files.push(...collectMarkdownFiles(full, seenRealPaths));
+      files.push(...collectMarkdownFiles(full, seenRealPaths, skipLatestAliases));
     } else if (stat.isFile() && isMarkdownFile(dirent.name)) {
       const real = fs.realpathSync(full);
       if (seenRealPaths.has(real)) continue;
@@ -275,7 +299,23 @@ function buildEntry(fullPath: string): ContentEntry | null {
   };
 }
 
-// Scan every Markdown report under `research/runs/**`, deduped by real path.
+// Real directories of the human-authored layer: `domains/<d>/{studies,discussions}`.
+function listDomainLocalDirs(): string[] {
+  let domainDirents: fs.Dirent[];
+  try {
+    domainDirents = fs.readdirSync(DOMAINS_DIR, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return domainDirents
+    .filter((d) => d.isDirectory() && shouldInclude(d.name))
+    .flatMap((d) => DOMAIN_LOCAL_PHASES.map((p) => path.join(DOMAINS_DIR, d.name, p)))
+    .filter((dir) => fs.existsSync(dir) && fs.lstatSync(dir).isDirectory());
+}
+
+// Scan every Markdown report under `research/runs/**` plus the human-authored
+// `research/domains/<d>/{studies,discussions}/**`, deduped by real path. The
+// `domains/` symlink views are never scanned: they alias `runs/`.
 //
 // Wrapped in React's `cache` so the full recursive scan (which reads every
 // Markdown file in the tree) runs once per request rather than once per caller:
@@ -285,7 +325,10 @@ function buildEntry(fullPath: string): ContentEntry | null {
 // render cost flat as content accumulates.
 export const getContentEntries = cache((): ContentEntry[] => {
   const seen = new Set<string>();
-  const files = collectMarkdownFiles(RUNS_DIR, seen);
+  const files = [
+    ...collectMarkdownFiles(RUNS_DIR, seen, true),
+    ...listDomainLocalDirs().flatMap((dir) => collectMarkdownFiles(dir, seen, false)),
+  ];
   const entries: ContentEntry[] = [];
   for (const file of files) {
     const entry = buildEntry(file);
@@ -318,6 +361,8 @@ export function getDomainSummaries(): DomainSummary[] {
       gather: 0,
       retrieval: 0,
       clustering: 0,
+      studies: 0,
+      discussions: 0,
     };
     let latestRunDate: string | undefined;
     for (const entry of domainEntries) {

@@ -33,7 +33,9 @@ External:
 research/                    表示用リサーチ成果物（append-only）
   runs/<domain>/clustering/<date>/            clustering の出力
   runs/<domain>/{gather,retrieval}/<date>/<cluster>/   gather / retrieval の出力
-  domains/<domain>/          runs への symlink 構成
+  domains/<domain>/          runs への symlink ビュー + 人手の層（実ファイル）
+    studies/<date>-<slug>/     skill 外の調査
+    discussions/<date>-<slug>.md  論文・レビューへの議論（書き換え可）
     domain.yaml                表示名・タグ（全ドメイン必須）
   _meta/                     整理の管理情報（dev/research-admin が更新）
     tags.yaml                  タグ辞書
@@ -85,6 +87,7 @@ dev/create-worktree  # Create git worktree with .env copy
 - **`research/**` が唯一の表示用領域**。ビルド時に `frontend/research` へコピーされ、`/research` 配下で描画される。
 - 最上位のドメインは分類しない。`domain.yaml` の `tags` で横断し、タグ・改名・統合・分離は整理 skill（`research-housekeeping`）の提案を承認して `dev/research-admin` で行う。
 - `research/runs/**` は append-only。既存 run の中身は改変せず（例外は `dev/research-admin` による置き場所の移動とリンク書き換えのみ）、新規は clustering は `runs/<domain>/clustering/<date>/`、gather / retrieval は `runs/<domain>/<phase>/<date>/<cluster>/` に追加する（詳細は `.claude/rules/research.md`）。
+- skill 外の調査は `domains/<domain>/studies/`、議論は `domains/<domain>/discussions/` に実ファイルで置く（加筆修正可）。
 - `docs/**` は開発用。viewer の表示対象ではない。
 - viewer のアセット参照は `/api/research-assets/<path>`、内部 Markdown リンクは `/research/<slug>` に解決される。
 
@@ -93,13 +96,15 @@ dev/create-worktree  # Create git worktree with .env copy
 | Term | Description |
 |------|-------------|
 | Research Content | `research/**` に置く手動リサーチ成果物 Markdown（`runs/` は append-only） |
+| Studies | skill のフローに乗らない調査（`domains/<domain>/studies/`） |
+| Discussions | 論文・レビューへの議論（`domains/<domain>/discussions/`、書き換え可） |
 | Tags | ドメイン単位のキーワード。`domain.yaml` の `tags` に `_meta/tags.yaml` の id を書く |
 | 整理 (housekeeping) | タグの付け直し、ドメインの改名・統合・分離。`research-housekeeping` skill が提案し `dev/research-admin` が実行 |
 | 転送表 | `_meta/redirects.yaml`。改名・統合・分離で変わった旧パスを新パスへ転送する |
 | Viewer | `research/**` を `/research` 配下で描画する Next.js UI |
 | research-assets | viewer が画像等を配信する API ルート（`/api/research-assets/<path>`） |
 | Cognito | viewer の認証を担う AWS User Pool |
-| E2E fixture | Playwright が参照する決定的アンカー（`research/_e2e_fixture/...`、ビルド時生成） |
+| E2E fixture | Playwright が参照する決定的アンカー（`research/_e2e_fixture/...` と `research/domains/_e2e_fixture/{studies,discussions}/...`、ビルド時生成） |
 
 ## Rules
 

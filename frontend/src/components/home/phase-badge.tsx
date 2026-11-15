@@ -30,6 +30,20 @@ const PHASE_META: Record<Phase, PhaseMeta> = {
     bg: "var(--phase-clustering-bg)",
     fg: "var(--phase-clustering-fg)",
   },
+  // Human-authored layers (domains/<d>/{studies,discussions}). They reuse the
+  // palette's ink / accent role pairs, which every palette already keeps AA.
+  studies: {
+    label: "S",
+    title: "Studies — skill 外の調査",
+    bg: "var(--text-primary)",
+    fg: "var(--text-inverse)",
+  },
+  discussions: {
+    label: "D",
+    title: "Discussions — 議論",
+    bg: "var(--accent-bg)",
+    fg: "var(--accent-text)",
+  },
 };
 
 type PhaseBadgeProps = {

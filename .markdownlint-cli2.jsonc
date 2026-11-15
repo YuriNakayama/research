@@ -49,7 +49,15 @@
     // remain enabled by "default": true and catch real rendering breakage.
   },
   "globs": ["research/**/*.md"],
-  // latest*/ entries are symlinks to a dated run dir; linting both the symlink
-  // view and the real dir would double-report. Ignore the symlink views.
-  "ignores": ["**/node_modules/**", "research/domains/**", "**/latest*/**"]
+  // latest*/ and domains/<d>/{clustering,resources,reports} are symlink views
+  // onto a dated run dir; linting both the view and the real dir would
+  // double-report. Ignore only the symlink views: the human-authored real files
+  // under domains/<d>/ (studies/, discussions/, README.md) are linted.
+  "ignores": [
+    "**/node_modules/**",
+    "research/domains/*/clustering/**",
+    "research/domains/*/resources/**",
+    "research/domains/*/reports/**",
+    "**/latest*/**"
+  ]
 }

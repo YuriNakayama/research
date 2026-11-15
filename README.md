@@ -5,7 +5,8 @@
 ## 構成
 
 ```
-research/  表示用リサーチ成果物（runs/<domain>/<phase>/..., append-only）
+research/  表示用リサーチ成果物（skill 出力: runs/<domain>/<phase>/..., append-only
+           / 人手の調査・議論: domains/<domain>/{studies,discussions}/）
 frontend/  Next.js (App Router, TypeScript) / レポート閲覧 UI（/research 配下で配信）
 infra/     Terraform（AWS: Cognito / Amplify / Secrets Manager / GitHub Actions OIDC）
 docs/      開発用ドキュメント（plans ほか）
@@ -17,7 +18,8 @@ dev/       開発用スクリプト（setup / format / lint / create-worktree）
 ## リサーチ成果物の追加
 
 - research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先は `research/runs/<domain>/<phase>/...`。配置ルールは [`research/README.md`](./research/README.md) を参照。
-- `research/**` は append-only。ファイル配置がそのまま viewer の公開 URL（`/research/...`）構造になる。
+- skill のフローに乗らない調査は `research/domains/<domain>/studies/<YYYYMMDD>-<slug>/`、論文・レビューへの議論は `research/domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` に置く（加筆修正可）。
+- `research/runs/**` は append-only。ファイル配置がそのまま viewer の公開 URL（`/research/...`）構造になる。
 - ドメインには `domain.yaml` の `tags` でタグを付ける。タグの付け直しやドメインの改名・統合・分離は、`research-housekeeping` skill を起動して行う（実行は `dev/research-admin`）。
 
 ## セットアップ

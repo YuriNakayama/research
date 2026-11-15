@@ -23,6 +23,11 @@ import { isRunDir, sortRunDirsDesc } from "./research-admin/run-dirs";
 // "newest version of each cluster". `runs/cate/retrieval/20260602/` only holds
 // two clusters while three others were last produced in `20260322`. Resolving
 // through the phase-level `latest` pointer alone would make those three vanish.
+//
+// `domains/<d>/` is also the home of the *human-authored* layer: real files and
+// directories that are not produced by the research skills (`studies/`,
+// `discussions/`, `domain.yaml`, `README.md`). Those are not virtual — they are
+// read straight from disk, alongside the virtual views above.
 
 const RESEARCH_ROOT = path.join(process.cwd(), "research");
 const RUNS_DIR = path.join(RESEARCH_ROOT, "runs");
@@ -166,24 +171,35 @@ export type DomainViewEntry = {
 export function listDomainViewEntries(slug: string[]): DomainViewEntry[] | null {
   if (slug[0] !== "domains") return null;
 
-  // `domains/<domain>`: the view directories, plus any real files that live
-  // alongside them (domain.yaml, README.md).
+  // `domains/<domain>`: the view directories, then the human-authored real
+  // directories (studies/, discussions/), then real Markdown files (README.md).
   if (slug.length === 2) {
     const domain = slug[1];
-    const entries: DomainViewEntry[] = listDomainViews(domain).map((view) => ({
+    const viewEntries: DomainViewEntry[] = listDomainViews(domain).map((view) => ({
       name: view,
       isDirectory: true,
       slug: [...slug, view],
     }));
 
-    for (const entry of safeReaddir(path.join(DOMAINS_DIR, domain))) {
-      if (entry.name.startsWith(".")) continue;
-      if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-      const name = entry.name.replace(/\.md$/, "");
-      entries.push({ name, isDirectory: false, slug: [...slug, name] });
-    }
+    const localEntries = safeReaddir(path.join(DOMAINS_DIR, domain)).filter(
+      (entry) => !entry.name.startsWith(".") && !isViewName(entry.name),
+    );
 
-    return entries;
+    // `Dirent.isDirectory()` is false for symlinks, so this only picks up real
+    // directories — exactly the human-authored layer.
+    const dirEntries: DomainViewEntry[] = localEntries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort((a, b) => a.localeCompare(b))
+      .map((name) => ({ name, isDirectory: true, slug: [...slug, name] }));
+
+    const fileEntries: DomainViewEntry[] = localEntries
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+      .map((entry) => entry.name.replace(/\.md$/, ""))
+      .sort((a, b) => a.localeCompare(b))
+      .map((name) => ({ name, isDirectory: false, slug: [...slug, name] }));
+
+    return [...viewEntries, ...dirEntries, ...fileEntries];
   }
 
   if (slug.length < 3) return null;
@@ -235,7 +251,8 @@ export function isDomainViewDirectory(slug: string[]): boolean {
   if (slug.length < 3) return false;
 
   const view = slug[2];
-  if (!isViewName(view)) return false;
+  // Human-authored directories (studies/, discussions/) are real on disk.
+  if (!isViewName(view)) return isDirectorySync(path.join(DOMAINS_DIR, ...slug.slice(1)));
 
   if (view !== "clustering" && slug.length === 3) {
     return resolveClusterDates(slug[1], VIEW_TO_PHASE[view]).size > 0;

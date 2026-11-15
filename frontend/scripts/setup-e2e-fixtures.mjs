@@ -65,6 +65,42 @@ Benchmark scores across legal NLP tasks (used by the resizable-table E2E test):
 This survey highlights the growing importance of NLP in the legal domain.
 `;
 
-fs.mkdirSync(REPORT_DIR, { recursive: true });
-fs.writeFileSync(REPORT_PATH, FIXTURE_REPORT, "utf-8");
-console.log(`[e2e-fixtures] wrote ${path.relative(process.cwd(), REPORT_PATH)}`);
+// Human-authored layer anchors: real files under `domains/<d>/` (studies/ and
+// discussions/), which the viewer reads from disk rather than deriving from
+// `runs/`. Dated 2000-01-01 so they never outrank real content on the home feed.
+const LOCAL_DOMAIN_DIR = path.join(RESEARCH_ROOT, "domains", "_e2e_fixture");
+
+const FIXTURE_LOCAL_FILES = {
+  "studies/20000101-sample-study/index.md": `# E2E Sample Study
+
+- **Type**: playbook
+
+## Background
+
+A study written by hand, outside the research skill flow.
+`,
+  "discussions/20000101-sample-discussion.md": `# E2E Sample Discussion
+
+## Target
+
+Discussion about [the fixture report](/research/_e2e_fixture/legal_tech/report/20260329).
+
+## Notes
+
+Discussions are mutable documents and may be rewritten over time.
+`,
+};
+
+const fixtureFiles = [
+  [REPORT_PATH, FIXTURE_REPORT],
+  ...Object.entries(FIXTURE_LOCAL_FILES).map(([relative, content]) => [
+    path.join(LOCAL_DOMAIN_DIR, relative),
+    content,
+  ]),
+];
+
+for (const [filePath, content] of fixtureFiles) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content, "utf-8");
+  console.log(`[e2e-fixtures] wrote ${path.relative(process.cwd(), filePath)}`);
+}

@@ -1,13 +1,14 @@
 # Research Directory Layout
 
-このディレクトリは research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先であり、viewer（`/research`）が配信する表示用リサーチ成果物領域です。**skill とユーザーは出力先を決める前に必ず本ファイルを読んでください**。
+このディレクトリは research 系 skill (`research-clustering` / `research-gather` / `research-retrieval`) の出力先であり、skill のフローに乗らない人手の調査・議論の置き場でもあります。viewer（`/research`）が配信する表示用リサーチ成果物領域です。**skill とユーザーは出力先を決める前に必ず本ファイルを読んでください**。
 
 ## 設計原則
 
 1. **`runs/` は append-only** — 実行のたびに新しいディレクトリを追加し、過去のものは書き換えません。これが source of truth です。
-2. **`domains/` は最新ビュー** — 各ドメインの最新成果物を見やすく整理した参照用レイヤー。`runs/` 内の最新版を指すシンボリックリンクで構成します。
+2. **`domains/` は最新ビュー + 人手の層** — `runs/` の最新版を指すシンボリックリンク（`clustering` / `resources/` / `reports/`）と、人が書く実ファイル（`domain.yaml` / `README.md` / `studies/` / `discussions/`）で構成します。
 3. **同一ドメインで `clustering` は複数回実行され得る** — 再クラスタリングで構造が変わった場合も過去の run は残し、`latest` ポインタだけを更新します。
-4. **phase は3種固定**: `clustering` / `gather` / `retrieval`
+4. **skill の phase は3種固定**: `clustering` / `gather` / `retrieval`（`runs/` 配下）
+5. **skill 外の成果物は `domains/<domain>/` に実ファイルで置く** — skill のフローに乗らない調査は `studies/`、論文・レビューへの議論は `discussions/`。`runs/` には書きません。
 
 ## ディレクトリ構成
 
@@ -20,14 +21,21 @@ phase ごとに **1本** で、最新の日付ディレクトリを指します�
 research/
 ├── README.md                                # このファイル（構成の単一情報源）
 │
-├── domains/                                 # 【最新ビュー】ドメイン中心
+├── domains/                                 # 【最新ビュー + 人手の層】ドメイン中心
 │   └── <domain>/
 │       ├── domain.yaml                      # ドメインメタ（任意・存在すれば skill が読む）
-│       ├── clustering -> ../../runs/<domain>/clustering/latest
-│       ├── resources/                       # 各クラスタの最新リソース一覧
+│       ├── README.md                        # ドメインの概要（任意）
+│       ├── clustering -> ../../runs/<domain>/clustering/latest      # symlink
+│       ├── resources/                       # symlink: 各クラスタの最新リソース一覧
 │       │   └── <cluster> -> ../../../runs/<domain>/gather/<YYYYMMDD>/<cluster>
-│       └── reports/                         # 各クラスタの最新詳細レポート
-│           └── <cluster> -> ../../../runs/<domain>/retrieval/<YYYYMMDD>/<cluster>
+│       ├── reports/                         # symlink: 各クラスタの最新詳細レポート
+│       │   └── <cluster> -> ../../../runs/<domain>/retrieval/<YYYYMMDD>/<cluster>
+│       ├── studies/                         # 実ファイル: skill 外の調査
+│       │   └── <YYYYMMDD>-<slug>/
+│       │       ├── index.md
+│       │       └── *.md
+│       └── discussions/                     # 実ファイル: 論文・レビューへの議論
+│           └── <YYYYMMDD>-<slug>.md
 │
 └── runs/                                    # 【実行履歴】append-only
     └── <domain>/
@@ -97,9 +105,9 @@ dev/sync-domain-links           # 再生成
 dev/sync-domain-links --check   # 差分があれば exit 1（CI 向け）
 ```
 
-### `domains/` は表示の正しさに関与しない
+### `domains/` のシンボリックリンクは表示の正しさに関与しない
 
-viewer は `domains/` のシンボリックリンクを**読みません**。`/research/domains/...` の内容は
+viewer は `domains/` のシンボリックリンクを**読みません**（実ファイルの `studies/` / `discussions/` / `domain.yaml` / `README.md` はそのまま読みます）。`/research/domains/...` の内容は
 リクエスト時に `runs/` から同じ規則で導出されます（`frontend/src/lib/domain-view.ts`）。
 
 理由は 2 つあります。
@@ -112,6 +120,20 @@ viewer は `domains/` のシンボリックリンクを**読みません**。`/r
 したがって `domains/` のリンクが古くても・壊れていても・存在しなくても、**公開される
 表示内容は常に正しい**。リンクは git やファイラで人がドメインを辿るための便宜であり、
 ずれた場合は `dev/sync-domain-links` で直せます。
+
+## 人手の層（`studies/` / `discussions/`）
+
+`domains/<domain>/` 配下の実ファイルとして置く、skill の出力ではない成果物です。`dev/sync-domain-links` は `clustering` / `resources/` / `reports/` のシンボリックリンクしか操作しないため、これらに影響しません（studies 内に置いた symlink も含む）。
+
+| 種別 | 置き場所 | 用途 | 更新 |
+|---|---|---|---|
+| studies | `domains/<domain>/studies/<YYYYMMDD>-<slug>/` | skill のフローに乗らない調査（プレイブック、手作業の文献整理、実験、仕様整理、メモなど） | 新しい調査は新しいディレクトリで追加。既存ディレクトリの加筆修正は可 |
+| discussions | `domains/<domain>/discussions/<YYYYMMDD>-<slug>.md` | 論文・レビュー（`runs/` の成果物や studies）に対する議論 | 書き換え可 |
+
+- **studies** の入口は `index.md`。冒頭のメタデータ行に `- **Type**: playbook | survey | experiment | spec | memo` を書きます。
+- **discussions** は冒頭で対象を `/research/...` リンクで示します（例: `/research/runs/<domain>/retrieval/<YYYYMMDD>/<cluster>/01-foo`）。
+- `<YYYYMMDD>` は作成日。ホームの新着はこの日付で並びます（`studies/` / `discussions/` の一覧とサイドバーは名前順）。
+- skill の run が存在しないドメインでも、`domains/<domain>/` を作って studies / discussions だけを置けます。
 
 ## ドメインメタファイル `domain.yaml`（任意）
 
@@ -143,6 +165,8 @@ output_paths:
 | クラスタディレクトリ | `<YYYYMMDD>/<cluster>`（gather / retrieval）        | `20260330/metalearner`      |
 | レポートファイル | `NN-kebab-case.md`（NN = 0埋め連番）                     | `01-causal-forest.md`       |
 | index ファイル | `index.md`                                                | -                           |
+| study ディレクトリ | `<YYYYMMDD>-<kebab-case>/`（`domains/<domain>/studies/` 配下） | `20261115-deck-playbook/` |
+| discussion ファイル | `<YYYYMMDD>-<kebab-case>.md`（`domains/<domain>/discussions/` 配下） | `20261115-causal-forest-review.md` |
 
 ## phase 定義
 

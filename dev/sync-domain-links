@@ -16,6 +16,10 @@ Clusters are resolved individually because a run does not necessarily re-run
 every cluster: the newest run directory is not the newest version of each
 cluster.
 
+Only symlinks are touched. `domains/<d>/` also holds the human-authored layer as
+real files (`domain.yaml`, `README.md`, `studies/`, `discussions/`); this script
+never creates, rewrites or removes those.
+
 Usage:
   dev/sync-domain-links           # apply
   dev/sync-domain-links --check   # exit 1 if anything would change (CI)
@@ -91,12 +95,33 @@ def desired_links() -> dict[Path, str]:
     return links
 
 
+# The symlink view entries this script owns. Anything else under `domains/<d>/`
+# (studies/, discussions/, ...) is the human-authored layer and is left alone,
+# including any symlinks a person places there.
+VIEW_ROOTS = ("clustering", *VIEWS)
+
+
 def current_links() -> dict[Path, str]:
-    """Every symlink that exists under `domains/` today."""
+    """Every view symlink that exists under `domains/<d>/` today."""
     found: dict[Path, str] = {}
     if not DOMAINS.is_dir():
         return found
-    for dirpath, dirnames, filenames in os.walk(DOMAINS):
+    for domain_dir in sorted(DOMAINS.iterdir()):
+        if not domain_dir.is_dir() or domain_dir.is_symlink():
+            continue
+        for root in VIEW_ROOTS:
+            path = domain_dir / root
+            if path.is_symlink():
+                found[path] = os.readlink(path)
+            elif path.is_dir():
+                found.update(_walk_links(path))
+    return found
+
+
+def _walk_links(base: Path) -> dict[Path, str]:
+    """Symlinks below a real view directory such as `domains/<d>/reports/`."""
+    found: dict[Path, str] = {}
+    for dirpath, dirnames, filenames in os.walk(base):
         for name in list(dirnames) + filenames:
             p = Path(dirpath) / name
             if p.is_symlink():

@@ -27,14 +27,14 @@ Orbit Wars の bot を **教師あり模倣学習 (Behavior Cloning)** で構築
 | 06 | [amount-prediction-strategies.md](./06-amount-prediction-strategies.md) | 「射出量 0〜N」の予測戦略（連続回帰 / 離散ビン / fraction / pointer / token decoder） |
 | 07 | [imitation-learning-pitfalls.md](./07-imitation-learning-pitfalls.md) | BC 特有の落とし穴（compounding error / mode collapse / multi-modal expert / DAgger） |
 | 08 | [orbit-wars-recommended-design.md](./08-orbit-wars-recommended-design.md) | 上記を統合した Orbit Wars 推奨アーキテクチャと段階的実装プラン |
-| 09 | [current-impl-knn-evaluation.md](./09-current-impl-knn-evaluation.md) | **現状実装（近傍 K=7 + NOOP の 8-class、ships ルールベース）の評価と改訂プラン** |
-| 10 | [backbone-training-log-comparison.md](./10-backbone-training-log-comparison.md) | **case1/3/4/5/8 の backbone × head × 学習ログの実測比較（DVC キャッシュから復元）** |
+| 09 | [current-impl-knn-evaluation.md](../../../../../domains/kaggle_orbit_wars/studies/20260502-imitation-learning-eval/09-current-impl-knn-evaluation.md) | **現状実装（近傍 K=7 + NOOP の 8-class、ships ルールベース）の評価と改訂プラン** |
+| 10 | [backbone-training-log-comparison.md](../../../../../domains/kaggle_orbit_wars/studies/20260502-imitation-learning-eval/10-backbone-training-log-comparison.md) | **case1/3/4/5/8 の backbone × head × 学習ログの実測比較（DVC キャッシュから復元）** |
 
 ## 現状実装の位置づけ（2026-05-02 追記）
 
 現状の Orbit Wars 実装は **「近傍 K=7 planet + NOOP の 8-class softmax、ships 量はルールベース固定値」** という設計を採用しており、これは学習の平易化（次元圧縮 + タスク直交分解 + inductive bias 注入）を狙った極めて妥当な Phase 0 baseline。
 
-本ランの 01〜08 章は「Pointer Network + Autoregressive 3-head」という理論最適形を扱うが、**現状実装からそこへの移行は段階的に行うべき** で、その評価と改訂プランは [09 章](./09-current-impl-knn-evaluation.md) に整理した。
+本ランの 01〜08 章は「Pointer Network + Autoregressive 3-head」という理論最適形を扱うが、**現状実装からそこへの移行は段階的に行うべき** で、その評価と改訂プランは [09 章](../../../../../domains/kaggle_orbit_wars/studies/20260502-imitation-learning-eval/09-current-impl-knn-evaluation.md) に整理した。
 
 要点:
 - 現状実装は `08` 章の Phase 1 baseline と同じ哲学（むしろ更に保守的）

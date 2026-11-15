@@ -89,7 +89,9 @@ function buildTree(
       children: virtualEntries.map((entry) =>
         entry.isDirectory
           ? buildTree(
-              fullPath,
+              // Virtual views ignore this path, but real directories under
+              // `domains/<d>/` (studies/, discussions/) are read from it.
+              resolveDocsPath(entry.slug),
               entry.name,
               `${urlPath}/${entry.name}`,
               entry.slug,

@@ -37,17 +37,17 @@ dev/research-admin report          # 機械向けは --json
 
 - `check` の error は先に直す（`domain.yaml` が無いドメインは手順 3 でタグと一緒に作る）。
 - `report` の見どころ:
-  - `[tags stale]`: タグ未設定、または `tags_reviewed` より新しい run がある → 手順 3 の対象
+  - `[tags stale]`: タグ未設定、または `tags_reviewed` より新しい run / study / discussion がある → 手順 3 の対象
   - `Overlap candidates`: gather で集めた URL やタグが重なるペア → 統合の候補
   - `Tags`: 1 ドメインにしか付いていないタグ、半分以上に付いているタグ → タグ辞書の見直し候補
 
 ### 3. タグを決める（ドメイン単位・全ファイルを総合）
 
-対象ドメインごとに、**全 phase・全日付の index と、`domains/<d>/` の実ファイル**（`README.md` など）を読む。最低限:
+対象ドメインごとに、**全 phase・全日付の index と、`domains/<d>/` の人手の層**（studies / discussions / README.md）を読む。最低限:
 
 - `runs/<d>/clustering/*/index.md`（全日付）
 - `runs/<d>/gather/*/*/` と `runs/<d>/retrieval/*/*/index.md`
-- `domains/<d>/README.md` と、`domains/<d>/` にあるそのほかの実ファイル
+- `domains/<d>/studies/*/index.md`、`domains/<d>/discussions/*.md`、`domains/<d>/README.md`
 
 そのうえで:
 
@@ -60,11 +60,11 @@ dev/research-admin report          # 機械向けは --json
 | 操作 | 判断の目安 |
 |---|---|
 | 統合（merge） | 同じ対象（同じコンペ・同じ製品・同じ問い）を別の観点で調べている。URL の重複が多い |
-| 分離（split） | 1 ドメインの中に、互いにほとんど関係しない run がある |
+| 分離（split） | 1 ドメインの中に、互いにほとんど関係しない run や study がある |
 | 改名（rename） | フォルダ名が中身を表していない。表示名だけで足りるなら `title` を使う |
 | タグ id の改名・統合 | 同義のタグがある、粒度がそろっていない |
 
-統合では、統合先は内容が広いほう・既存リンクが多いほうにする。統合元と統合先の両方に `README.md` があるなどの衝突は dry-run が conflicts として出すので、解消案もあわせて提案する。
+統合では、統合先は内容が広いほう・既存リンクが多いほうにする。統合元と統合先の両方に `README.md` がある、同名の study があるなどの衝突は dry-run が conflicts として出すので、解消案もあわせて提案する。
 
 ### 5. 提案して承認を得る
 

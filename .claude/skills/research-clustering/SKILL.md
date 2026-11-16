@@ -341,7 +341,7 @@ If "Deep-dive into a specific cluster" is selected, show a follow-up AskUserQues
    - Output `index.md` and `cluster-NN-*.md` files inside this directory.
    - `<YYYYMMDD>` is today's date (UTC or JST is acceptable, use whichever the pipeline uses).
    - clustering は日付ディレクトリ単位で、クラスタサブディレクトリは持ちません（gather / retrieval のみ `<YYYYMMDD>/<cluster>/`）。
-4. **Never write directly under `research/domains/<domain>/`** — that layer is composed of symlinks pointing into `runs/`.
+4. **Never write skill output under `research/domains/<domain>/`** — `clustering` there is a symlink view into `runs/`. Real files under `research/domains/<domain>/` (`domain.yaml`, `README.md`, `studies/`, `discussions/`) are the human-authored layer: read `domain.yaml`, but never create or modify the others from this skill.
 5. **Never overwrite or modify existing files under `runs/<domain>/clustering/<old_date>/`** — clustering is append-only. Re-clustering creates a NEW dated directory.
 
 ### After writing
@@ -359,6 +359,24 @@ dev/sync-domain-links
 nothing to set up by hand. Note the viewer does not read those links at all — it derives
 the same view from `runs/` at request time — so they are a browsing convenience and a
 stale link never breaks the site.
+
+**New domain → create `domain.yaml`.** Every domain must have
+`research/domains/<domain>/domain.yaml` (`dev/research-admin check` fails without it, and CI
+runs that check). If this run created a new domain, create the file with only these keys:
+
+```yaml
+domain: <domain>                 # must equal the folder name
+display_name: <short human-readable name>
+tags: []
+```
+
+Leave `tags` empty: tags are assigned later from the whole domain by the
+`research-housekeeping` skill, and only ids defined in `research/_meta/tags.yaml` are allowed.
+Do not otherwise edit an existing `domain.yaml` from this skill. Finally confirm:
+
+```bash
+dev/research-admin check   # must report 0 error(s)
+```
 
 ## Parallel Processing
 

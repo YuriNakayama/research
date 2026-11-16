@@ -26,11 +26,11 @@ python-review	c8024036e765cde6
 python-tdd	d565c344311b69de
 release-tag	99eada6b05d5851a
 remove-unused	ec87092be5b707f0
-research-clustering	e1125ca2c95d5c8f
-research-gather	fdd443a90e524546
-research-housekeeping	ac812d4059441011
+research-clustering	bc6cf0248dc62cf4
+research-gather	0d2f636dbe83b5a0
+research-housekeeping	8689ff865ba094d2
 research-prompt-builder	787ae61ca88366c5
-research-retrieval	b197e07fa678b5ea
+research-retrieval	980fdca3da00d781
 skill-creator	af87e51188444b28
 skill-list	a5a08ef48b56485c
 tdd	281c8b7dcdf6a840

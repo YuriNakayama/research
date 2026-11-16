@@ -733,7 +733,7 @@ If "Revise specific reports" is selected, present a follow-up AskUserQuestion wi
 
    - Place `index.md` and per-resource files (`NN-kebab-case-name.md`) inside this directory.
    - Multiple clusters retrieved on the same day share one `<YYYYMMDD>/` directory, each in its own `<cluster>/` subdirectory.
-5. **Never write directly under `research/domains/<domain>/reports/`** — that layer is symlinks.
+5. **Never write directly under `research/domains/<domain>/reports/`** — that layer is symlinks. Real files under `research/domains/<domain>/` (`domain.yaml`, `README.md`, `studies/`, `discussions/`) are the human-authored layer: read `domain.yaml`, but never create or modify the others from this skill.
 6. **Never overwrite previous retrieval runs** — append-only.
 
 ### After writing
@@ -754,6 +754,24 @@ Do not hand-write links under `domains/`: `dev/sync-domain-links` derives them f
 `runs/`, pointing each cluster at the newest date directory that contains it. Note the
 viewer does not read those links at all — it derives the same view from `runs/` at request
 time — so they are a browsing convenience and a stale link never breaks the site.
+
+**New domain → create `domain.yaml`.** Every domain must have
+`research/domains/<domain>/domain.yaml` (`dev/research-admin check` fails without it, and CI
+runs that check). If this run created a new domain, create the file with only these keys:
+
+```yaml
+domain: <domain>                 # must equal the folder name
+display_name: <short human-readable name>
+tags: []
+```
+
+Leave `tags` empty: tags are assigned later from the whole domain by the
+`research-housekeeping` skill, and only ids defined in `research/_meta/tags.yaml` are allowed.
+Do not otherwise edit an existing `domain.yaml` from this skill. Finally confirm:
+
+```bash
+dev/research-admin check   # must report 0 error(s)
+```
 
 ### Filename conventions
 
